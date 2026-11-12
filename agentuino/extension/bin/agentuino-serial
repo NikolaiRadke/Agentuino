@@ -1,0 +1,6 @@
+#!/bin/sh
+# Agentuino: read the serial output of the board for a fixed time.
+# Runs serial-read.js with the Node runtime of the Arduino IDE (AGENTUINO_NODE),
+# so nothing has to be installed. Usage: agentuino-serial --seconds 10 --baud 9600
+NODE="${AGENTUINO_NODE:-node}"
+ELECTRON_RUN_AS_NODE=1 exec "$NODE" "$(dirname "$0")/serial-read.js" "$@"

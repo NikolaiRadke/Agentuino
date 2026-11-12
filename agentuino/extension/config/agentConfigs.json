@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "version": "2026-11-12",
+  "agents": {
+    "claudecode": {
+      "name": "Claude Code",
+      "command": "claude",
+      "versionArgs": ["--version"],
+      "helpArgs": [["--help"]],
+      "installUrl": "https://code.claude.com",
+      "install": {
+        "unix": "curl -fsSL https://claude.ai/install.sh | bash",
+        "windows": "irm https://claude.ai/install.ps1 | iex"
+      },
+      "setupCommand": "claude",
+      "loginHint": "claude → /login",
+      "candidates": {
+        "unix": [
+          "{home}/.local/bin/claude",
+          "{home}/.claude/local/claude",
+          "{home}/.npm-global/bin/claude",
+          "/usr/local/bin/claude",
+          "/opt/homebrew/bin/claude",
+          "/usr/bin/claude"
+        ],
+        "windows": [
+          "{home}/.local/bin/claude.exe",
+          "{appData}/npm/claude.cmd"
+        ]
+      },
+      "args": {
+        "base": ["-p", "--output-format", "stream-json", "--verbose"],
+        "instructions": ["--append-system-prompt-file", "{file}"],
+        "permissions": {
+          "bypassPermissions": ["--permission-mode", "bypassPermissions"],
+          "acceptEdits": ["--permission-mode", "acceptEdits"],
+          "auto": ["--permission-mode", "auto"]
+        },
+        "model": ["--model", "{model}"],
+        "resume": ["--resume", "{session}"]
+      },
+      "sessionNotFound": "no conversation found",
+      "titleModel": "haiku"
+    },
+    "codex": {
+      "name": "Codex CLI",
+      "experimental": true,
+      "command": "codex",
+      "versionArgs": ["--version"],
+      "helpArgs": [["exec", "--help"], ["exec", "resume", "--help"]],
+      "installUrl": "https://github.com/openai/codex",
+      "install": {
+        "unix": "npm install -g @openai/codex",
+        "windows": "npm install -g @openai/codex"
+      },
+      "setupCommand": "codex login",
+      "loginHint": "codex login",
+      "candidates": {
+        "unix": [
+          "{home}/.npm-global/bin/codex",
+          "{home}/.local/bin/codex",
+          "/usr/local/bin/codex",
+          "/opt/homebrew/bin/codex",
+          "/usr/bin/codex"
+        ],
+        "windows": [
+          "{appData}/npm/codex.cmd"
+        ]
+      },
+      "args": {
+        "base": ["exec", "--json", "--skip-git-repo-check", "--color", "never"],
+        "permissions": {
+          "bypassPermissions": ["--dangerously-bypass-approvals-and-sandbox"],
+          "acceptEdits": ["--sandbox", "workspace-write"],
+          "auto": ["--approve-for-me"]
+        },
+        "model": ["--model", "{model}"],
+        "resume": ["resume", "{session}"],
+        "tail": ["-"]
+      },
+      "sessionNotFound": "no (conversation|session|thread|rollout) found|not found",
+      "authError": "401|unauthori[sz]ed|not logged in|login required|api key"
+    },
+    "vibe": {
+      "name": "Mistral Vibe",
+      "command": "vibe",
+      "versionArgs": ["--version"],
+      "helpArgs": [["--help"]],
+      "minVersion": "3.0.0",
+      "updateHint": "uv tool upgrade mistral-vibe",
+      "installUrl": "https://docs.mistral.ai/vibe",
+      "install": {
+        "unix": "curl -LsSf https://mistral.ai/vibe/install.sh | bash",
+        "windows": "uv tool install mistral-vibe"
+      },
+      "setupCommand": "vibe --setup",
+      "loginHint": "vibe --setup",
+      "candidates": {
+        "unix": [
+          "{home}/.local/bin/vibe",
+          "/usr/local/bin/vibe",
+          "/opt/homebrew/bin/vibe",
+          "/usr/bin/vibe"
+        ],
+        "windows": [
+          "{home}/.local/bin/vibe.exe"
+        ]
+      },
+      "args": {
+        "base": ["-p", "--output", "streaming", "--trust", "--output-dir", "{runDir}"],
+        "permissions": {
+          "bypassPermissions": ["--auto-approve"],
+          "acceptEdits": ["--agent", "accept-edits"],
+          "auto": ["--smart-approve"]
+        },
+        "model": ["--model", "{model}"],
+        "modelOnNewSession": true,
+        "resume": ["--resume", "{session}"]
+      },
+      "sessionNotFound": "session.*not found|no session",
+      "authError": "401|unauthori[sz]ed|api key|setup|credential|login"
+    }
+  }
+}

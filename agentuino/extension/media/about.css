@@ -1,0 +1,197 @@
+/*
+ * Agentuino - About Page Styles
+ * Copyright 2026 Monster Maker
+ *
+ * Licensed under the Apache License, Version 2.0
+ */
+
+:root {
+    --accent: #01B6B8;
+    --radius: 8px;
+}
+
+body {
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size);
+    color: var(--vscode-foreground);
+    background: var(--vscode-editor-background);
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.page {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.logo {
+    margin: 10px 0 5px;
+}
+
+h1 {
+    color: var(--accent);
+    margin: 0;
+}
+
+h3 {
+    color: var(--accent);
+    margin-top: 0;
+}
+
+.version {
+    font-size: 1.4em;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 10px;
+}
+
+.tagline {
+    margin-bottom: 20px;
+}
+
+.box {
+    background: var(--vscode-editorWidget-background);
+    border: 1px solid var(--vscode-panel-border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin: 16px 0;
+    text-align: left;
+}
+
+.box p {
+    margin: 6px 0;
+}
+
+.hint {
+    font-size: 0.9em;
+    opacity: 0.75;
+}
+
+.shortcut {
+    font-family: var(--vscode-editor-font-family);
+    background: var(--vscode-textCodeBlock-background);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+.agent-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    border-top: 1px solid var(--vscode-panel-border);
+}
+
+.agent-name {
+    flex: 0 0 11em;
+    font-weight: bold;
+}
+
+.agent-status {
+    flex: 1;
+}
+
+.status-ok {
+    color: var(--vscode-testing-iconPassed, #4CAF50);
+}
+
+.status-missing {
+    opacity: 0.7;
+}
+
+.status-tooOld {
+    color: var(--vscode-editorWarning-foreground, #CCA700);
+}
+
+.badge {
+    font-size: 0.75em;
+    font-weight: normal;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--vscode-badge-background);
+    color: var(--vscode-badge-foreground);
+}
+
+.details {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 2px 12px;
+    font-size: 0.9em;
+    margin-bottom: 12px;
+    word-break: break-all;
+}
+
+.details .key {
+    opacity: 0.7;
+}
+
+.license {
+    background: var(--vscode-textBlockQuote-background);
+    padding: 12px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-family: var(--vscode-editor-font-family);
+}
+
+.credits {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid var(--vscode-panel-border);
+}
+
+.credits p {
+    margin: 4px 0;
+}
+
+button {
+    font-family: inherit;
+    font-size: inherit;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 12px;
+    cursor: pointer;
+    color: var(--vscode-button-foreground);
+    background: var(--vscode-button-background);
+}
+
+button.secondary {
+    color: var(--vscode-button-secondaryForeground);
+    background: var(--vscode-button-secondaryBackground);
+}
+
+button.link {
+    background: none;
+    padding: 0;
+    color: var(--vscode-textLink-foreground);
+}
+
+button.link:hover {
+    text-decoration: underline;
+}
+
+.support {
+    text-align: center;
+}
+
+.support-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+button.support {
+    padding: 8px 18px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+button.kofi {
+    background: #FF5E5B;
+}
+
+button.sponsor {
+    background: #DB61A2;
+}

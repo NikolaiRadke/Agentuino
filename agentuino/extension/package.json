@@ -1,0 +1,202 @@
+{
+  "name": "agentuino",
+  "displayName": "Agentuino",
+  "description": "Agentic coding for Arduino beginners: chat with Claude Code, Codex CLI or Mistral Vibe directly in the Arduino IDE.",
+  "version": "0.6.0",
+  "license": "Apache-2.0",
+  "publisher": "NikolaiRadke",
+  "icon": "icons/agentuino.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NikolaiRadke/Agentuino"
+  },
+  "homepage": "https://github.com/NikolaiRadke/Agentuino",
+  "bugs": {
+    "url": "https://github.com/NikolaiRadke/Agentuino/issues"
+  },
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other",
+    "Education"
+  ],
+  "keywords": [
+    "arduino",
+    "arduinoIDE",
+    "ai",
+    "agent",
+    "agentic",
+    "claude",
+    "claude code",
+    "embedded",
+    "microcontroller",
+    "beginner",
+    "codex",
+    "mistral",
+    "vibe"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "agentuino.openChat",
+        "title": "Open Chat",
+        "category": "Agentuino",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "agentuino.setupProject",
+        "title": "Set Up Project",
+        "category": "Agentuino"
+      },
+      {
+        "command": "agentuino.newChat",
+        "title": "New Chat",
+        "category": "Agentuino"
+      },
+      {
+        "command": "agentuino.addKnowledge",
+        "title": "Add Knowledge File",
+        "category": "Agentuino"
+      },
+      {
+        "command": "agentuino.openMemory",
+        "title": "View Project Memory",
+        "category": "Agentuino"
+      },
+      {
+        "command": "agentuino.openInstructions",
+        "title": "Edit Project Instructions",
+        "category": "Agentuino"
+      },
+      {
+        "command": "agentuino.switchLanguage",
+        "title": "Switch Language",
+        "category": "Agentuino"
+      },
+      {
+        "command": "agentuino.settings",
+        "title": "Settings",
+        "category": "Agentuino"
+      },
+      {
+        "command": "agentuino.about",
+        "title": "About",
+        "category": "Agentuino"
+      },
+      {
+        "command": "agentuino.chooseAgent",
+        "title": "Choose Agent",
+        "category": "Agentuino"
+      },
+      {
+        "command": "agentuino.uninstall",
+        "title": "Uninstall",
+        "category": "Agentuino"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "agentuino.openChat",
+        "key": "ctrl+alt+a",
+        "mac": "cmd+alt+a"
+      }
+    ],
+    "configuration": {
+      "title": "Agentuino",
+      "properties": {
+        "agentuino.language": {
+          "type": "string",
+          "default": "auto",
+          "description": "UI language. 'auto' follows the IDE language. Available languages are detected from the locales folder."
+        },
+        "agentuino.agent": {
+          "type": "string",
+          "default": "auto",
+          "enum": [
+            "auto",
+            "claudecode",
+            "codex",
+            "vibe"
+          ],
+          "enumDescriptions": [
+            "First installed agent: Claude Code, Codex CLI, Mistral Vibe",
+            "Claude Code",
+            "Codex CLI",
+            "Mistral Vibe"
+          ],
+          "description": "Agent for new chats. Existing chats keep their agent."
+        },
+        "agentuino.compileCheck": {
+          "type": "boolean",
+          "default": true,
+          "description": "Compile the sketch after every agent run that changed code and show the result in the chat (flash and RAM usage or errors)."
+        },
+        "agentuino.permissionMode": {
+          "type": "string",
+          "default": "bypassPermissions",
+          "enum": [
+            "bypassPermissions",
+            "acceptEdits",
+            "auto"
+          ],
+          "description": "What the agent may do without asking. 'bypassPermissions' lets it edit files and compile freely (recommended, compiling needs it). 'acceptEdits' only allows file edits, 'auto' lets the agent's own safety check decide."
+        },
+        "agentuino.claudePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the Claude Code executable. Leave empty for auto-detection."
+        },
+        "agentuino.claudeModel": {
+          "type": "string",
+          "default": "",
+          "description": "Claude model (e.g. 'sonnet', 'opus'). Leave empty to use the Claude Code default."
+        },
+        "agentuino.codexPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Codex CLI. Leave empty for auto-detection."
+        },
+        "agentuino.codexModel": {
+          "type": "string",
+          "default": "",
+          "description": "Codex model (e.g. 'gpt-5.5'). Leave empty to use the Codex default."
+        },
+        "agentuino.vibePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Mistral Vibe. Leave empty for auto-detection."
+        },
+        "agentuino.vibeModel": {
+          "type": "string",
+          "default": "",
+          "description": "Mistral Vibe model alias. Leave empty to use Vibe's active model."
+        },
+        "agentuino.arduinoCliPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to arduino-cli. Leave empty to use the one bundled with the Arduino IDE."
+        },
+        "agentuino.checkForUpdates": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check at startup for new Agentuino versions and agent configurations. Nothing is downloaded and stored without asking."
+        },
+        "agentuino.skipUpdateVersion": {
+          "type": "string",
+          "default": "",
+          "description": "Version for which no update notice is shown (set by 'Skip this version')."
+        },
+        "agentuino.skipConfigVersion": {
+          "type": "string",
+          "default": "",
+          "description": "Agent configuration for which no update notice is shown (set by 'Skip this version')."
+        }
+      }
+    }
+  }
+}
