@@ -8,6 +8,7 @@
   "menu": {
     "addKnowledge": "📚 Wissensdatei hinzufügen",
     "openInstructions": "📝 Projektanweisungen bearbeiten",
+    "rules": "⚓ Regelbausteine",
     "switchLanguage": "🌐 Sprache wechseln",
     "title": "Agentuino",
     "openMemory": "🧠 Projektgedächtnis ansehen",
@@ -177,7 +178,8 @@
         "- Mit `--send \"Text\"` schickst du nach dem Start eine Zeile an den Sketch (für `Serial.read()`).",
         "- Meldet der Befehl einen belegten Port oder kommt nach einem Upload nichts an, hält vermutlich der serielle Monitor der IDE den Port. Bitte den Nutzer, ihn einmal zu öffnen und wieder zu schließen oder die Debug-Sitzung zu beenden.",
         "- Wurde mit „Für Debugging optimieren“ (Optimize for Debugging, ArduDebug) hochgeladen, gehört der serielle Port dem Debugger und der Monitor zeigt nur unlesbare Zeichen. Werte sie nicht aus, sondern bitte den Nutzer, ohne diese Option hochzuladen."
-      ]
+      ],
+      "codeRulesTitle": "## Regeln für den Code"
     }
   },
   "about": {
@@ -205,6 +207,85 @@
     "config": {
       "bundled": "mitgeliefert",
       "downloaded": "heruntergeladen"
+    }
+  },
+  "rules": {
+    "pageTitle": "Regelbausteine",
+    "title": "⚓ Regelbausteine",
+    "forSketch": "Für den Sketch {0}",
+    "noSketch": "Kein Sketch geöffnet: Hier legst du den Standard für neue Sketche fest.",
+    "intro": "Angehakte Bausteine stehen als Regeln in den Projektanweisungen (AGENTS.md) und gelten ab der nächsten Nachricht. Die Sicherheitsregeln, etwa nie von selbst hochzuladen, gelten immer.",
+    "groups": {
+      "basic": "Grundlagen",
+      "pro": "Fortgeschritten",
+      "workflow": "Arbeitsweise",
+      "custom": "Eigene Bausteine"
+    },
+    "customHint": "Eigene Bausteine stehen in allen Sketchen zur Auswahl.",
+    "noCustom": "Noch keine eigenen Bausteine.",
+    "add": "+ Neuer Baustein",
+    "labelField": "Name",
+    "textField": "Regel für den Agenten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "deleteConfirm": "Baustein „{0}“ löschen? Er verschwindet aus allen Sketchen.",
+    "saveDefaults": "Als Standard für neue Sketche speichern",
+    "applyDefaults": "Standard übernehmen",
+    "defaultsSaved": "Als Standard für neue Sketche gespeichert.",
+    "defaultsApplied": "Standard übernommen.",
+    "saved": "Gespeichert ✓",
+    "missing": "Name und Regel dürfen nicht leer sein.",
+    "blocks": {
+      "beginnerComments": {
+        "label": "Einsteigerfreundliche Kommentare",
+        "text": "Kommentiere den Code einsteigerfreundlich: Erkläre in kurzen Kommentaren, was die einzelnen Abschnitte tun und warum."
+      },
+      "noMagicNumbers": {
+        "label": "Keine Magic Numbers",
+        "text": "Keine Magic Numbers: Lege Pins, Zeiten und Grenzwerte als benannte Konstanten am Anfang des Sketches an."
+      },
+      "nonBlocking": {
+        "label": "Nicht blockierend",
+        "text": "Schreibe nicht blockierenden Code: Miss Zeiten mit `millis()` statt `delay()`, damit der Sketch reaktionsfähig bleibt."
+      },
+      "lowRam": {
+        "label": "Sparsam mit RAM",
+        "text": "Gehe sparsam mit dem Arbeitsspeicher um: kleine Datentypen, keine unnötigen Puffer, globale Variablen nur wenn nötig."
+      },
+      "defensive": {
+        "label": "Defensiv programmieren",
+        "text": "Programmiere defensiv: Prüfe Rückgabewerte, Sensorwerte und Eingaben auf Plausibilität und fange Fehler ab."
+      },
+      "isrSafe": {
+        "label": "Interrupt-sicher",
+        "text": "Halte Interrupt-Routinen kurz, deklariere gemeinsam genutzte Variablen als `volatile` und verwende in Interrupts weder `Serial` noch `delay()`."
+      },
+      "noDynamicMemory": {
+        "label": "Kein String, kein malloc",
+        "text": "Verwende keine dynamische Speicherverwaltung: kein `String`, kein `malloc` oder `new`. Nutze feste `char`-Arrays."
+      },
+      "flashStrings": {
+        "label": "Texte im Flash",
+        "text": "Lege feste Texte mit `F()` oder `PROGMEM` im Flash ab statt im RAM."
+      },
+      "fixedWidthTypes": {
+        "label": "Feste Datentypen",
+        "text": "Verwende Datentypen mit fester Breite wie `uint8_t`, `int16_t` oder `uint32_t` statt `int` und `long`."
+      },
+      "explainChanges": {
+        "label": "Änderungen zusammenfassen",
+        "text": "Fasse am Ende kurz zusammen, was du geändert hast und warum."
+      },
+      "keepStyle": {
+        "label": "Stil beibehalten",
+        "text": "Behalte Formatierung, Einrückung und Benennung des vorhandenen Codes bei. Formatiere nichts um, was du nicht ändern musst."
+      },
+      "smallSteps": {
+        "label": "In kleinen Schritten",
+        "text": "Arbeite in kleinen Schritten: Nenne bei größeren Aufgaben erst den Plan, setze ihn dann Schritt für Schritt um und kompiliere nach jedem Schritt."
+      }
     }
   },
   "support": {

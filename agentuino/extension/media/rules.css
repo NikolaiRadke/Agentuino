@@ -1,0 +1,163 @@
+/*
+ * Agentuino - Rule Blocks Page Styles
+ * Copyright 2026 Monster Maker
+ *
+ * Licensed under the Apache License, Version 2.0
+ */
+
+:root {
+    --accent: #01B6B8;
+    --radius: 8px;
+}
+
+body {
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size);
+    color: var(--vscode-foreground);
+    background: var(--vscode-editor-background);
+    margin: 0;
+    padding: 20px;
+    line-height: 1.5;
+}
+
+.page {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: var(--accent);
+    margin: 0;
+}
+
+.subtitle {
+    font-weight: bold;
+    margin: 4px 0 8px;
+}
+
+.intro,
+.hint {
+    color: var(--vscode-descriptionForeground);
+    margin: 4px 0 12px;
+}
+
+.group {
+    background: var(--vscode-editorWidget-background);
+    border: 1px solid var(--vscode-panel-border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin: 14px 0;
+}
+
+.group-title {
+    color: var(--accent);
+    font-size: 1.1em;
+    font-weight: bold;
+    margin: 0 0 8px;
+    cursor: default;
+}
+
+summary.group-title {
+    cursor: pointer;
+}
+
+.block {
+    padding: 6px 0;
+    border-top: 1px solid var(--vscode-panel-border);
+}
+
+.block-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.block-label {
+    font-weight: bold;
+}
+
+.block-text {
+    margin-left: 24px;
+    font-size: 0.9em;
+    color: var(--vscode-descriptionForeground);
+}
+
+.block-text code {
+    font-family: var(--vscode-editor-font-family);
+    background: var(--vscode-textCodeBlock-background);
+    padding: 0 3px;
+    border-radius: 3px;
+}
+
+.block-actions {
+    margin-left: 24px;
+    display: flex;
+    gap: 12px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 0;
+    border-top: 1px solid var(--vscode-panel-border);
+}
+
+.field {
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--vscode-input-foreground);
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border, var(--vscode-panel-border));
+    border-radius: 4px;
+    padding: 4px 6px;
+    resize: vertical;
+}
+
+.form-buttons,
+.footer {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.footer {
+    margin-top: 16px;
+}
+
+button {
+    font-family: inherit;
+    font-size: inherit;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 12px;
+    cursor: pointer;
+    color: var(--vscode-button-foreground);
+    background: var(--vscode-button-background);
+}
+
+button.secondary {
+    color: var(--vscode-button-secondaryForeground);
+    background: var(--vscode-button-secondaryBackground);
+}
+
+button.link {
+    background: none;
+    padding: 0;
+    color: var(--vscode-textLink-foreground);
+}
+
+button.link.danger {
+    color: var(--vscode-errorForeground);
+}
+
+.notice {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    background: var(--vscode-notifications-background, var(--vscode-editorWidget-background));
+    border: 1px solid var(--accent);
+}

@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Rule blocks (⚙ → ⚓ Rule blocks): code rules switched on per sketch with a click,
+  written into the automatic section of AGENTS.md. Basics, advanced (collapsed),
+  way of working and custom blocks you create, edit and delete yourself.
+  New sketches start with the default selection; "Save as default for new sketches"
+  and "Apply defaults" on the page. Without an open sketch the page edits the defaults.
+- Custom blocks and defaults are stored in ~/.agentuino/rules.json
+  (removed by Uninstall like the rest of ~/.agentuino)
+
 ## 0.6.0
 
 - First public beta on GitHub (github.com/NikolaiRadke/Agentuino)

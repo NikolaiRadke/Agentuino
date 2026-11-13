@@ -26,6 +26,7 @@ const uninstaller = require('./utils/uninstaller');
 const { BoardDetector } = require('./utils/boardDetector');
 const { ChatPanel } = require('./chat/chatPanel');
 const { AboutPanel } = require('./ui/aboutPanel');
+const { RulesPanel } = require('./ui/rulesPanel');
 
 // ===== CONSTANTS =====
 
@@ -127,6 +128,15 @@ async function ensureCurrentProject() {
         vscode.window.showWarningMessage(t('errors.notASketch'));
         return null;
     }
+    return (await ensureProjectFor(sketchPath)) ? sketchPath : null;
+}
+
+/**
+ * Make sure the project folder of a sketch exists
+ * @param {string} sketchPath - Sketch folder
+ * @returns {Promise<boolean>} True if the project exists (otherwise a message was shown)
+ */
+async function ensureProjectFor(sketchPath) {
     try {
         const context = await collectContext(sketchPath);
         projectManager.ensureProject(sketchPath, { language: currentLocale, context });
@@ -135,9 +145,9 @@ async function ensureCurrentProject() {
             ? t('errors.configInvalid', err.message)
             : t('errors.unknown', err.message);
         vscode.window.showErrorMessage(message);
-        return null;
+        return false;
     }
-    return sketchPath;
+    return true;
 }
 
 /**
@@ -458,6 +468,7 @@ async function showSettingsMenu() {
     const items = [
         { label: t('menu.chooseAgent'), action: chooseAgent },
         { label: t('menu.openInstructions'), action: openInstructions },
+        { label: t('menu.rules'), action: showRules },
         { label: t('menu.addKnowledge'), action: addKnowledge },
         { label: t('menu.openMemory'), action: openMemory },
         { label: t('menu.switchLanguage'), action: switchLanguage },
@@ -466,6 +477,13 @@ async function showSettingsMenu() {
     ];
     const selected = await vscode.window.showQuickPick(items, { placeHolder: t('menu.title') });
     if (selected) await selected.action();
+}
+
+/**
+ * Open the rule blocks of the current sketch (or the defaults without a sketch)
+ */
+function showRules() {
+    RulesPanel.show({ extensionPath, getT: () => t, ensureProject: ensureProjectFor }, findSketch());
 }
 
 /**
@@ -529,6 +547,7 @@ function activate(context) {
         vscode.commands.registerCommand('agentuino.settings', showSettingsMenu),
         vscode.commands.registerCommand('agentuino.about', showAbout),
         vscode.commands.registerCommand('agentuino.chooseAgent', chooseAgent),
+        vscode.commands.registerCommand('agentuino.rules', showRules),
         vscode.commands.registerCommand('agentuino.uninstall', uninstall),
         vscode.commands.registerCommand('agentuino.setupProject', setupProject),
         vscode.commands.registerCommand('agentuino.openInstructions', openInstructions),

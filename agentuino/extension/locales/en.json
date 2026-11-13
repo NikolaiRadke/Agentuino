@@ -8,6 +8,7 @@
   "menu": {
     "addKnowledge": "📚 Add knowledge file",
     "openInstructions": "📝 Edit project instructions",
+    "rules": "⚓ Rule blocks",
     "switchLanguage": "🌐 Switch language",
     "title": "Agentuino",
     "openMemory": "🧠 View project memory",
@@ -177,7 +178,8 @@
         "- `--send \"text\"` sends a line to the sketch after the start (for `Serial.read()`).",
         "- If the command reports a busy port, or nothing arrives after an upload, the Serial Monitor of the IDE probably holds the port. Ask the user to open and close it once, or to end the debug session.",
         "- If the sketch was uploaded with \"Optimize for Debugging\" (ArduDebug), the serial port belongs to the debugger and the monitor only shows unreadable characters. Do not interpret them; ask the user to upload without this option."
-      ]
+      ],
+      "codeRulesTitle": "## Code rules"
     }
   },
   "about": {
@@ -205,6 +207,85 @@
     "config": {
       "bundled": "shipped",
       "downloaded": "downloaded"
+    }
+  },
+  "rules": {
+    "pageTitle": "Rule blocks",
+    "title": "⚓ Rule blocks",
+    "forSketch": "For the sketch {0}",
+    "noSketch": "No sketch open: here you set the defaults for new sketches.",
+    "intro": "Checked blocks are written as rules into the project instructions (AGENTS.md) and apply from the next message on. The safety rules, like never uploading on its own, always apply.",
+    "groups": {
+      "basic": "Basics",
+      "pro": "Advanced",
+      "workflow": "Way of working",
+      "custom": "Custom blocks"
+    },
+    "customHint": "Custom blocks are available in all sketches.",
+    "noCustom": "No custom blocks yet.",
+    "add": "+ New block",
+    "labelField": "Name",
+    "textField": "Rule for the agent",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete the block \"{0}\"? It disappears from all sketches.",
+    "saveDefaults": "Save as default for new sketches",
+    "applyDefaults": "Apply defaults",
+    "defaultsSaved": "Saved as default for new sketches.",
+    "defaultsApplied": "Defaults applied.",
+    "saved": "Saved ✓",
+    "missing": "Name and rule must not be empty.",
+    "blocks": {
+      "beginnerComments": {
+        "label": "Beginner-friendly comments",
+        "text": "Comment the code for beginners: explain in short comments what each part does and why."
+      },
+      "noMagicNumbers": {
+        "label": "No magic numbers",
+        "text": "No magic numbers: define pins, times and limits as named constants at the top of the sketch."
+      },
+      "nonBlocking": {
+        "label": "Non-blocking",
+        "text": "Write non-blocking code: measure time with `millis()` instead of `delay()`, so the sketch stays responsive."
+      },
+      "lowRam": {
+        "label": "Save RAM",
+        "text": "Use little RAM: small data types, no unnecessary buffers, global variables only where needed."
+      },
+      "defensive": {
+        "label": "Defensive programming",
+        "text": "Program defensively: check return values, sensor readings and input for plausibility and handle errors."
+      },
+      "isrSafe": {
+        "label": "Interrupt-safe",
+        "text": "Keep interrupt routines short, declare shared variables `volatile` and use neither `Serial` nor `delay()` in interrupts."
+      },
+      "noDynamicMemory": {
+        "label": "No String, no malloc",
+        "text": "Do not use dynamic memory: no `String`, no `malloc` or `new`. Use fixed `char` arrays."
+      },
+      "flashStrings": {
+        "label": "Texts in flash",
+        "text": "Keep constant texts in flash with `F()` or `PROGMEM` instead of RAM."
+      },
+      "fixedWidthTypes": {
+        "label": "Fixed-width types",
+        "text": "Use fixed-width types like `uint8_t`, `int16_t` or `uint32_t` instead of `int` and `long`."
+      },
+      "explainChanges": {
+        "label": "Summarize changes",
+        "text": "At the end, briefly summarize what you changed and why."
+      },
+      "keepStyle": {
+        "label": "Keep the style",
+        "text": "Keep the formatting, indentation and naming of the existing code. Do not reformat what you do not need to change."
+      },
+      "smallSteps": {
+        "label": "Small steps",
+        "text": "Work in small steps: for larger tasks first state the plan, then implement it step by step and compile after each step."
+      }
     }
   },
   "support": {

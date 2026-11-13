@@ -21,6 +21,7 @@
 const fs = require('fs');
 const path = require('path');
 const i18n = require('./i18n');
+const ruleBlocks = require('./ruleBlocks');
 
 // ===== CONSTANTS =====
 
@@ -394,6 +395,12 @@ function buildAutoSection(sketchPath, config) {
         lines.push(t('project.auto.ruleBeginner'));
     }
 
+    // Rule blocks chosen for this sketch (page "Rule blocks")
+    const codeRules = ruleBlocks.getActiveTexts(config, t);
+    if (codeRules.length > 0) {
+        lines.push('', t('project.auto.codeRulesTitle'), '', ...codeRules.map(text => `- ${text}`));
+    }
+
     lines.push('', t('project.auto.hardwareTitle'), '');
     lines.push(fqbn
         ? t('project.auto.board', boardName || fqbn, fqbn)
@@ -535,6 +542,8 @@ function ensureProject(sketchPath, options = {}) {
     if (!fs.existsSync(paths.config)) {
         const config = structuredClone(DEFAULT_CONFIG);
         config.language = options.language || i18n.FALLBACK_LOCALE;
+        // A new sketch starts with the current default rule blocks
+        config.rules = ruleBlocks.getDefaults();
         writeConfig(sketchPath, config);
     }
 

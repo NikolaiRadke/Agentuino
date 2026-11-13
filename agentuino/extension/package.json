@@ -74,6 +74,11 @@
         "category": "Agentuino"
       },
       {
+        "command": "agentuino.rules",
+        "title": "Rule blocks",
+        "category": "Agentuino"
+      },
+      {
         "command": "agentuino.switchLanguage",
         "title": "Switch Language",
         "category": "Agentuino"
