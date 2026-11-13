@@ -9,7 +9,7 @@ Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Co
 *Englisch? Kein Problem: Agentuino spricht Deutsch, sobald deine Arduino IDE auf Deutsch eingestellt ist.*
 
 > [!IMPORTANT]
-> Agentuino is a **beta**. It is tested on Linux with Claude Code and Mistral Vibe. Windows, macOS, Codex CLI and Antigravity CLI are untested so far, feedback is very welcome!
+> Agentuino is a **beta**. It is tested on Linux with Claude Code, Mistral Vibe and Antigravity CLI. **Testers for Windows and macOS wanted!** Codex CLI is untested so far, too. Please tell how it went in the [issues](https://github.com/NikolaiRadke/Agentuino/issues), it works or not.
 
 🆕 What's new?
 * **13.11.2026** **V0.9.0**: Antigravity CLI (free) and French, Spanish, Italian.
