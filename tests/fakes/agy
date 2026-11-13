@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+/*
+ * Fake Antigravity CLI (stream-json in and out), event layout as seen from
+ * agy 1.5.8: text in fragments per step, tool parameters like {Path}.
+ * Prompt words: AUTH_FAIL. Calls go to $FAKE_AGENT_LOG.
+ */
+
+"use strict";
+
+const fs = require('fs');
+const path = require('path');
+
+const args = process.argv.slice(2);
+const out = (type, payload) => process.stdout.write(JSON.stringify({ event: type, [type]: payload }) + '\n');
+if (args.includes('--version')) {
+    console.log('1.5.8');
+    process.exit(0);
+}
+
+let input = '';
+process.stdin.on('data', data => { input += data; });
+process.stdin.on('end', () => {
+    // One JSON line per user message
+    const prompt = input.trim().split('\n').map(line => JSON.parse(line).message.content).join('\n');
+    if (process.env.FAKE_AGENT_LOG) {
+        fs.appendFileSync(process.env.FAKE_AGENT_LOG, JSON.stringify({ agent: 'agy', args, input, prompt }) + '\n');
+    }
+    if (prompt.includes('AUTH_FAIL')) {
+        out('result', { conversation_id: '', status: 'ERROR', response: '', error: 'authentication failed or timed out' });
+        process.stderr.write("Error: authentication required. Run 'agy' to log in, then retry.\n");
+        process.exit(1);
+    }
+    const resume = args.indexOf('--conversation');
+    const id = resume >= 0 ? args[resume + 1] : 'agy-conversation-1';
+    const step = (index, state, type, extra = {}) => out('step_update', { conversation_id: id, step_index: index, state, step_type: type, ...extra });
+    const file = path.join(process.cwd(), 'Test.ino');
+
+    out('init', { cwd: process.cwd(), tools: ['read_file'], permission_mode: 'always-proceed' });
+    step(0, 'DONE', 'user_input');
+    step(1, 'ACTIVE', 'agent_response', { text_delta: 'Reading ' });
+    step(1, 'DONE', 'agent_response', { text_delta: 'the sketch.' });
+    step(2, 'ACTIVE', 'tool', { tool_name: 'read_file' });
+    step(2, 'ACTIVE', 'tool', { tool_name: 'read_file', tool_info: { name: 'read_file', parameters: { Path: file } } });
+    step(2, 'DONE', 'tool', { tool_name: 'read_file', tool_info: { name: 'read_file', parameters: { Path: file }, output: '3 lines' } });
+    step(3, 'DONE', 'tool', { tool_info: { name: 'run_command', parameters: { CommandLine: 'arduino-cli compile .' } } });
+    step(4, 'DONE', 'agent_response', { text_delta: 'Agy answer.' });
+    out('result', { conversation_id: id, status: 'SUCCESS', response: 'Agy answer.', num_turns: 1 });
+});

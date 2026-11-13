@@ -1,0 +1,42 @@
+#!/usr/bin/env node
+/*
+ * Fake Codex CLI (exec --json). Prompt words: AUTH_FAIL. Resuming the
+ * session "gone" fails like a deleted rollout. Calls go to $FAKE_AGENT_LOG.
+ */
+
+"use strict";
+
+const fs = require('fs');
+const path = require('path');
+
+const args = process.argv.slice(2);
+const out = event => process.stdout.write(JSON.stringify(event) + '\n');
+if (args.includes('--version')) {
+    console.log('codex-cli 0.169.0');
+    process.exit(0);
+}
+
+let prompt = '';
+process.stdin.on('data', data => { prompt += data; });
+process.stdin.on('end', () => {
+    if (process.env.FAKE_AGENT_LOG) {
+        fs.appendFileSync(process.env.FAKE_AGENT_LOG, JSON.stringify({ agent: 'codex', args, prompt }) + '\n');
+    }
+    const resume = args.indexOf('resume');
+    const threadId = resume >= 0 ? args[resume + 1] : 'codex-thread-1';
+    if (threadId === 'gone') {
+        process.stderr.write('Error: no rollout found for thread id gone\n');
+        process.exit(1);
+    }
+    out({ type: 'thread.started', thread_id: threadId });
+    out({ type: 'turn.started' });
+    if (prompt.includes('AUTH_FAIL')) {
+        out({ type: 'turn.failed', error: { message: 'unexpected status 401 Unauthorized' } });
+        process.exit(1);
+    }
+    out({ type: 'item.started', item: { id: 'i1', type: 'command_execution', command: 'bash -lc "arduino-cli compile ."' } });
+    out({ type: 'item.completed', item: { id: 'i2', type: 'file_change', changes: [{ path: path.join(process.cwd(), 'Test.ino'), kind: 'update' }] } });
+    out({ type: 'error', message: 'Reconnecting... 1/5' });
+    out({ type: 'item.completed', item: { id: 'i3', type: 'agent_message', text: 'Codex answer.' } });
+    out({ type: 'turn.completed', usage: { input_tokens: 10, output_tokens: 5 } });
+});

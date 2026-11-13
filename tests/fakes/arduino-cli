@@ -1,0 +1,124 @@
+#!/usr/bin/env node
+/*
+ * Fake arduino-cli for the tests. Answers the commands Agentuino uses with
+ * output in the format of arduino-cli 1.x, without boards or toolchains.
+ *
+ * compile: a line containing BROKEN is a compiler error, #include <X.h> needs
+ *          the library X to be installed ("lib install X"), "// RAM n" sets the
+ *          RAM usage. Installed libraries live in $FAKE_CLI_STATE.
+ * monitor: prints "tick n" until it is stopped; a port containing "busy" fails.
+ */
+
+"use strict";
+
+const fs = require('fs');
+const path = require('path');
+
+const FLASH_MAX = 32256;
+const RAM_MAX = 2048;
+const BASE_FLASH = 444;
+const BASE_RAM = 9;
+const TICK_MS = 100;
+const SKETCH_EXTENSIONS = ['.ino', '.h', '.cpp', '.c'];
+const BUILTIN_HEADERS = new Set(['Arduino.h', 'Wire.h', 'SPI.h', 'EEPROM.h', 'SoftwareSerial.h', 'Servo.h']);
+
+const args = process.argv.slice(2).filter((arg, i, all) => arg !== '--config-file' && all[i - 1] !== '--config-file');
+const stateFile = process.env.FAKE_CLI_STATE;
+
+function readState() {
+    try {
+        return JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+    } catch {
+        return { libraries: [] };
+    }
+}
+
+function option(name) {
+    const index = args.indexOf(name);
+    return index >= 0 ? args[index + 1] : null;
+}
+
+function compile() {
+    const sketch = path.resolve(args[args.length - 1]);
+    const installed = new Set(readState().libraries);
+    const diagnostics = [];
+    let ram = BASE_RAM;
+    let flash = BASE_FLASH;
+
+    for (const name of fs.readdirSync(sketch).filter(f => SKETCH_EXTENSIONS.includes(path.extname(f))).sort()) {
+        const file = path.join(sketch, name);
+        fs.readFileSync(file, 'utf8').split('\n').forEach((line, index) => {
+            flash += line.length;
+            const include = line.match(/#include\s*<([\w.]+)>/);
+            if (include && !BUILTIN_HEADERS.has(include[1]) && !installed.has(path.basename(include[1], '.h'))) {
+                diagnostics.push({
+                    severity: 'FATAL', file, line: index + 1, column: 10,
+                    message: `${include[1]}: No such file or directory\n #include <${include[1]}>\n          ^~~~~~~~~~\ncompilation terminated.`
+                });
+            }
+            if (line.includes('BROKEN')) {
+                diagnostics.push({ severity: 'ERROR', file, line: index + 1, column: 3, message: "'BROKEN' was not declared in this scope" });
+            }
+            const ramLine = line.match(/\/\/ RAM (\d+)/);
+            if (ramLine) ram = Number(ramLine[1]);
+        });
+    }
+
+    const success = diagnostics.length === 0;
+    const errText = diagnostics.map(d => `${d.file}:${d.line}:${d.column}: error: ${d.message}`).join('\n');
+    console.log(JSON.stringify({
+        compiler_out: success ? `Sketch uses ${flash} bytes of program storage space.` : '',
+        compiler_err: errText,
+        builder_result: {
+            build_path: '/tmp/fake-build',
+            executable_sections_size: success
+                ? [{ name: 'text', size: flash, max_size: FLASH_MAX }, { name: 'data', size: ram, max_size: RAM_MAX }]
+                : null,
+            diagnostics
+        },
+        success
+    }));
+    process.exit(success ? 0 : 1);
+}
+
+function monitor() {
+    const port = option('-p') || '';
+    if (port.includes('busy')) {
+        console.error(`Error opening port ${port}: Serial port busy`);
+        process.exit(1);
+    }
+    const baud = (option('--config') || '').replace('baudrate=', '');
+    let count = 0;
+    console.log(`hello at ${baud}`);
+    setInterval(() => console.log(`tick ${++count}`), TICK_MS);
+    process.stdin.on('data', data => console.log(`echo ${String(data).trim()}`));
+}
+
+switch (`${args[0]} ${args[1] || ''}`.trim()) {
+    case 'compile --fqbn':
+        compile();
+        break;
+    case 'lib install': {
+        const state = readState();
+        state.libraries.push(...args.slice(2));
+        fs.writeFileSync(stateFile, JSON.stringify(state));
+        console.log(`Installed ${args.slice(2).join(', ')}`);
+        break;
+    }
+    case 'board list':
+        console.log(JSON.stringify({ detected_ports: [
+            { port: { address: '/dev/ttyS0', protocol: 'serial', properties: {} } },
+            { port: { address: '/dev/ttyACM0', protocol: 'serial', properties: { vid: '0x2341', pid: '0x0043' } } }
+        ] }));
+        break;
+    case 'core list':
+        console.log(JSON.stringify({ platforms: [{ id: 'arduino:avr' }] }));
+        break;
+    default:
+        if (args[0] === 'monitor') monitor();
+        else if (args[0] === 'version') console.log('arduino-cli  Version: 1.3.1 (fake)');
+        else {
+            console.error(`fake arduino-cli: unknown command ${args.join(' ')}`);
+            process.exit(1);
+        }
+}

@@ -1,0 +1,78 @@
+#!/usr/bin/env node
+/*
+ * Fake Claude Code (stream-json) for the chat tests. Words in the prompt
+ * decide what it does with the sketch in the current folder:
+ *   WRITE_OK, WRITE_BROKEN, WRITE_STUBBORN (stays broken), WRITE_LIB,
+ *   WRITE_RAM (high RAM use), INSTALL_LIB (calls arduino-cli from PATH),
+ *   AUTH_FAIL. Anything else is a question: no change.
+ * A repair prompt ("Compiler output:") fixes the code unless it is stubborn.
+ * Every call is appended to $FAKE_AGENT_LOG.
+ */
+
+"use strict";
+
+const fs = require('fs');
+const path = require('path');
+const { execFileSync } = require('child_process');
+
+const args = process.argv.slice(2);
+const sketch = path.join(process.cwd(), `${path.basename(process.cwd())}.ino`);
+const out = event => process.stdout.write(JSON.stringify(event) + '\n');
+
+const CODE = {
+    ok: 'void setup() {}\nvoid loop() {}\n',
+    broken: 'void setup() {\n  BROKEN;\n}\nvoid loop() {}\n',
+    stubborn: '// stubborn\nvoid setup() {\n  BROKEN;\n}\nvoid loop() {}\n',
+    lib: '#include <TM1637Display.h>\nvoid setup() {}\nvoid loop() {}\n',
+    ram: '// RAM 1800\nvoid setup() {}\nvoid loop() {}\n'
+};
+
+let prompt = '';
+process.stdin.on('data', data => { prompt += data; });
+process.stdin.on('end', () => {
+    if (process.env.FAKE_AGENT_LOG) {
+        fs.appendFileSync(process.env.FAKE_AGENT_LOG, JSON.stringify({ agent: 'claude', args, prompt }) + '\n');
+    }
+    // Title generation: single JSON answer
+    if (args.includes('json')) {
+        out({ type: 'result', is_error: false, result: 'Test title', session_id: 'title' });
+        return;
+    }
+    const resume = args.indexOf('--resume');
+    const sessionId = resume >= 0 ? args[resume + 1] : 'claude-session-1';
+    if (sessionId === 'gone') {
+        process.stderr.write('No conversation found with session ID: gone\n');
+        process.exit(1);
+    }
+    out({ type: 'system', subtype: 'init', session_id: sessionId });
+
+    if (prompt.includes('AUTH_FAIL')) {
+        out({ type: 'assistant', is_api_error_message: true, error: 'authentication_failed', message: { content: [] } });
+        out({ type: 'result', is_error: true, result: 'Invalid API key', session_id: sessionId });
+        return;
+    }
+
+    const write = (code, text) => {
+        out({ type: 'assistant', message: { content: [{ type: 'tool_use', name: 'Write', input: { file_path: sketch } }] } });
+        fs.writeFileSync(sketch, code);
+        out({ type: 'assistant', message: { content: [{ type: 'text', text }] } });
+    };
+
+    if (prompt.includes('Compiler output:')) {
+        const current = fs.readFileSync(sketch, 'utf8');
+        if (current.includes('// stubborn')) write(`${current}// try ${Date.now()}\n`, 'Tried again.');
+        else write(CODE.ok, 'Fixed.');
+    } else if (prompt.includes('WRITE_OK')) write(CODE.ok, 'Written.');
+    else if (prompt.includes('WRITE_BROKEN')) write(CODE.broken, 'Written with a mistake.');
+    else if (prompt.includes('WRITE_STUBBORN')) write(CODE.stubborn, 'Written, stays broken.');
+    else if (prompt.includes('WRITE_LIB')) write(CODE.lib, 'Uses a library.');
+    else if (prompt.includes('WRITE_RAM')) write(CODE.ram, 'Uses a lot of RAM.');
+    else if (prompt.includes('INSTALL_LIB')) {
+        out({ type: 'assistant', message: { content: [{ type: 'tool_use', name: 'Bash', input: { command: 'arduino-cli lib install TM1637Display' } }] } });
+        execFileSync('arduino-cli', ['lib', 'install', 'TM1637Display'], { stdio: 'ignore' });
+        out({ type: 'assistant', message: { content: [{ type: 'text', text: 'Library installed.' }] } });
+    } else {
+        out({ type: 'assistant', message: { content: [{ type: 'text', text: 'Just an answer.' }] } });
+    }
+    out({ type: 'result', is_error: false, result: 'done', session_id: sessionId, total_cost_usd: 0.01 });
+});

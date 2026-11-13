@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+/*
+ * Fake Mistral Vibe (-p --output streaming --output-dir). Session, cost and
+ * outcome go to export.json like the real one. Prompt words: AUTH_FAIL.
+ * Resuming the session "gone" fails. Calls go to $FAKE_AGENT_LOG.
+ */
+
+"use strict";
+
+const fs = require('fs');
+const path = require('path');
+
+const args = process.argv.slice(2);
+const out = event => process.stdout.write(JSON.stringify(event) + '\n');
+if (args.includes('--version')) {
+    console.log('vibe 3.1.2');
+    process.exit(0);
+}
+
+let prompt = '';
+process.stdin.on('data', data => { prompt += data; });
+process.stdin.on('end', () => {
+    if (process.env.FAKE_AGENT_LOG) {
+        fs.appendFileSync(process.env.FAKE_AGENT_LOG, JSON.stringify({ agent: 'vibe', args, prompt }) + '\n');
+    }
+    const outputDir = args[args.indexOf('--output-dir') + 1];
+    const resume = args.indexOf('--resume');
+    const sessionId = resume >= 0 ? args[resume + 1] : 'vibe-session-1';
+    if (sessionId === 'gone') {
+        process.stderr.write('Error: session gone not found\n');
+        process.exit(1);
+    }
+    const report = { outcome: 'completed', session_id: sessionId, cost_usd: 0.0021, exit_code: 0, error: null };
+
+    out({ role: 'user', content: prompt });
+    if (prompt.includes('AUTH_FAIL')) {
+        Object.assign(report, { outcome: 'failed', exit_code: 1, error: { message: '401 Unauthorized: invalid api key' } });
+    } else {
+        const file = path.join(process.cwd(), 'Test.ino');
+        out({ role: 'assistant', content: '', tool_calls: [{ id: 'c1', function: { name: 'search_replace', arguments: JSON.stringify({ file_path: file }) } }] });
+        out({ role: 'tool', content: 'ok' });
+        out({ role: 'assistant', content: [{ type: 'text', text: 'Vibe answer.' }] });
+    }
+    fs.writeFileSync(path.join(outputDir, 'export.json'), JSON.stringify(report));
+    process.exit(report.exit_code);
+});

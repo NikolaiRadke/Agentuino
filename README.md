@@ -143,6 +143,14 @@ node .github/scripts/check-agent-configs.js [--codex=<path>] [--vibe=<path>] [--
 
 The workflow *Check agent configs* does the same on GitHub: it installs all agents with the commands from the file and runs the check, on every change of the file and every Monday. A red run means an agent changed its options or its install command.
 
+The tests run the extension in a fake IDE with fake agents and a fake arduino-cli, so they need neither a board nor a login. Node 22 or newer, no dependencies:
+
+```
+node --test tests/*.test.js
+```
+
+The workflow *Tests* runs them on every push.
+
 `.github/scripts/package.sh` builds the VSIX and the release zip into `dist/`.
 
 ## Content
