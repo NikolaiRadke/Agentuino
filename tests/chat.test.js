@@ -166,3 +166,17 @@ test('a new chat uses the chosen agent, AGENTS.md goes into the prompt once', as
         ide.settings.agent = 'claudecode';
     }
 });
+
+test('webview messages cannot reach files outside the chats or open other URLs', async () => {
+    const sketch = await newSketch('Guard');
+    await ide.send('Hello');
+    const config = path.join(sketch, 'agentuino', 'config.json');
+    await ide.message({ command: 'deleteChat', id: '../config' });
+    await ide.message({ command: 'selectChat', id: '../config' });
+    assert.ok(fs.existsSync(config));
+
+    ide.opened.length = 0;
+    await ide.message({ command: 'openUrl', url: 'file:///etc/passwd' });
+    await ide.message({ command: 'openUrl', url: 'https://code.claude.com' });
+    assert.deepEqual(ide.opened, ['https://code.claude.com']);
+});

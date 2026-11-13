@@ -1,6 +1,6 @@
 # Security Policy
 
-Agentuino starts an AI agent (Claude Code, Mistral Vibe or Codex CLI) on your computer. This document explains what the agent may do and how to report a problem.
+Agentuino starts an AI agent (Claude Code, Mistral Vibe, Codex CLI or Antigravity CLI) on your computer. This document explains what the agent may do and how to report a problem.
 
 ## What the agent can do
 
@@ -12,15 +12,17 @@ Agentuino starts an AI agent (Claude Code, Mistral Vibe or Codex CLI) on your co
 ## What Agentuino stores
 
 - In the sketch: the folder `agentuino/` (instructions, memory, knowledge, chats, attachments, one code backup).
-- In your home folder: `~/.agentuino/agentConfigs.json`, only after you accepted a new agent configuration.
+- In your home folder: `~/.agentuino/rules.json` (your own semantic anchors and defaults) and `~/.agentuino/agentConfigs.json`, only after you accepted a new agent configuration.
+- In the temp folder: `agentuino-debug/`, the debug builds of `agentuino-debug` (only with ArduDebug).
+- Uninstalling removes everything in the home and temp folder. The `agentuino/` folders in your sketches are yours and stay.
 - Agentuino stores no API keys. Logins are handled by the agents themselves.
 
 ## Network access
 
 At startup Agentuino reads two files from this repository on raw.githubusercontent.com: `package.json` (new version?) and `agentConfigs.json` (new agent options?). Nothing is downloaded and stored without asking. Switch both checks off with `agentuino.checkForUpdates`.
 
-Downloaded agent configurations are pure JSON data, never executed, and strictly validated before use.
+Downloaded agent configurations are pure JSON data, never executed, and strictly validated before use: one bad field rejects the whole file, and agent commands and install locations must name the agent itself. Install commands are only shown for copying, never run.
 
 ## Reporting a vulnerability
 
-Please open an issue at https://github.com/NikolaiRadke/Agentuino/issues with a description, the steps to reproduce and the possible impact.
+Please report it privately: on GitHub, open the **Security** tab of this repository and choose **Report a vulnerability**. Describe the problem, the steps to reproduce and the possible impact. Please do not open a public issue for security problems.

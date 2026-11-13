@@ -18,7 +18,7 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const { spawn, execFile } = require('child_process');
-const { IS_WINDOWS, createError, needsShell, buildEnv } = require('./agentUtils');
+const { IS_WINDOWS, createError, prepareSpawn, buildEnv } = require('./agentUtils');
 
 // ===== CONSTANTS =====
 
@@ -85,15 +85,15 @@ class AgentRunner {
         return new Promise((resolve, reject) => {
             const args = adapter.buildArgs({ sessionId, model, permissionMode, instructionsFile, runDir });
             const parser = adapter.createParser({ cwd, sessionId });
-            const shell = needsShell(toolPath);
 
             let child;
             try {
-                child = spawn(shell ? `"${toolPath}"` : toolPath, args, {
+                const spawnArgs = prepareSpawn(toolPath, args);
+                child = spawn(spawnArgs.command, spawnArgs.args, {
                     cwd,
                     env: buildEnv(toolPath, { ...EXTRA_ENV, ...env }, pathDirs),
                     stdio: ['pipe', 'pipe', 'pipe'],
-                    shell,
+                    shell: spawnArgs.shell,
                     windowsHide: true,
                     detached: !IS_WINDOWS
                 });

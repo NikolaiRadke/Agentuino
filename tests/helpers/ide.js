@@ -39,6 +39,8 @@ function startIde(overrides = {}) {
         posted,
         output,
         handler: null,
+        // URLs given to openExternal
+        opened: [],
         // Answer of modal questions: (message, ...buttons) => button
         answerWarning: (message, options, ...buttons) => buttons[0],
         answerQuickPick: items => items[0],
@@ -54,7 +56,7 @@ function startIde(overrides = {}) {
                 appName: 'Arduino IDE',
                 appRoot: path.join(env.TMP, 'no-ide'),
                 clipboard: { writeText: async () => {}, readText: async () => '' },
-                openExternal: async () => true
+                openExternal: async uri => { ide.opened.push(uri.url); return true; }
             },
             window: {
                 activeTextEditor: null,

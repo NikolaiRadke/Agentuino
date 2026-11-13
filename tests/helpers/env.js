@@ -17,8 +17,11 @@ const EXTENSION = path.join(REPO, 'agentuino', 'extension');
 const FAKES = path.join(__dirname, '..', 'fakes');
 
 fs.mkdirSync(HOME);
+fs.mkdirSync(path.join(TMP, 'temp'));
 process.env.HOME = HOME;
 process.env.USERPROFILE = HOME;
+// Run folders and debug builds also stay inside the test folder
+process.env.TMPDIR = path.join(TMP, 'temp');
 // Read by the fakes
 process.env.FAKE_CLI_STATE = path.join(TMP, 'cli-state.json');
 process.env.FAKE_AGENT_LOG = path.join(TMP, 'agent-log.jsonl');

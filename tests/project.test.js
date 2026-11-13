@@ -129,3 +129,30 @@ test('snapshot: reset restores and removes files, a question keeps the last rese
     assert.ok(!fs.existsSync(path.join(sketch, 'extra.h')));
     assert.notEqual(backupManager.getCodeFingerprint(sketch), before);
 });
+
+// ===== UNINSTALL =====
+
+test('uninstall leaves nothing behind outside the sketches', () => {
+    const uninstaller = env.ext('out/utils/uninstaller.js');
+    const make = (file, content = 'x') => {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, content);
+        return file;
+    };
+    // Nothing found: nothing is touched
+    const rules = make(path.join(env.HOME, '.agentuino', 'rules.json'), '{}');
+    assert.deepEqual(uninstaller.getTargets(), []);
+
+    const vsix = make(path.join(env.HOME, '.arduinoIDE', 'extensions', 'agentuino-0.9.0.vsix'));
+    const deployed = make(path.join(env.HOME, '.arduinoIDE', 'deployedPlugins', 'agentuino', 'package.json'));
+    const other = make(path.join(env.HOME, '.arduinoIDE', 'extensions', 'aiduino-2.0.vsix'));
+    const debug = make(path.join(env.TMP, 'temp', 'agentuino-debug', 'Blink-1234', 'build', 'Blink.elf'));
+    const sketch = env.makeSketch('Kept');
+    projectManager.ensureProject(sketch, { language: 'en', context: UNO });
+
+    const result = uninstaller.removeTargets();
+    assert.deepEqual(result.failed, []);
+    for (const file of [rules, vsix, deployed, debug]) assert.ok(!fs.existsSync(file), file);
+    assert.ok(fs.existsSync(other));
+    assert.ok(projectManager.isProject(sketch));
+});

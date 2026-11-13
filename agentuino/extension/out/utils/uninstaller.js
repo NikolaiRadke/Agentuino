@@ -21,8 +21,10 @@ const path = require('path');
 const IDE_DIR = path.join(os.homedir(), '.arduinoIDE');
 const SEARCH_DIRS = [path.join(IDE_DIR, 'extensions'), path.join(IDE_DIR, 'deployedPlugins')];
 const NAME_PATTERN = /^(nikolairadke\.)?agentuino([-.@].*)?(\.vsix)?$/i;
-// Downloaded agent configuration (see agents/agentConfig.js)
+// Downloaded agent configuration and own semantic anchors (agents/agentConfig.js, utils/ruleBlocks.js)
 const USER_DIR = path.join(os.homedir(), '.agentuino');
+// Debug builds of agentuino-debug (bin/debug-run.js)
+const DEBUG_DIR = path.join(os.tmpdir(), 'agentuino-debug');
 
 /**
  * List everything that belongs to the installation
@@ -36,7 +38,8 @@ function getTargets() {
             if (NAME_PATTERN.test(name)) targets.push(path.join(dir, name));
         }
     }
-    if (targets.length > 0 && fs.existsSync(USER_DIR)) targets.push(USER_DIR);
+    // Nothing is left behind, but only if Agentuino itself was found
+    if (targets.length > 0) targets.push(...[USER_DIR, DEBUG_DIR].filter(dir => fs.existsSync(dir)));
     return targets;
 }
 

@@ -37,7 +37,6 @@
     "sketch": "Sketch: {0}",
     "noSketch": "Kein Sketch",
     "cost": "Kosten bisher: {0} $",
-    "newChatStarted": "Neuer Chat. Projektgedächtnis, Wissen und frühere Chats stehen dem Agenten weiterhin zur Verfügung.",
     "knowledgeAdded": "Zum Projektwissen hinzugefügt: {0}",
     "projectCreated": "Projektordner eingerichtet. Eigene Anweisungen für den Agenten kannst du über „Projektanweisungen bearbeiten“ ergänzen.",
     "sessionLost": "Die vorherige Sitzung war nicht mehr verfügbar, es wurde eine neue gestartet.",
@@ -327,7 +326,7 @@
     "applied": "Agenten-Konfiguration {0} übernommen. Sie gilt ab dem nächsten Auftrag."
   },
   "uninstall": {
-    "confirm": "Agentuino deinstallieren? Die Erweiterung und ihre Einstellungen werden entfernt. Deine Projektordner „agentuino“ in den Sketches mit Chats und Notizen bleiben erhalten. Wer sie nicht mehr braucht, löscht im jeweiligen Sketch einfach den Ordner „agentuino“, der Sketch funktioniert ohne ihn weiter.",
+    "confirm": "Agentuino deinstallieren? Die Erweiterung, ihre Einstellungen, deine eigenen semantischen Anker und die heruntergeladene Agenten-Konfiguration werden entfernt. Deine Projektordner „agentuino“ in den Sketches mit Chats und Notizen bleiben erhalten. Wer sie nicht mehr braucht, löscht im jeweiligen Sketch einfach den Ordner „agentuino“, der Sketch funktioniert ohne ihn weiter.",
     "button": "Deinstallieren",
     "done": "Agentuino wurde entfernt. Lade die IDE neu, um es abzuschließen.",
     "reload": "Neu laden",

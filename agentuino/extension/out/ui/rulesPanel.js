@@ -1,10 +1,10 @@
 /*
- * Agentuino - Rule Blocks Panel
+ * Agentuino - Semantic Anchors Panel
  * Copyright 2026 Monster Maker
  *
  * Licensed under the Apache License, Version 2.0
  *
- * Page in the code column to switch rule blocks on and off for the current
+ * Page in the code column to switch semantic anchors on and off for the current
  * sketch, to manage custom blocks and the defaults for new sketches. Without
  * an open sketch the page edits the defaults. Every change rewrites the
  * automatic section of AGENTS.md, so it applies from the next message on.

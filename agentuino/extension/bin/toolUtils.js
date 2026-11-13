@@ -9,11 +9,10 @@
 
 const path = require('path');
 const { execFile } = require('child_process');
-const { buildEnv } = require(path.join(__dirname, '..', 'out', 'agents', 'agentUtils'));
+const { IS_WINDOWS, buildEnv } = require(path.join(__dirname, '..', 'out', 'agents', 'agentUtils'));
 
 // ===== CONSTANTS =====
 
-const IS_WINDOWS = process.platform === 'win32';
 const CLI_TIMEOUT_MS = 5 * 60 * 1000;
 const MAX_CLI_BUFFER = 32 * 1024 * 1024;
 const CLI_ENV = { ARDUINO_UPDATER_ENABLE_NOTIFICATION: 'false' };

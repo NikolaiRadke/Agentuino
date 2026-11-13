@@ -1,5 +1,5 @@
 /*
- * Agentuino - Rule Blocks Page Script
+ * Agentuino - Semantic Anchors Page Script
  * Copyright 2026 Monster Maker
  *
  * Licensed under the Apache License, Version 2.0

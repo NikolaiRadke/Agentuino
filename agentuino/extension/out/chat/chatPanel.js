@@ -20,9 +20,10 @@ const projectManager = require('../utils/projectManager');
 const toolDetector = require('../agents/toolDetector');
 const chatStore = require('./chatStore');
 const backupManager = require('../utils/backupManager');
+const links = require('../utils/links');
 const registry = require('../agents/registry');
 const { AgentRunner } = require('../agents/agentRunner');
-const { shorten } = require('../agents/agentUtils');
+const { shorten, createError } = require('../agents/agentUtils');
 const { CompileChecker } = require('../utils/compileChecker');
 
 // ===== CONSTANTS =====
@@ -269,14 +270,13 @@ class ChatPanel {
         }
         // Nothing usable, but an outdated agent exists: tell the user how to update
         if (tooOld) {
-            throw Object.assign(new Error(`${tooOld.adapter.id} too old`),
-                { code: 'AGENT_TOO_OLD', adapter: tooOld.adapter, version: tooOld.version });
+            throw createError('AGENT_TOO_OLD', `${tooOld.adapter.id} too old`, { adapter: tooOld.adapter, version: tooOld.version });
         }
         if (wanted !== registry.AUTO) {
             const adapter = registry.get(wanted);
-            throw Object.assign(new Error(`${wanted} not found`), { code: 'AGENT_NOT_FOUND', adapter, agentId: wanted });
+            throw createError('AGENT_NOT_FOUND', `${wanted} not found`, { adapter, agentId: wanted });
         }
-        throw Object.assign(new Error('No agent found'), { code: 'NO_AGENT' });
+        throw createError('NO_AGENT', 'No agent found');
     }
 
     /**
@@ -342,7 +342,9 @@ class ChatPanel {
                     break;
                 case 'attach': await this.attachFiles(); break;
                 case 'restore': await this.restore(); break;
-                case 'openUrl': await vscode.env.openExternal(vscode.Uri.parse(msg.url)); break;
+                case 'openUrl':
+                    if (links.isWebUrl(msg.url)) await vscode.env.openExternal(vscode.Uri.parse(msg.url));
+                    break;
                 case 'copy': await this.copyToClipboard(msg.text); break;
                 case 'requestPaste':
                     this.post({ command: 'paste', text: await vscode.env.clipboard.readText() });
@@ -384,7 +386,7 @@ class ChatPanel {
     async prepareProject() {
         const sketchPath = this.deps.findSketch();
         if (!sketchPath) {
-            throw Object.assign(new Error('No sketch'), { code: 'NOT_A_SKETCH' });
+            throw createError('NOT_A_SKETCH', 'No sketch');
         }
         if (sketchPath !== this.sketchPath) {
             this.sketchPath = sketchPath;

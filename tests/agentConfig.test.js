@@ -30,7 +30,10 @@ test('one bad field rejects the whole file', () => {
         [config => { config.agents.claudecode.installUrl = 'http://claude.ai'; }, 'claudecode.installUrl'],
         [config => { config.agents.codex.args.resume = ['resume']; }, 'codex.args.resume'],
         [config => { config.agents.antigravity.sessionNotFound = '(unclosed'; }, 'antigravity.sessionNotFound'],
-        [config => { config.agents.vibe.minVersion = '3'; }, 'vibe.minVersion']
+        [config => { config.agents.vibe.minVersion = '3'; }, 'vibe.minVersion'],
+        // Install locations and the command must name the agent, not another program
+        [config => { config.agents.antigravity.candidates.unix.push('/tmp/evil'); }, 'antigravity.candidates'],
+        [config => { config.agents.codex.command = '/bin/sh'; }, 'codex.command']
     ];
     for (const [change, expected] of cases) {
         const config = bundled();
@@ -100,4 +103,14 @@ test('a stored download is used only when it is newer and valid', () => {
     assert.equal(registry.get('claudecode').name, 'Claude Code');
 
     fs.rmSync(userFile);
+});
+
+test('Windows: arguments are quoted for cmd.exe', () => {
+    const { quoteShellArg } = env.ext('out/agents/agentUtils.js');
+    assert.equal(quoteShellArg('--resume'), '--resume');
+    assert.equal(quoteShellArg('agentuino/AGENTS.md'), 'agentuino/AGENTS.md');
+    assert.equal(quoteShellArg('C:\\Users\\Max Mustermann\\Temp'), '"C:\\Users\\Max Mustermann\\Temp"');
+    assert.equal(quoteShellArg('x & calc'), '"x & calc"');
+    assert.equal(quoteShellArg('say "hi"'), '"say ""hi"""');
+    assert.equal(quoteShellArg(''), '""');
 });

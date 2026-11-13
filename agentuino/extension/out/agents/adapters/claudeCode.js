@@ -13,7 +13,7 @@
 
 const os = require('os');
 const { spawn } = require('child_process');
-const { describeToolInput, needsShell, buildEnv, parseJson } = require('../agentUtils');
+const { describeToolInput, prepareSpawn, buildEnv, parseJson } = require('../agentUtils');
 const { defineAdapter } = require('../agentConfig');
 
 // ===== CONSTANTS =====
@@ -89,16 +89,16 @@ function createParser({ cwd, sessionId }) {
 function generateTitle(toolPath, prompt) {
     return new Promise(resolve => {
         const args = ['-p', '--model', adapter.titleModel, '--output-format', 'json', '--max-turns', '1'];
-        const shell = needsShell(toolPath);
+        const spawnArgs = prepareSpawn(toolPath, args);
         let stdout = '';
         let child;
 
         try {
-            child = spawn(shell ? `"${toolPath}"` : toolPath, args, {
+            child = spawn(spawnArgs.command, spawnArgs.args, {
                 cwd: os.tmpdir(),
                 env: buildEnv(toolPath),
                 stdio: ['pipe', 'pipe', 'ignore'],
-                shell,
+                shell: spawnArgs.shell,
                 windowsHide: true
             });
         } catch {

@@ -16,9 +16,9 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const https = require('https');
 const links = require('../utils/links');
-const { IS_WINDOWS } = require('./agentUtils');
+const { fetchJson } = require('../utils/remoteFile');
+const { IS_WINDOWS, writeFileAtomic } = require('./agentUtils');
 
 // ===== CONSTANTS =====
 
@@ -27,15 +27,14 @@ const SUPPORTED_SCHEMA = 1;
 const BUNDLED_FILE = path.join(__dirname, '..', '..', 'config', 'agentConfigs.json');
 const USER_DIR = path.join(os.homedir(), '.agentuino');
 const USER_FILE = path.join(USER_DIR, 'agentConfigs.json');
-const REQUEST_TIMEOUT_MS = 10000;
-const MAX_DOWNLOAD_BYTES = 256 * 1024;
-const HTTP_OK = 200;
 const REGEX_FLAGS = 'i';
 const PERMISSION_MODES = ['bypassPermissions', 'acceptEdits', 'auto'];
 const DEFAULT_PERMISSION = 'bypassPermissions';
 const VERSION_PATTERN = /^(\d{4}-\d{2}-\d{2})(?:-(\d+))?$/;
 const JSON_INDENT = 2;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
+// A plain program name: looked up in PATH, never a path to some other program
+const COMMAND_PATTERN = /^[a-z][\w-]*$/;
 
 // ===== STATE =====
 
@@ -46,6 +45,18 @@ let current = null;
 const isString = value => typeof value === 'string' && value.length > 0;
 const isStringArray = value => Array.isArray(value) && value.every(isString);
 const isOptional = (value, check) => value === undefined || check(value);
+
+/**
+ * Install locations must point to the agent's own command, not to any program
+ * @param {Object} agent - Agent entry
+ * @returns {boolean} Valid
+ */
+function hasValidCandidates(agent) {
+    const lists = [agent.candidates?.unix, agent.candidates?.windows];
+    if (!lists.every(isStringArray) || !isString(agent.command)) return false;
+    const names = new Set([agent.command, `${agent.command}.exe`, `${agent.command}.cmd`]);
+    return lists.flat().every(entry => names.has(entry.split(/[\\/]/).pop()));
+}
 
 /**
  * Check that a string is a valid regular expression
@@ -72,14 +83,14 @@ function checkAgent(agent) {
     const args = agent.args || {};
     const checks = {
         name: isString(agent.name),
-        command: isString(agent.command),
+        command: isString(agent.command) && COMMAND_PATTERN.test(agent.command),
         versionArgs: isStringArray(agent.versionArgs),
         helpArgs: isOptional(agent.helpArgs, v => Array.isArray(v) && v.every(isStringArray)),
         installUrl: isString(agent.installUrl) && agent.installUrl.startsWith('https://'),
         install: isString(agent.install?.unix) && isString(agent.install?.windows),
         setupCommand: isString(agent.setupCommand),
         loginHint: isString(agent.loginHint),
-        candidates: isStringArray(agent.candidates?.unix) && isStringArray(agent.candidates?.windows),
+        candidates: hasValidCandidates(agent),
         'args.base': isStringArray(args.base),
         'args.instructions': isOptional(args.instructions, v => isStringArray(v) && v.includes('{file}')),
         'args.permissions': PERMISSION_MODES.every(mode => isStringArray(args.permissions?.[mode])),
@@ -274,52 +285,13 @@ function defineAdapter(id, code) {
 // ===== REMOTE =====
 
 /**
- * Download the configuration from GitHub (only parsed, nothing is stored)
- * @returns {Promise<Object|null>} Parsed configuration or null
- */
-function fetchRemote() {
-    return new Promise(resolve => {
-        const request = https.request({
-            hostname: links.RAW_HOST,
-            path: links.RAW_AGENT_CONFIG_PATH,
-            headers: { 'User-Agent': 'Agentuino-Extension' },
-            timeout: REQUEST_TIMEOUT_MS
-        }, response => {
-            if (response.statusCode !== HTTP_OK) {
-                response.resume();
-                resolve(null);
-                return;
-            }
-            let data = '';
-            response.on('data', chunk => {
-                data += chunk;
-                if (data.length > MAX_DOWNLOAD_BYTES) request.destroy();
-            });
-            response.on('end', () => {
-                try {
-                    resolve(JSON.parse(data));
-                } catch {
-                    resolve(null);
-                }
-            });
-        });
-        request.on('error', () => resolve(null));
-        request.on('timeout', () => {
-            request.destroy();
-            resolve(null);
-        });
-        request.end();
-    });
-}
-
-/**
  * Look for a newer valid configuration on GitHub
  * @param {string[]} requiredIds - Agents the code has adapters for
  * @param {string} skipped - Version the user chose to skip
  * @returns {Promise<Object|null>} Newer configuration or null
  */
 async function findUpdate(requiredIds, skipped) {
-    const remote = await fetchRemote();
+    const remote = await fetchJson(links.RAW_AGENT_CONFIG_PATH);
     if (!remote || validate(remote, requiredIds)) return null;
     if (remote.version === skipped || !current || !isNewer(remote.version, current.config.version)) return null;
     return remote;
@@ -331,18 +303,16 @@ async function findUpdate(requiredIds, skipped) {
  */
 function apply(config) {
     fs.mkdirSync(USER_DIR, { recursive: true });
-    fs.writeFileSync(USER_FILE, JSON.stringify(config, null, JSON_INDENT) + '\n', 'utf8');
+    writeFileAtomic(USER_FILE, JSON.stringify(config, null, JSON_INDENT) + '\n');
     current = { config, source: 'downloaded' };
 }
 
 module.exports = {
     USER_DIR,
     load,
-    getAgent,
     getInfo,
     validate,
     isNewer,
-    toRegex,
     expandCandidates,
     buildArgs,
     defineAdapter,

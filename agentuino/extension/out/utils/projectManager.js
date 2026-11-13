@@ -22,6 +22,7 @@ const fs = require('fs');
 const path = require('path');
 const i18n = require('./i18n');
 const ruleBlocks = require('./ruleBlocks');
+const { createError, writeFileAtomic } = require('../agents/agentUtils');
 
 // ===== CONSTANTS =====
 
@@ -51,7 +52,6 @@ const AUTO_END = '<!-- agentuino:auto:end -->';
 
 const CONFIG_VERSION = 1;
 const JSON_INDENT = 2;
-const FILE_MODE = 0o644;
 const FIRST_DUPLICATE_SUFFIX = 1;
 const MAX_SKETCH_SEARCH_DEPTH = 3;
 const UNKNOWN_PORT_PLACEHOLDER = '<PORT>';
@@ -80,32 +80,7 @@ const GITIGNORE_CONTENT = [
     ''
 ].join('\n');
 
-// ===== ERRORS =====
-
-/**
- * Create an error with a machine-readable code for the UI layer
- * @param {string} code - Error code (e.g. 'NOT_A_SKETCH')
- * @param {string} message - Technical message (English)
- * @returns {Error} Error with code property
- */
-function createError(code, message) {
-    const error = new Error(message);
-    error.code = code;
-    return error;
-}
-
 // ===== FILE HELPERS =====
-
-/**
- * Write a file atomically via temp file and rename
- * @param {string} filePath - Target path
- * @param {string} content - File content
- */
-function writeFileAtomic(filePath, content) {
-    const tempFile = filePath + '.tmp';
-    fs.writeFileSync(tempFile, content, { encoding: 'utf8', mode: FILE_MODE });
-    fs.renameSync(tempFile, filePath);
-}
 
 /**
  * Get a file name that does not exist yet in the given directory
@@ -399,7 +374,7 @@ function buildAutoSection(sketchPath, config) {
         lines.push(t('project.auto.ruleBeginner'));
     }
 
-    // Rule blocks chosen for this sketch (page "Rule blocks")
+    // Semantic anchors chosen for this sketch (page "Semantic anchors")
     const codeRules = ruleBlocks.getActiveTexts(config, t);
     if (codeRules.length > 0) {
         lines.push('', t('project.auto.codeRulesTitle'), '', ...codeRules.map(text => `- ${text}`));
@@ -560,7 +535,7 @@ function ensureProject(sketchPath, options = {}) {
     if (!fs.existsSync(paths.config)) {
         const config = structuredClone(DEFAULT_CONFIG);
         config.language = options.language || i18n.FALLBACK_LOCALE;
-        // A new sketch starts with the current default rule blocks
+        // A new sketch starts with the current default anchors
         config.rules = ruleBlocks.getDefaults();
         writeConfig(sketchPath, config);
     }
@@ -577,22 +552,21 @@ function ensureProject(sketchPath, options = {}) {
 // ===== EXPORTS =====
 
 module.exports = {
-    PROJECT_DIR_NAME,
     AGENTS_FILE_REL: `${PROJECT_DIR_NAME}/${FILES.agents}`,
     getProjectPaths,
     isSketchFolder,
     findSketchFolder,
-    validateSketch,
     isProject,
     ensureProject,
     readConfig,
     writeConfig,
     getLastChatId,
     setLastChatId,
+    CHAT_DATA_EXT,
+    CHAT_PROTOCOL_EXT,
     listChatSummaries,
     updateAutoSection,
     refreshAutoSection,
-    listKnowledgeFiles,
     addKnowledgeFile,
     addAttachment
 };

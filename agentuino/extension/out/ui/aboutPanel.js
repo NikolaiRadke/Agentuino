@@ -15,6 +15,7 @@
 const vscode = require('vscode');
 const path = require('path');
 const crypto = require('crypto');
+const links = require('../utils/links');
 
 // ===== CONSTANTS =====
 
@@ -64,7 +65,7 @@ class AboutPanel {
         this.panel.iconPath = vscode.Uri.file(path.join(this.iconsDir, 'agentuino.png'));
 
         this.panel.webview.onDidReceiveMessage(async msg => {
-            if (msg.command === 'openUrl' && msg.url) {
+            if (msg.command === 'openUrl' && links.isWebUrl(msg.url)) {
                 await vscode.env.openExternal(vscode.Uri.parse(msg.url));
             } else if (msg.command === 'copy') {
                 await vscode.env.clipboard.writeText(this.copyText);

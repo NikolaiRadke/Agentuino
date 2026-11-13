@@ -37,7 +37,6 @@
     "sketch": "Sketch : {0}",
     "noSketch": "Aucun sketch",
     "cost": "Coût jusqu'ici : ${0}",
-    "newChatStarted": "Nouveau chat. La mémoire du projet, les connaissances et les chats précédents restent accessibles à l'agent.",
     "knowledgeAdded": "Ajouté aux connaissances du projet : {0}",
     "projectCreated": "Dossier du projet créé. Tu peux ajouter tes propres instructions pour l'agent via « Modifier les instructions du projet ».",
     "sessionLost": "La session précédente n'était plus disponible, une nouvelle a été démarrée.",
@@ -327,7 +326,7 @@
     "applied": "Configuration des agents {0} appliquée. Elle est utilisée à partir de la prochaine tâche."
   },
   "uninstall": {
-    "confirm": "Désinstaller Agentuino ? L'extension et ses paramètres seront supprimés. Tes dossiers de projet « agentuino » dans les sketches, avec les chats et les notes, sont conservés. Si tu n'en as plus besoin, supprime simplement le dossier « agentuino » du sketch ; le sketch fonctionne aussi sans lui.",
+    "confirm": "Désinstaller Agentuino ? L'extension, ses paramètres, tes propres ancres sémantiques et la configuration des agents téléchargée seront supprimés. Tes dossiers de projet « agentuino » dans les sketches, avec les chats et les notes, sont conservés. Si tu n'en as plus besoin, supprime simplement le dossier « agentuino » du sketch ; le sketch fonctionne aussi sans lui.",
     "button": "Désinstaller",
     "done": "Agentuino a été supprimé. Recharge l'IDE pour terminer.",
     "reload": "Recharger",

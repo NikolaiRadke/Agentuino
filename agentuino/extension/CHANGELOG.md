@@ -8,6 +8,14 @@
 - check-agent-configs.js also reads help texts printed to stderr
 - French, Spanish and Italian
 - Timeout message names the agent in general (was always "Claude Code")
+- Antigravity: file names in the tool activity (read_file uses {Path})
+- Windows: arguments are quoted when an agent runs through the shell
+  (paths with spaces, e.g. in the user name, no longer fall apart)
+- Webview messages: chat IDs are checked, only https links are opened
+- agentConfigs.json: command and install locations must name the agent itself
+- Uninstalling also removes the own semantic anchors and the debug builds
+- Cleanup: one helper each for downloads, atomic files, errors and versions;
+  unused exports and texts removed
 
 ## 0.8.0
 

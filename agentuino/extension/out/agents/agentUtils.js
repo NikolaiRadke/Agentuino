@@ -4,17 +4,23 @@
  *
  * Licensed under the Apache License, Version 2.0
  *
- * Helpers shared by the runner and all agent adapters. Pure Node.js.
+ * Helpers shared by the runner, the agent adapters and the other modules
+ * (errors, Windows processes, atomic files, versions). Pure Node.js.
  */
 
 "use strict";
 
+const fs = require('fs');
 const path = require('path');
 
 // ===== CONSTANTS =====
 
 const IS_WINDOWS = process.platform === 'win32';
 const MAX_DETAIL_CHARS = 80;
+const FILE_MODE = 0o644;
+const TEMP_SUFFIX = '.tmp';
+// Arguments that need no quotes in cmd.exe
+const SAFE_SHELL_ARG = /^[\w\-.:\\/=,@+]+$/;
 
 // ===== FUNCTIONS =====
 
@@ -96,6 +102,28 @@ function needsShell(toolPath) {
 }
 
 /**
+ * Quote one argument for cmd.exe. With a shell, Node joins the arguments with
+ * spaces, so a path with spaces would fall apart and "&" would start a command.
+ * @param {string} arg - Argument
+ * @returns {string} Argument, quoted if needed
+ */
+function quoteShellArg(arg) {
+    const text = String(arg);
+    return SAFE_SHELL_ARG.test(text) ? text : `"${text.replace(/"/g, '""')}"`;
+}
+
+/**
+ * Command, arguments and shell flag for spawn() and execFile()
+ * @param {string} toolPath - Executable
+ * @param {string[]} args - Arguments
+ * @returns {{command: string, args: string[], shell: boolean}} Spawn parameters
+ */
+function prepareSpawn(toolPath, args) {
+    if (!needsShell(toolPath)) return { command: toolPath, args, shell: false };
+    return { command: `"${toolPath}"`, args: args.map(quoteShellArg), shell: true };
+}
+
+/**
  * Build the environment for a spawned tool. The tool's own folder goes to
  * the front of PATH: IDEs started from the desktop often have a short PATH,
  * and npm-installed agents (e.g. via nvm) need 'node' from that folder.
@@ -114,6 +142,34 @@ function buildEnv(toolPath, extra = {}, extraDirs = []) {
     const front = dirs.filter((dir, index) => dirs.indexOf(dir) === index);
     env[key] = [...front, ...parts.filter(part => !front.includes(part))].join(path.delimiter);
     return env;
+}
+
+/**
+ * Write a file atomically via temp file and rename, so a crash never leaves half a file
+ * @param {string} file - Target path
+ * @param {string} content - Content
+ */
+function writeFileAtomic(file, content) {
+    const tempFile = file + TEMP_SUFFIX;
+    fs.writeFileSync(tempFile, content, { encoding: 'utf8', mode: FILE_MODE });
+    fs.renameSync(tempFile, file);
+}
+
+/**
+ * Compare version numbers like '3.1.2' or folder names like 'v20.11.0'
+ * @param {string} a - Version
+ * @param {string} b - Version
+ * @returns {number} Negative if a is older, 0 if equal, positive if a is newer
+ */
+function compareVersions(a, b) {
+    const parse = v => String(v || '').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+    const pa = parse(a);
+    const pb = parse(b);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+        const diff = (pa[i] || 0) - (pb[i] || 0);
+        if (diff !== 0) return diff;
+    }
+    return 0;
 }
 
 /**
@@ -136,7 +192,10 @@ module.exports = {
     displayPath,
     describeToolInput,
     describeCommand,
-    needsShell,
+    quoteShellArg,
+    prepareSpawn,
     buildEnv,
+    writeFileAtomic,
+    compareVersions,
     parseJson
 };

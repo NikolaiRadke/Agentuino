@@ -211,6 +211,5 @@ class BoardDetector extends EventEmitter {
 }
 
 module.exports = {
-    BoardDetector,
-    getBoardName
+    BoardDetector
 };

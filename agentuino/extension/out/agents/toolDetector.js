@@ -15,11 +15,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFile } = require('child_process');
-const { buildEnv } = require('./agentUtils');
+const { IS_WINDOWS, buildEnv, prepareSpawn, compareVersions } = require('./agentUtils');
 
 // ===== CONSTANTS =====
 
-const IS_WINDOWS = process.platform === 'win32';
 const LOOKUP_TIMEOUT_MS = 3000;
 const VERSION_TIMEOUT_MS = 5000;
 const PORT_LIST_TIMEOUT_MS = 8000;
@@ -72,22 +71,6 @@ function preferNative(paths) {
 // ===== NODE VERSION MANAGERS =====
 
 /**
- * Compare two version folder names like 'v20.11.0', newest first
- * @param {string} a - Folder name
- * @param {string} b - Folder name
- * @returns {number} Sort order
- */
-function compareVersionsDesc(a, b) {
-    const pa = a.replace(/^v/, '').split('.').map(Number);
-    const pb = b.replace(/^v/, '').split('.').map(Number);
-    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-        const diff = (pb[i] || 0) - (pa[i] || 0);
-        if (diff !== 0) return diff;
-    }
-    return 0;
-}
-
-/**
  * List version subfolders of a node manager, newest first
  * @param {string} dir - Folder with one subfolder per Node version
  * @returns {string[]} Version folder paths
@@ -97,7 +80,7 @@ function listVersionDirs(dir) {
         return fs.readdirSync(dir, { withFileTypes: true })
             .filter(entry => entry.isDirectory() && /^v?\d+\./.test(entry.name))
             .map(entry => entry.name)
-            .sort(compareVersionsDesc)
+            .sort((a, b) => compareVersions(b, a))
             .map(name => path.join(dir, name));
     } catch {
         return [];
@@ -269,12 +252,10 @@ function hasArdudebug(cliPath, configFile) {
  */
 function getToolVersion(toolPath, args) {
     if (!toolPath) return Promise.resolve(null);
-    const lower = toolPath.toLowerCase();
-    const shell = IS_WINDOWS && (lower.endsWith('.cmd') || toolPath.includes('\\.'));
-    const command = shell ? `"${toolPath}"` : toolPath;
+    const spawnArgs = prepareSpawn(toolPath, args);
     return new Promise(resolve => {
-        const options = { timeout: VERSION_TIMEOUT_MS, windowsHide: true, shell, env: buildEnv(toolPath) };
-        execFile(command, args, options, (error, stdout) => {
+        const options = { timeout: VERSION_TIMEOUT_MS, windowsHide: true, shell: spawnArgs.shell, env: buildEnv(toolPath) };
+        execFile(spawnArgs.command, spawnArgs.args, options, (error, stdout) => {
             const line = (stdout || '').split(/\r?\n/).map(s => s.trim()).find(Boolean);
             // Keep only the version number, e.g. "2.1.322" or "1.5.1"
             const version = line?.match(/\d+\.\d+\.\d+[\w.-]*/)?.[0];
@@ -296,7 +277,7 @@ const versionCache = new Map();
 function isVersionAtLeast(version, minimum) {
     const match = String(version || '').match(/\d+(\.\d+)*/);
     if (!match) return true;
-    return compareVersionsDesc(match[0], minimum) <= 0;
+    return compareVersions(match[0], minimum) >= 0;
 }
 
 /**

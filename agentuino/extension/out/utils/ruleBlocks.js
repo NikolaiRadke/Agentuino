@@ -1,5 +1,5 @@
 /*
- * Agentuino - Rule Blocks
+ * Agentuino - Semantic Anchors
  * Copyright 2026 Monster Maker
  *
  * Licensed under the Apache License, Version 2.0
@@ -18,6 +18,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { writeFileAtomic } = require('../agents/agentUtils');
 
 // ===== CONSTANTS =====
 
@@ -76,9 +77,7 @@ function loadState() {
 function saveState(state) {
     fs.mkdirSync(path.dirname(USER_FILE), { recursive: true });
     const data = { version: FILE_VERSION, defaults: state.defaults, custom: state.custom };
-    const tempFile = `${USER_FILE}.tmp`;
-    fs.writeFileSync(tempFile, JSON.stringify(data, null, JSON_INDENT) + '\n', 'utf8');
-    fs.renameSync(tempFile, USER_FILE);
+    writeFileAtomic(USER_FILE, JSON.stringify(data, null, JSON_INDENT) + '\n');
 }
 
 // ===== BLOCKS =====
@@ -214,7 +213,6 @@ module.exports = {
     GROUPS,
     MAX_LABEL_LENGTH,
     MAX_TEXT_LENGTH,
-    loadState,
     getDefaults,
     setDefaults,
     getActiveKeys,

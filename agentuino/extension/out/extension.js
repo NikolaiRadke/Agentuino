@@ -279,13 +279,15 @@ function describeConfigInfo() {
 async function showAbout() {
     const settings = getSettings();
     const notFound = t('about.notFound');
-    const version = require(path.join(extensionPath, 'package.json')).version;
+    const version = getVersion();
 
     // Status per agent, the detail lines show versions and paths
     const agents = await Promise.all(registry.getAll().map(async adapter => {
         const toolPath = await toolDetector.findAgent(adapter, settings.paths[adapter.id]);
-        const agentVersion = toolPath ? await toolDetector.getToolVersion(toolPath, adapter.versionArgs) : null;
-        const tooOld = toolPath ? (await toolDetector.checkAgentVersion(adapter, toolPath)).tooOld : false;
+        // The version check already asks for the version if the agent has a minimum
+        const check = toolPath ? await toolDetector.checkAgentVersion(adapter, toolPath) : { version: null, tooOld: false };
+        const agentVersion = check.version || (toolPath ? await toolDetector.getToolVersion(toolPath, adapter.versionArgs) : null);
+        const tooOld = check.tooOld;
         return {
             name: adapter.name,
             status: !toolPath ? 'missing' : (tooOld ? 'tooOld' : 'ok'),
@@ -486,7 +488,7 @@ async function showSettingsMenu() {
 }
 
 /**
- * Open the rule blocks of the current sketch (or the defaults without a sketch)
+ * Open the semantic anchors of the current sketch (or the defaults without a sketch)
  */
 function showRules() {
     RulesPanel.show({ extensionPath, getT: () => t, ensureProject: ensureProjectFor }, findSketch());

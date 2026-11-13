@@ -37,7 +37,6 @@
     "sketch": "Sketch: {0}",
     "noSketch": "No sketch",
     "cost": "Cost so far: ${0}",
-    "newChatStarted": "New chat. Project memory, knowledge and earlier chats remain available to the agent.",
     "knowledgeAdded": "Added to project knowledge: {0}",
     "projectCreated": "Project folder set up. You can add your own instructions for the agent via 'Edit project instructions'.",
     "sessionLost": "The previous session was no longer available, a new one was started.",
@@ -327,7 +326,7 @@
     "applied": "Agent configuration {0} applied. It is used from the next task on."
   },
   "uninstall": {
-    "confirm": "Uninstall Agentuino? The extension and its settings will be removed. Your 'agentuino' project folders in the sketches with chats and notes are kept. If you no longer need them, simply delete the 'agentuino' folder in the sketch; the sketch keeps working without it.",
+    "confirm": "Uninstall Agentuino? The extension, its settings, your own semantic anchors and the downloaded agent configuration will be removed. Your 'agentuino' project folders in the sketches with chats and notes are kept. If you no longer need them, simply delete the 'agentuino' folder in the sketch; the sketch keeps working without it.",
     "button": "Uninstall",
     "done": "Agentuino was removed. Reload the IDE to finish.",
     "reload": "Reload",

@@ -14,7 +14,17 @@ const REPO_OWNER = 'NikolaiRadke';
 const REPO_NAME = 'Agentuino';
 const REPO_BRANCH = 'main';
 
+/**
+ * Only web pages may be opened from a webview, no file: or other schemes
+ * @param {*} url - URL from a webview message
+ * @returns {boolean} True for https URLs
+ */
+function isWebUrl(url) {
+    return typeof url === 'string' && url.startsWith('https://');
+}
+
 module.exports = {
+    isWebUrl,
     REPO_URL: `https://github.com/${REPO_OWNER}/${REPO_NAME}`,
     RELEASES_URL: `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/latest`,
     ISSUES_URL: `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues`,
