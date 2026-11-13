@@ -1,0 +1,6 @@
+#!/bin/sh
+# Agentuino: debug the sketch with ArduDebug (breakpoints, variables).
+# Runs debug-run.js with the Node runtime of the Arduino IDE (AGENTUINO_NODE),
+# so nothing has to be installed. Usage: agentuino-debug --break sketch.ino:12 --print counter
+NODE="${AGENTUINO_NODE:-node}"
+ELECTRON_RUN_AS_NODE=1 exec "$NODE" "$(dirname "$0")/debug-run.js" "$@"

@@ -599,18 +599,19 @@ class ChatPanel {
     }
 
     /**
-     * Environment for Agentuino's own tools in the agent's shell (agentuino-serial):
+     * Environment for Agentuino's own tools in the agent's shell (agentuino-serial, agentuino-debug):
      * the IDE's Node runtime and the arduino-cli setup of this sketch
      * @param {string} sketchPath - Sketch folder
      * @returns {Object} Variables
      */
     getToolEnv(sketchPath) {
-        const env = { AGENTUINO_NODE: process.execPath };
+        const env = { AGENTUINO_NODE: process.execPath, AGENTUINO_SKETCH: sketchPath };
         try {
-            const { cliPath, configFile, port } = projectManager.readConfig(sketchPath).context;
+            const { cliPath, configFile, port, fqbn } = projectManager.readConfig(sketchPath).context;
             if (cliPath) env.AGENTUINO_CLI = cliPath;
             if (configFile) env.AGENTUINO_CLI_CONFIG = configFile;
             if (port) env.AGENTUINO_PORT = port;
+            if (fqbn) env.AGENTUINO_FQBN = fqbn;
         } catch {
             // Without config the tool detects arduino-cli and the port itself
         }

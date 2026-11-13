@@ -28,6 +28,9 @@ const ruleBlocks = require('./ruleBlocks');
 const PROJECT_DIR_NAME = 'agentuino';
 // Agentuino's serial reader in the agent's PATH (bin/agentuino-serial), example call
 const SERIAL_EXAMPLE = 'agentuino-serial --seconds 10 --baud 9600';
+// Agentuino's debugger (bin/agentuino-debug), only with ArduDebug and an AVR board
+const DEBUG_EXAMPLES = ['agentuino-debug --break {0}:12 --print counter,ledState --hits 3', 'agentuino-debug --pause --locals'];
+const DEBUG_BOARD_PATTERN = /^(arduino|ardudebug):avr:/;
 
 const SUBDIRS = {
     knowledge: 'knowledge',
@@ -66,7 +69,8 @@ const DEFAULT_CONFIG = {
         fqbn: null,
         port: null,
         cliPath: null,
-        configFile: null
+        configFile: null,
+        ardudebug: false
     }
 };
 
@@ -444,6 +448,20 @@ function buildAutoSection(sketchPath, config) {
             '',
             ...t.strings.project.auto.serialRules
         );
+        if (config.context.ardudebug && DEBUG_BOARD_PATTERN.test(fqbn)) {
+            lines.push(
+                '',
+                t('project.auto.debugTitle'),
+                '',
+                t('project.auto.debugIntro'),
+                '',
+                '```',
+                ...DEBUG_EXAMPLES.map(example => example.replace('{0}', sketchFile)),
+                '```',
+                '',
+                ...t.strings.project.auto.debugRules
+            );
+        }
     }
 
     const chats = listChatSummaries(sketchPath).slice(0, MAX_LISTED_CHATS);

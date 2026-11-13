@@ -24,6 +24,9 @@ const LOOKUP_TIMEOUT_MS = 3000;
 const VERSION_TIMEOUT_MS = 5000;
 const PORT_LIST_TIMEOUT_MS = 8000;
 const PORT_CACHE_MS = 30000;
+// Installed board packages change rarely
+const CORE_CACHE_MS = 5 * 60 * 1000;
+const ARDUDEBUG_CORE = 'ardudebug:avr';
 
 // ===== HELPERS =====
 
@@ -231,6 +234,31 @@ function detectSerialPort(cliPath, configFile) {
     });
 }
 
+let coreCache = { time: 0, key: null, installed: false };
+
+/**
+ * Check whether the ArduDebug board package is installed ('arduino-cli core list')
+ * @param {string} cliPath - arduino-cli executable
+ * @param {string|null} configFile - arduino-cli config file
+ * @returns {Promise<boolean>} Installed
+ */
+function hasArdudebug(cliPath, configFile) {
+    const key = `${cliPath}|${configFile}`;
+    if (key === coreCache.key && Date.now() - coreCache.time < CORE_CACHE_MS) {
+        return Promise.resolve(coreCache.installed);
+    }
+    const args = ['core', 'list', '--format', 'json'];
+    if (configFile) args.push('--config-file', configFile);
+
+    return new Promise(resolve => {
+        execFile(cliPath, args, { timeout: PORT_LIST_TIMEOUT_MS, windowsHide: true }, (error, stdout) => {
+            const installed = !error && String(stdout).includes(`"${ARDUDEBUG_CORE}"`);
+            coreCache = { time: Date.now(), key, installed };
+            resolve(installed);
+        });
+    });
+}
+
 // ===== VERSIONS =====
 
 /**
@@ -300,5 +328,6 @@ module.exports = {
     findAgent,
     findArduinoCli,
     findArduinoCliConfig,
-    detectSerialPort
+    detectSerialPort,
+    hasArdudebug
 };

@@ -30,6 +30,9 @@ Before every task Agentuino saves the code. ↶ next to your message brings back
 ### Serial output for the agent
 The agent can read what your board prints with `Serial.println()` for a few seconds and check whether the sketch really does what it should.
 
+### Debugging with ArduDebug
+With [ArduDebug](https://github.com/NikolaiRadke/ArduDebug) installed, the agent can stop your sketch on the board at a line and look into the variables, without changing the code. It asks before it uploads a debug build and brings the normal sketch back when the bug is fixed.
+
 ### Semantic anchors
 Switch code rules on with a click, per sketch: beginner-friendly comments, no magic numbers, non-blocking code, save RAM, interrupt-safe and more. Create your own anchors for rules you need again and again. New sketches start with your default selection.
 
@@ -148,7 +151,7 @@ node .github/scripts/check-agent-configs.js [--codex=<path>] [--vibe=<path>]
 ## Related projects
 
 - [AI.duino](https://github.com/NikolaiRadke/AI.duino) – the big sibling with many AI providers and features
-- [ArduDebug](https://github.com/NikolaiRadke/ArduDebug) – breakpoint debugging for AVR boards in the Arduino IDE
+- [ArduDebug](https://github.com/NikolaiRadke/ArduDebug) – breakpoint debugging for AVR boards in the Arduino IDE; Agentuino uses it for debugging by the agent
 
 ## 💙 Support Agentuino
 

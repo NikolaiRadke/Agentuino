@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- agentuino-debug: with ArduDebug installed, the agent stops the program on the board at a
+  line and reads variables (`--break`, `--print`, `--locals`, `--hits`, `--pause`), including
+  the Serial output during the run. It builds the debug build itself with the ArduDebug
+  variant of the selected board, so "Arduino AVR Boards" sketches work too. Uploads only
+  after the user agreed (`--upload`); `--restore` brings the normal build back.
+  Uses bridge and avr-gdb from the ArduDebug package; nothing to install, builds go to the
+  temp folder (not into synced sketchbooks)
+- AGENTS.md explains it when ArduDebug is installed, with rules for uploads, hardware that
+  stops at a breakpoint and cleaning up afterwards
 - Rule blocks renamed to semantic anchors, the better known term (as in AI.duino)
 
 ## 0.7.0

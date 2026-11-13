@@ -22,22 +22,19 @@
 "use strict";
 
 const path = require('path');
-const { spawn, execFile } = require('child_process');
+const { spawn } = require('child_process');
 const { detectSerialPort } = require(path.join(__dirname, '..', 'out', 'agents', 'toolDetector'));
 const { buildEnv } = require(path.join(__dirname, '..', 'out', 'agents', 'agentUtils'));
+const { IS_WINDOWS, stopProcess, cutText } = require('./toolUtils');
 
 // ===== CONSTANTS =====
 
-const IS_WINDOWS = process.platform === 'win32';
 const DEFAULT_SECONDS = 10;
 const MAX_SECONDS = 60;
 const DEFAULT_BAUD = 9600;
 const MS_PER_SECOND = 1000;
 // Opening the port resets an Uno; the bootloader needs a moment before the sketch runs
 const SEND_DELAY_MS = 2000;
-// Longer output keeps its start (setup messages) and its end
-const KEEP_HEAD_CHARS = 4000;
-const KEEP_TAIL_CHARS = 12000;
 // Share of unreadable characters above which the output is probably garbage
 const GARBAGE_RATIO = 0.3;
 const BUSY_PATTERN = /busy|in use|access is denied|permission denied|zugriff verweigert/i;
@@ -76,22 +73,6 @@ function looksLikeGarbage(text) {
 }
 
 /**
- * Stop arduino-cli monitor including its child processes
- * @param {ChildProcess} child - Monitor process
- */
-function stopMonitor(child) {
-    if (IS_WINDOWS) {
-        execFile('taskkill', ['/pid', String(child.pid), '/T', '/F'], { windowsHide: true }, () => {});
-        return;
-    }
-    try {
-        process.kill(-child.pid, 'SIGTERM');
-    } catch {
-        child.kill('SIGTERM');
-    }
-}
-
-/**
  * Read from the serial port for a fixed time
  * @param {Object} options - {cli, configFile, port, baud, seconds, send}
  * @returns {Promise<{output: string, error: string, early: boolean}>} Result
@@ -118,7 +99,7 @@ function readPort({ cli, configFile, port, baud, seconds, send }) {
             resolve({ output, error, early });
         };
         const timer = setTimeout(() => {
-            stopMonitor(child);
+            stopProcess(child);
             finish(false);
         }, seconds * MS_PER_SECOND);
         // Some sketches wait for input; stdin stays open, closing it would end the monitor
@@ -161,10 +142,7 @@ async function main() {
     }
 
     let text = result.output.replace(/\r\n/g, '\n');
-    if (text.length > KEEP_HEAD_CHARS + KEEP_TAIL_CHARS) {
-        const skipped = text.length - KEEP_HEAD_CHARS - KEEP_TAIL_CHARS;
-        text = `${text.slice(0, KEEP_HEAD_CHARS)}\n… (${skipped} characters cut) …\n${text.slice(-KEEP_TAIL_CHARS)}`;
-    }
+    text = cutText(text);
 
     // Opening the port does not always reset the board: the sketch keeps running
     console.log(`--- Serial output of ${port} at ${options.baud} baud, ${options.seconds} s. The first line may be incomplete ---`);

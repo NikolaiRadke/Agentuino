@@ -58,6 +58,8 @@ folders in the sketches are kept.
 - After every run that changed code the sketch is compiled: ✅ with flash and RAM usage,
   or ❌ with the errors. The agent then gets the compiler output and fixes it on its own
   (up to 3 runs per task); if that fails, a button starts another round.
+- With [ArduDebug](https://github.com/NikolaiRadke/ArduDebug) installed, the agent can stop the program
+  on the board at a line and read variables. It asks before uploading a debug build.
 - **⚙** opens project instructions, semantic anchors, knowledge files, project memory, the language and the about info.
 - **⚓ Semantic anchors** switch code rules on per sketch (e.g. no magic numbers, non-blocking code, save RAM);
   create your own anchors there too. New sketches start with your default selection.

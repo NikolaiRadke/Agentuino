@@ -179,7 +179,17 @@
         "- If the command reports a busy port, or nothing arrives after an upload, the Serial Monitor of the IDE probably holds the port. Ask the user to open and close it once, or to end the debug session.",
         "- If the sketch was uploaded with \"Optimize for Debugging\" (ArduDebug), the serial port belongs to the debugger and the monitor only shows unreadable characters. Do not interpret them; ask the user to upload without this option."
       ],
-      "codeRulesTitle": "## Code rules"
+      "codeRulesTitle": "## Code rules",
+      "debugTitle": "## Debugging with ArduDebug",
+      "debugIntro": "ArduDebug is installed. With it you stop the program on the board at a line and read variables, without changing the code. The command builds a debug build with the ArduDebug variant of the board itself:",
+      "debugRules": [
+        "- Offer debugging when you look for a bug and what happens at runtime matters. Ask first whether the user wants it.",
+        "- A debug build must run on the board. If the command reports that none runs, ask the user whether you may upload one, then call the command with `--upload`. Tell the user: in a debug build pins 0, 1 and 2 (Uno, Nano) or pin 7 (Leonardo) belong to the debugger, and the Serial Monitor only shows unreadable characters. `agentuino-debug` returns the `Serial` output itself, `agentuino-serial` does not work then.",
+        "- If the sketch drives motors, heaters, relays or similar, ask before every stop: at a breakpoint the hardware stays in its state.",
+        "- At most 8 breakpoints. Breakpoints in interrupt routines are never reached. With breakpoints set the program runs slower, and while it is stopped `millis()` does not count on.",
+        "- When debugging has done its job: fix the bug in the sketch, remove everything you added only for debugging, then ask whether you may upload the normal build: `agentuino-debug --restore`.",
+        "- Never call `ardudebug-bridge` or `avr-gdb` directly, only through `agentuino-debug`."
+      ]
     }
   },
   "about": {

@@ -34,6 +34,8 @@ const CONFIG_SECTION = 'agentuino';
 const STATUS_BAR_PRIORITY = 100;
 const UPDATE_CHECK_DELAY_MS = 5000;
 const EXECUTABLE_MODE = 0o755;
+// Agentuino's commands for the agent in bin/
+const AGENT_TOOLS = ['agentuino-serial', 'agentuino-debug'];
 
 // ===== STATE =====
 
@@ -113,7 +115,9 @@ async function collectContext(sketchPath) {
     const board = boardDetector.getBoardInfo(sketchPath);
     const port = board.port || (cliPath ? await toolDetector.detectSerialPort(cliPath, configFile) : null);
 
-    const context = { cliPath, configFile, port };
+    const ardudebug = cliPath ? await toolDetector.hasArdudebug(cliPath, configFile) : false;
+
+    const context = { cliPath, configFile, port, ardudebug };
     if (board.fqbn) Object.assign(context, { fqbn: board.fqbn, boardName: board.boardName });
     return context;
 }
@@ -247,14 +251,16 @@ async function addKnowledge() {
 
 /**
  * The IDE unpacks the VSIX without execute permissions, but the agent calls
- * bin/agentuino-serial directly (Linux, macOS, Git Bash)
+ * the tools in bin/ directly (Linux, macOS, Git Bash)
  */
 function makeToolsExecutable() {
     if (process.platform === 'win32') return;
-    try {
-        fs.chmodSync(path.join(extensionPath, 'bin', 'agentuino-serial'), EXECUTABLE_MODE);
-    } catch {
-        // Read-only installation: the tool is then only missing, the chat still works
+    for (const tool of AGENT_TOOLS) {
+        try {
+            fs.chmodSync(path.join(extensionPath, 'bin', tool), EXECUTABLE_MODE);
+        } catch {
+            // Read-only installation: the tool is then only missing, the chat still works
+        }
     }
 }
 

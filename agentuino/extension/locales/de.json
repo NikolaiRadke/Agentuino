@@ -179,7 +179,17 @@
         "- Meldet der Befehl einen belegten Port oder kommt nach einem Upload nichts an, hält vermutlich der serielle Monitor der IDE den Port. Bitte den Nutzer, ihn einmal zu öffnen und wieder zu schließen oder die Debug-Sitzung zu beenden.",
         "- Wurde mit „Für Debugging optimieren“ (Optimize for Debugging, ArduDebug) hochgeladen, gehört der serielle Port dem Debugger und der Monitor zeigt nur unlesbare Zeichen. Werte sie nicht aus, sondern bitte den Nutzer, ohne diese Option hochzuladen."
       ],
-      "codeRulesTitle": "## Regeln für den Code"
+      "codeRulesTitle": "## Regeln für den Code",
+      "debugTitle": "## Debuggen mit ArduDebug",
+      "debugIntro": "ArduDebug ist installiert. Damit hältst du das Programm auf dem Board an einer Zeile an und liest Variablen, ohne den Code zu ändern. Der Befehl kompiliert dafür selbst einen Debug-Build mit der ArduDebug-Variante des Boards:",
+      "debugRules": [
+        "- Biete das Debuggen an, wenn du einen Fehler suchst und wichtig ist, was zur Laufzeit passiert. Frag vorher, ob der Nutzer das möchte.",
+        "- Dafür muss ein Debug-Build auf dem Board laufen. Meldet der Befehl, dass keiner läuft, frag den Nutzer, ob du ihn hochladen darfst, und rufe den Befehl dann mit `--upload` auf. Sag dabei: Im Debug-Build gehören Pin 0, 1 und 2 (Uno, Nano) bzw. Pin 7 (Leonardo) dem Debugger, und der serielle Monitor zeigt nur unlesbare Zeichen. Die `Serial`-Ausgabe liefert `agentuino-debug` selbst mit, `agentuino-serial` funktioniert dann nicht.",
+        "- Steuert der Sketch Motoren, Heizungen, Relais oder Ähnliches, frag vor jedem Anhalten: Im Haltepunkt bleibt die Hardware in ihrem Zustand stehen.",
+        "- Höchstens 8 Haltepunkte. Haltepunkte in Interrupt-Routinen werden nie erreicht. Mit Haltepunkten läuft das Programm langsamer, und während es angehalten ist, zählt `millis()` nicht weiter.",
+        "- Hat das Debuggen seinen Zweck erfüllt: Behebe den Fehler im Sketch, entferne alles, was du nur zum Debuggen eingebaut hast, und frag dann, ob du den normalen Build hochladen darfst: `agentuino-debug --restore`.",
+        "- Rufe `ardudebug-bridge` und `avr-gdb` nie direkt auf, nur über `agentuino-debug`."
+      ]
     }
   },
   "about": {
