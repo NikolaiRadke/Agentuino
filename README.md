@@ -141,6 +141,8 @@ Before publishing a changed `agentuino/extension/config/agentConfigs.json`, chec
 node .github/scripts/check-agent-configs.js [--codex=<path>] [--vibe=<path>] [--antigravity=<path>]
 ```
 
+The workflow *Check agent configs* does the same on GitHub: it installs all agents with the commands from the file and runs the check, on every change of the file and every Monday. A red run means an agent changed its options or its install command.
+
 `.github/scripts/package.sh` builds the VSIX and the release zip into `dist/`.
 
 ## Content

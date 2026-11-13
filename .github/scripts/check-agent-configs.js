@@ -10,7 +10,8 @@
  * does, then asks each installed agent for its help text and checks that every
  * option from the templates exists. No login needed.
  *
- * Usage: node .github/scripts/check-agent-configs.js [config file] [--<agentId>=<path>]
+ * Usage: node .github/scripts/check-agent-configs.js [config file] [--<agentId>=<path>] [--all]
+ * --all: a missing agent is an error (CI, where all agents are installed)
  */
 
 "use strict";
@@ -26,20 +27,27 @@ const { IS_WINDOWS } = require(path.join(EXTENSION_DIR, 'out', 'agents', 'agentU
 const HELP_TIMEOUT_MS = 20000;
 const MAX_HELP_BUFFER = 4 * 1024 * 1024;
 const OPTION_PATTERN = /^--?[a-zA-Z]/;
+const VERSION_NUMBER = /\d+\.\d+\.\d+/;
+const ALL_FLAG = '--all';
 
 /**
  * Parse the command line
- * @returns {{file: string, paths: Object}} Config file and agent paths
+ * @returns {{file: string, paths: Object, all: boolean}} Config file, agent paths, all required
  */
 function parseArgs() {
     const paths = {};
+    let all = false;
     let file = path.join(EXTENSION_DIR, 'config', 'agentConfigs.json');
     for (const arg of process.argv.slice(2)) {
+        if (arg === ALL_FLAG) {
+            all = true;
+            continue;
+        }
         const match = arg.match(/^--([\w-]+)=(.+)$/);
         if (match) paths[match[1]] = match[2];
         else file = path.resolve(arg);
     }
-    return { file, paths };
+    return { file, paths, all };
 }
 
 /**
@@ -72,6 +80,21 @@ function run(toolPath, args) {
 }
 
 /**
+ * Compare two version numbers (x.y.z)
+ * @param {string} a - Version
+ * @param {string} b - Version
+ * @returns {boolean} True if a is older than b
+ */
+function isOlder(a, b) {
+    const pa = a.split('.').map(Number);
+    const pb = b.split('.').map(Number);
+    for (let i = 0; i < pa.length; i++) {
+        if (pa[i] !== pb[i]) return pa[i] < pb[i];
+    }
+    return false;
+}
+
+/**
  * All options (words starting with '-') used in the templates of an agent
  * @param {Object} agent - Agent entry
  * @returns {string[]} Options
@@ -86,7 +109,7 @@ function collectOptions(agent) {
 }
 
 function main() {
-    const { file, paths } = parseArgs();
+    const { file, paths, all } = parseArgs();
     const config = JSON.parse(fs.readFileSync(file, 'utf8'));
     const ids = Object.keys(config.agents || {});
     const error = agentConfig.validate(config, ids);
@@ -101,7 +124,12 @@ function main() {
         const agent = config.agents[id];
         const toolPath = paths[id] || which(agent.command);
         if (!toolPath) {
-            console.log(`- ${agent.name}: not installed, skipped (use --${id}=<path>)`);
+            if (all) {
+                console.log(`✗ ${agent.name}: not installed`);
+                failed = true;
+            } else {
+                console.log(`- ${agent.name}: not installed, skipped (use --${id}=<path>)`);
+            }
             continue;
         }
         const version = run(toolPath, agent.versionArgs).trim().split(/\r?\n/)[0];
@@ -111,10 +139,13 @@ function main() {
         const missing = collectOptions(agent).filter(option =>
             !new RegExp(`(^|[\\s,\\[(])${option.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=[\\s,=\\])]|$)`, 'm').test(help));
 
-        console.log(`${missing.length ? '✗' : '✓'} ${agent.name} (${version || '?'}, ${toolPath})`);
-        if (agent.minVersion) console.log(`    minimum version ${agent.minVersion}`);
+        // A fresh install older than minVersion means the entry is wrong
+        const number = version.match(VERSION_NUMBER)?.[0];
+        const tooOld = Boolean(agent.minVersion && number && isOlder(number, agent.minVersion));
+        console.log(`${missing.length || tooOld ? '✗' : '✓'} ${agent.name} (${version || '?'}, ${toolPath})`);
+        if (agent.minVersion) console.log(`    minimum version ${agent.minVersion}${tooOld ? ': installed version is older' : ''}`);
         missing.forEach(option => console.log(`    option not in help: ${option}`));
-        failed = failed || missing.length > 0;
+        failed = failed || missing.length > 0 || tooOld;
     }
     process.exit(failed ? 1 : 0);
 }

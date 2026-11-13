@@ -1,0 +1,54 @@
+# Installs every agent with the command from agentConfigs.json and checks
+# the file against the real CLIs: on every change and once a week, because
+# the agents also change their options without Agentuino changing anything.
+name: Check agent configs
+
+on:
+  push:
+    paths:
+      - agentuino/extension/config/agentConfigs.json
+      - agentuino/extension/out/agents/agentConfig.js
+      - .github/scripts/check-agent-configs.js
+      - .github/workflows/check-agent-configs.yml
+  pull_request:
+    paths:
+      - agentuino/extension/config/agentConfigs.json
+  schedule:
+    - cron: '23 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The install commands are part of the check: a broken one fails the run
+      - name: Install agents
+        shell: bash
+        run: |
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.local/bin:$PATH"
+          failed=0
+          while IFS=$'\t' read -r id command; do
+            echo "::group::$id: $command"
+            bash -c "$command" < /dev/null || { echo "::error::Install of $id failed: $command"; failed=1; }
+            echo "::endgroup::"
+          done < <(node -e "
+            const config = require('./agentuino/extension/config/agentConfigs.json');
+            for (const [id, agent] of Object.entries(config.agents)) console.log(id + '\t' + agent.install.unix);
+          ")
+          exit $failed
+
+      # Also after a failed install, so the report shows everything at once
+      - name: Check options and versions
+        if: success() || failure()
+        run: node .github/scripts/check-agent-configs.js --all
