@@ -12,6 +12,7 @@ Agentuino drives the command line agents **Claude Code**, **Mistral Vibe** and *
 > Agentuino is a **beta**. It is tested on Linux with Claude Code and Mistral Vibe. Windows, macOS and Codex CLI are untested so far, feedback is very welcome!
 
 🆕 What's new?
+* **13.11.2026** **V0.7.0**: rule blocks for your code rules.
 * **12.11.2026** First public beta **V0.6.0**.
     -- More news? Check the [newsblog](NEWS.md).
 

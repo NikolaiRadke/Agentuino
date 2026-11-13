@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.7.0
 
 - Rule blocks (⚙ → ⚓ Rule blocks): code rules switched on per sketch with a click,
   written into the automatic section of AGENTS.md. Basics, advanced (collapsed),
