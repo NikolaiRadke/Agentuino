@@ -58,9 +58,9 @@ folders in the sketches are kept.
 - After every run that changed code the sketch is compiled: ✅ with flash and RAM usage,
   or ❌ with the errors. The agent then gets the compiler output and fixes it on its own
   (up to 3 runs per task); if that fails, a button starts another round.
-- **⚙** opens project instructions, rule blocks, knowledge files, project memory, the language and the about info.
-- **⚓ Rule blocks** switch code rules on per sketch (e.g. no magic numbers, non-blocking code, save RAM);
-  create your own blocks there too. New sketches start with your default selection.
+- **⚙** opens project instructions, semantic anchors, knowledge files, project memory, the language and the about info.
+- **⚓ Semantic anchors** switch code rules on per sketch (e.g. no magic numbers, non-blocking code, save RAM);
+  create your own anchors there too. New sketches start with your default selection.
 
 ## Settings
 

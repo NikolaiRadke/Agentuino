@@ -30,8 +30,8 @@ Before every task Agentuino saves the code. ↶ next to your message brings back
 ### Serial output for the agent
 The agent can read what your board prints with `Serial.println()` for a few seconds and check whether the sketch really does what it should.
 
-### Rule blocks
-Switch code rules on with a click, per sketch: beginner-friendly comments, no magic numbers, non-blocking code, save RAM, interrupt-safe and more. Create your own blocks for rules you need again and again. New sketches start with your default selection.
+### Semantic anchors
+Switch code rules on with a click, per sketch: beginner-friendly comments, no magic numbers, non-blocking code, save RAM, interrupt-safe and more. Create your own anchors for rules you need again and again. New sketches start with your default selection.
 
 ### Safe by default
 The agent **never uploads on its own**, because a board can drive motors or relays. It installs libraries and board packages only after asking.
@@ -87,7 +87,7 @@ Agentuino checks for new versions at startup and shows a notice with a link to t
 - Click **Agentuino** in the status bar or press `Ctrl+Alt+A`. The chat opens next to your code.
 - Describe what your Arduino should do, e.g. *"Let the LED blink faster when I press the button on pin 2."*
 - The chat title opens the list of all chats of this sketch, **+ New** starts a new one.
-- **⚙** opens the project instructions, rule blocks, knowledge files, project memory, agent selection, language and the about page.
+- **⚙** opens the project instructions, semantic anchors, knowledge files, project memory, agent selection, language and the about page.
 
 ### The project folder
 

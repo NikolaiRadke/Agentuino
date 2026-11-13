@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Rule blocks renamed to semantic anchors, the better known term (as in AI.duino)
+
 ## 0.7.0
 
 - Rule blocks (⚙ → ⚓ Rule blocks): code rules switched on per sketch with a click,
