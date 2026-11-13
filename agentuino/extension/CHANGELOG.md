@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.0
 
 - Antigravity CLI (agy) as fourth agent, experimental: free with a Google account
   (weekly limits). Prompt via streaming JSON input, AGENTS.md goes into the prompt.

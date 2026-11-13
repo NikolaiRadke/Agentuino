@@ -12,6 +12,7 @@ Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Co
 > Agentuino is a **beta**. It is tested on Linux with Claude Code and Mistral Vibe. Windows, macOS, Codex CLI and Antigravity CLI are untested so far, feedback is very welcome!
 
 🆕 What's new?
+* **13.11.2026** **V0.9.0**: Antigravity CLI (free) and French, Spanish, Italian.
 * **13.11.2026** **V0.8.0**: the agent debugs your sketch with ArduDebug.
 * **13.11.2026** **V0.7.0**: rule blocks for your code rules.
 * **12.11.2026** First public beta **V0.6.0**.
