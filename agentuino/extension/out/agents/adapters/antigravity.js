@@ -9,7 +9,7 @@
  * Every output line is {"event": "<type>", "<type>": {...}} with the types
  * init, step_update and result (checked against agy 1.5.8 and the headless docs).
  * Text arrives in fragments (text_delta) per step and is joined until the step
- * is DONE. Tool names and parameters are not documented, so parsing is tolerant.
+ * is DONE. Tool names and parameters are not documented (read_file uses {Path}), so parsing is tolerant.
  * agy has no option for an instructions file, so Agentuino puts AGENTS.md
  * into the prompt.
  */
@@ -51,6 +51,7 @@ const TOOL_NAMES = {
 
 // Parameter names of Antigravity tools mapped to the ones describeToolInput reads
 const PARAMETER_NAMES = {
+    Path: 'path',
     TargetFile: 'file_path',
     AbsolutePath: 'file_path',
     File: 'file_path',
