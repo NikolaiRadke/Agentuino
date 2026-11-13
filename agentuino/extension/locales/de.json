@@ -112,7 +112,7 @@
     "fileNotFound": "Datei nicht gefunden: {0}",
     "processFailed": "{0} wurde mit einem Fehler beendet (Code {1}): {2}",
     "agentError": "Der Agent meldet einen Fehler: {0}",
-    "timeout": "Keine Rückmeldung von Claude Code seit {0} Minuten – abgebrochen.",
+    "timeout": "Keine Rückmeldung vom Agenten seit {0} Minuten, abgebrochen.",
     "busy": "Der Agent arbeitet noch. Warte oder drücke Stopp.",
     "unknown": "Unerwarteter Fehler: {0}",
     "notLoggedIn": "{0} ist nicht angemeldet. Öffne ein Terminal und melde dich an: {1}",

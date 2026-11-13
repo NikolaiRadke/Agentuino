@@ -1,0 +1,358 @@
+{
+  "language": {
+    "name": "Español",
+    "auto": "Automático (idioma del IDE)",
+    "select": "Elegir el idioma de Agentuino",
+    "changed": "Idioma cambiado: {0}"
+  },
+  "menu": {
+    "addKnowledge": "📚 Añadir archivo de conocimiento",
+    "openInstructions": "📝 Editar instrucciones del proyecto",
+    "rules": "⚓ Anclas semánticas",
+    "switchLanguage": "🌐 Cambiar idioma",
+    "title": "Agentuino",
+    "openMemory": "🧠 Ver la memoria del proyecto",
+    "about": "ℹ️ Acerca de Agentuino",
+    "chooseAgent": "🤖 Agente para chats nuevos",
+    "uninstall": "🗑 Desinstalar Agentuino"
+  },
+  "status": {
+    "text": "Agentuino",
+    "tooltip": "Abrir el chat de Agentuino",
+    "busy": "Agentuino está trabajando …"
+  },
+  "chat": {
+    "title": "Agentuino",
+    "placeholder": "¿Qué debe hacer tu Arduino? (Intro = enviar, Mayús+Intro = nueva línea)",
+    "send": "Enviar",
+    "stop": "Detener",
+    "newChat": "+ Nuevo",
+    "attach": "Adjuntar archivo",
+    "remove": "Quitar",
+    "welcome": "¡Hola! Describe lo que debe hacer tu Arduino. El agente trabaja directamente en la carpeta de tu sketch, compila por sí mismo y corrige los errores.",
+    "working": "El agente está trabajando …",
+    "stopped": "Detenido.",
+    "you": "Tú",
+    "agent": "Agente",
+    "sketch": "Sketch: {0}",
+    "noSketch": "Ningún sketch",
+    "cost": "Coste hasta ahora: ${0}",
+    "newChatStarted": "Chat nuevo. La memoria del proyecto, el conocimiento y los chats anteriores siguen disponibles para el agente.",
+    "knowledgeAdded": "Añadido al conocimiento del proyecto: {0}",
+    "projectCreated": "Carpeta del proyecto creada. Puedes añadir tus propias instrucciones para el agente con «Editar instrucciones del proyecto».",
+    "sessionLost": "La sesión anterior ya no estaba disponible, se ha iniciado una nueva.",
+    "selectFiles": "Seleccionar archivos",
+    "copy": "Copiar",
+    "paste": "Pegar",
+    "copyMessage": "Copiar respuesta",
+    "copyCode": "Copiar código",
+    "copied": "Copiado al portapapeles",
+    "untitled": "Chat nuevo",
+    "settings": "Ajustes",
+    "noChats": "Todavía no hay chats en este sketch.",
+    "delete": "Eliminar",
+    "deleteConfirm": "¿Eliminar el chat «{0}»? No se puede deshacer.",
+    "chatList": "Chats de este sketch",
+    "restore": "Restablecer",
+    "restoreConfirm": "¿Restablecer el estado anterior a esta tarea? Se restaurarán {0} archivo(s) y se eliminarán {1} archivo(s) nuevo(s): {2}",
+    "restored": "Estado anterior a esta tarea restablecido.",
+    "restoreNothing": "Nada ha cambiado desde esta tarea.",
+    "chooseAgent": "Elegir el agente para este chat nuevo",
+    "noAgent": "ningún agente",
+    "fixErrors": "🔧 Que el agente lo corrija",
+    "checkLabel": "Comprobación de Agentuino"
+  },
+  "tools": {
+    "Read": "Lee {0}",
+    "Edit": "Edita {0}",
+    "MultiEdit": "Edita {0}",
+    "Write": "Escribe {0}",
+    "Bash": "Ejecuta: {0}",
+    "Glob": "Busca archivos: {0}",
+    "Grep": "Busca en el código: {0}",
+    "TodoWrite": "Planifica los siguientes pasos",
+    "WebFetch": "Descarga: {0}",
+    "WebSearch": "Busca en la web: {0}",
+    "default": "Herramienta: {0}",
+    "Delete": "Elimina {0}"
+  },
+  "compile": {
+    "running": "Comprobando que el sketch compila para {0} …",
+    "ok": "✅ Compilado para {0}",
+    "error": "❌ Error al compilar para {0}",
+    "flash": "Flash",
+    "ram": "RAM",
+    "size": "{0} % ({1} de {2} bytes)",
+    "sizeNoMax": "{0} bytes",
+    "ramWarning": "⚠ Poca memoria libre: el sketch puede funcionar de forma inestable.",
+    "moreErrors": "… y {0} errores más",
+    "fixRequest": "Corrige los errores de compilación, por favor.",
+    "noBoard": "No se ha detectado ninguna placa, se ha omitido la comprobación de compilación. Elige una placa en el IDE.",
+    "noCli": "No se encontró arduino-cli, se ha omitido la comprobación de compilación.",
+    "failed": "No se pudo comprobar la compilación: {0}",
+    "autoFix": "🔧 El agente está corrigiendo los errores (intento {0} de {1}) …",
+    "noChange": "El agente no ha cambiado nada, la corrección automática se ha detenido.",
+    "missingLibrary": "📚 Falta una biblioteca para {0}. El agente solo la instala con tu permiso. Dile, por ejemplo, «Instala la biblioteca».",
+    "missingLibraries": "📚 Faltan bibliotecas para {0}. El agente solo las instala con tu permiso. Dile, por ejemplo, «Instala las bibliotecas».",
+    "sizeShort": "{0} {1} %",
+    "outputHeader": "── Agentuino: {0} para {1} ({2}), {3} ──"
+  },
+  "prompt": {
+    "attachments": "He adjuntado los siguientes archivos. Léelos antes de responder:",
+    "title": "Crea un título breve y adecuado (seis palabras como máximo) para una conversación que empieza con el siguiente mensaje. Responde solo con el título, sin comillas.\n\nMensaje:\n{0}",
+    "restored": "Nota: he restablecido el código al estado anterior a mi tarea «{0}». Todos los cambios desde entonces están deshechos. Vuelve a leer los archivos antes de continuar. Comprueba también si las entradas de agentuino/memory.md sobre esta tarea siguen siendo correctas y elimina las obsoletas.",
+    "instructions": "Instrucciones del proyecto (de {0}), síguelas por favor:",
+    "fixErrors": "El sketch no compila. Salida del compilador:\n\n```\n{0}\n```\n\nCorrige los errores y vuelve a compilar para comprobarlo. No lo subas.",
+    "checkOk": "Nota: después de tu última tarea, Agentuino compiló el sketch por sí mismo, con éxito para {0} ({1}). Mientras el código no cambie, no necesitas volver a compilar.",
+    "checkFailed": "Nota: después de tu última tarea, Agentuino compiló el sketch por sí mismo y falló para {0}:\n{1}"
+  },
+  "errors": {
+    "notASketch": "No se encontró ningún sketch de Arduino. Abre primero un sketch en el IDE.",
+    "configInvalid": "El archivo agentuino/config.json está dañado: {0}",
+    "fileNotFound": "Archivo no encontrado: {0}",
+    "processFailed": "{0} terminó con un error (código {1}): {2}",
+    "agentError": "El agente informa de un error: {0}",
+    "timeout": "Sin respuesta del agente desde hace {0} minutos, detenido.",
+    "busy": "El agente sigue trabajando. Espera o pulsa Detener.",
+    "unknown": "Error inesperado: {0}",
+    "notLoggedIn": "{0} no ha iniciado sesión. Abre un terminal e inicia sesión: {1}",
+    "agentNotFound": "No se encontró {0}. Instálalo ({1}) o indica la ruta en los ajustes, en «{2}».",
+    "agentUnknown": "Agente desconocido: {0}",
+    "noAgent": "No se encontró ningún agente. Instala Claude Code, Codex CLI o Mistral Vibe y reinicia el IDE.",
+    "anAgent": "El agente",
+    "agentTooOld": "{0} {1} es demasiado antiguo, Agentuino necesita al menos la versión {2}. Actualízalo en un terminal con: {3}"
+  },
+  "project": {
+    "agentsTemplate": [
+      "# Instrucciones del proyecto",
+      "",
+      "<!-- Añade aquí tus propias instrucciones para el agente. -->",
+      "<!-- Todo lo que está por encima de la sección automática te pertenece. -->",
+      "",
+      "## Descripción del proyecto",
+      "",
+      "## Componentes y cableado",
+      "",
+      "## Reglas propias",
+      ""
+    ],
+    "memoryTemplate": [
+      "# Memoria del proyecto",
+      "",
+      "<!-- El agente anota aquí la información importante sobre este proyecto. -->",
+      ""
+    ],
+    "auto": {
+      "notice": "<!-- Esta sección la genera Agentuino. Los cambios aquí se sobrescribirán. -->",
+      "rulesTitle": "## Reglas de trabajo (Agentuino)",
+      "ruleSketch": "- Esto es un sketch de Arduino. No cambies el nombre de la carpeta ni del archivo principal `{0}`.",
+      "ruleScope": "- Trabaja solo dentro de esta carpeta del sketch.",
+      "ruleSrc": "- Los archivos de código adicionales (.h, .cpp) van en la carpeta del sketch o en `src/`, si no, no se compilan.",
+      "ruleProjectDir": "- Dentro de `{0}/`, cambia solo el archivo `{1}`.",
+      "ruleMemory": "- Lee primero `{0}`. Anota allí solo lo que vale más allá de esta conversación: componentes, cableado, decisiones, problemas resueltos. Nada de resúmenes de conversación, esos están en los protocolos de chat.",
+      "ruleBeginner": "- El usuario es principiante: explica de forma breve y clara qué haces y por qué.",
+      "hardwareTitle": "## Hardware",
+      "board": "- Placa: {0} (FQBN: `{1}`)",
+      "boardUnknown": "- Placa: no detectada. Pregunta al usuario qué placa usa.",
+      "port": "- Puerto: {0}",
+      "portUnknown": "desconocido",
+      "buildTitle": "## Compilar y subir",
+      "compile": "Compila después de cada cambio en el código y corrige los errores por tu cuenta:",
+      "upload": "Sube solo cuando el usuario lo pida expresamente:",
+      "knowledgeTitle": "## Archivos de conocimiento",
+      "knowledgeIntro": "Lee estos archivos cuando sean relevantes para la tarea:",
+      "knowledgeNone": "No hay archivos disponibles.",
+      "ruleNoUpload": "- NUNCA subas el sketch a la placa por tu cuenta, ni siquiera tras una compilación correcta. La placa puede controlar motores, relés u otro hardware.",
+      "portHint": "El puerto es desconocido. Averígualo con `{0}`. Si hay varias opciones, pregunta al usuario.",
+      "chatsTitle": "## Chats anteriores",
+      "chatsIntro": "Las conversaciones anteriores sobre este proyecto están guardadas como protocolos en `{0}`. Si el usuario se refiere a una conversación anterior o te falta contexto, busca en ellas palabras clave de forma específica con Grep y lee solo las partes que encajen. Nunca leas todos los protocolos completos.",
+      "chatsRecent": "Chats recientes:",
+      "ruleLibraries": "- Instala bibliotecas o paquetes de placas (lib install, core install) solo después de preguntar al usuario. Valen para todos los sketches.",
+      "libList": "Las bibliotecas instaladas se muestran con `{0}`.",
+      "serialTitle": "## Leer la salida serie",
+      "serialIntro": "Así lees la salida serie de la placa durante unos segundos (velocidad como en `Serial.begin()`, 60 segundos como máximo). El puerto se elige automáticamente; con varias placas, indícalo con `--port`:",
+      "serialRules": [
+        "- Lee la salida serie solo con `agentuino-serial`. No uses cat, stty, screen, Python ni `arduino-cli monitor` para ello: se cuelgan, bloquean el puerto o pierden datos.",
+        "- El sketch sigue funcionando mientras lees, así que la salida empieza a mitad de camino y la primera línea puede estar incompleta. Que la placa se reinicie al abrir el puerto depende de la placa.",
+        "- Ves lo que se está ejecutando en la placa. No es necesariamente el código actual: sube solo después de preguntar, o el usuario sube él mismo desde el IDE.",
+        "- `--send \"texto\"` envía una línea al sketch después del inicio (para `Serial.read()`).",
+        "- Si el comando informa de un puerto ocupado, o no llega nada tras una subida, probablemente el monitor serie del IDE ocupa el puerto. Pide al usuario que lo abra y lo cierre una vez, o que termine la sesión de depuración.",
+        "- Si el sketch se subió con «Optimizar para depuración» (ArduDebug), el puerto serie pertenece al depurador y el monitor solo muestra caracteres ilegibles. No los interpretes; pide al usuario que suba sin esta opción."
+      ],
+      "codeRulesTitle": "## Reglas para el código",
+      "debugTitle": "## Depurar con ArduDebug",
+      "debugIntro": "ArduDebug está instalado. Con él detienes el programa en la placa en una línea y lees variables, sin cambiar el código. El comando compila por sí mismo una versión de depuración con la variante ArduDebug de la placa:",
+      "debugRules": [
+        "- Ofrece la depuración cuando busques un error y sea importante lo que pasa en tiempo de ejecución. Pregunta antes si el usuario lo quiere.",
+        "- En la placa debe ejecutarse una versión de depuración. Si el comando informa de que no hay ninguna, pregunta al usuario si puedes subir una y luego llama al comando con `--upload`. Dile: en una versión de depuración los pines 0, 1 y 2 (Uno, Nano) o el pin 7 (Leonardo) pertenecen al depurador, y el monitor serie solo muestra caracteres ilegibles. `agentuino-debug` entrega él mismo la salida de `Serial`, `agentuino-serial` no funciona entonces.",
+        "- Si el sketch controla motores, calefactores, relés o similares, pregunta antes de cada parada: en un punto de interrupción el hardware se queda en su estado.",
+        "- Como máximo 8 puntos de interrupción. Los puntos de interrupción en rutinas de interrupción nunca se alcanzan. Con puntos de interrupción el programa va más lento, y mientras está detenido `millis()` no sigue contando.",
+        "- Cuando la depuración haya cumplido su función: corrige el error en el sketch, quita todo lo que añadiste solo para depurar y luego pregunta si puedes subir la versión normal: `agentuino-debug --restore`.",
+        "- No llames nunca directamente a `ardudebug-bridge` ni a `avr-gdb`, solo a través de `agentuino-debug`."
+      ]
+    }
+  },
+  "about": {
+    "subtitle": "Programación agéntica para principiantes de Arduino",
+    "cli": "arduino-cli",
+    "board": "Placa",
+    "ide": "IDE",
+    "system": "Sistema",
+    "license": "Licencia",
+    "notFound": "no encontrado",
+    "copy": "Copiar información",
+    "agentSetting": "Agente para chats nuevos",
+    "agentAuto": "automático",
+    "pageTitle": "Acerca de Agentuino",
+    "quickstart": "🚀 Inicio rápido",
+    "step1": "Abre el chat: haz clic en «Agentuino» en la barra de estado o pulsa",
+    "step2": "Describe con tus palabras lo que debe hacer tu Arduino.",
+    "step3": "¿No te gusta el resultado? ↶ recupera el estado anterior a la tarea.",
+    "agents": "🤖 Agentes",
+    "details": "🔧 Detalles técnicos",
+    "publisher": "Editor",
+    "repository": "Repositorio",
+    "reportBugs": "Informar de errores",
+    "agentConfig": "Configuración de agentes",
+    "config": {
+      "bundled": "incluida",
+      "downloaded": "descargada"
+    }
+  },
+  "rules": {
+    "pageTitle": "Anclas semánticas",
+    "title": "⚓ Anclas semánticas",
+    "forSketch": "Para el sketch {0}",
+    "noSketch": "Ningún sketch abierto: aquí defines los valores predeterminados para sketches nuevos.",
+    "intro": "Las anclas marcadas se escriben como reglas en las instrucciones del proyecto (AGENTS.md) y se aplican a partir del siguiente mensaje. Las reglas de seguridad, como no subir nunca por cuenta propia, se aplican siempre.",
+    "groups": {
+      "basic": "Básicas",
+      "pro": "Avanzadas",
+      "workflow": "Forma de trabajar",
+      "custom": "Anclas propias"
+    },
+    "customHint": "Las anclas propias están disponibles en todos los sketches.",
+    "noCustom": "Todavía no hay anclas propias.",
+    "add": "+ Nueva ancla",
+    "labelField": "Nombre",
+    "textField": "Regla para el agente",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "deleteConfirm": "¿Eliminar el ancla «{0}»? Desaparece de todos los sketches.",
+    "saveDefaults": "Guardar como predeterminado para sketches nuevos",
+    "applyDefaults": "Aplicar predeterminados",
+    "defaultsSaved": "Guardado como predeterminado para sketches nuevos.",
+    "defaultsApplied": "Predeterminados aplicados.",
+    "saved": "Guardado ✓",
+    "missing": "El nombre y la regla no pueden estar vacíos.",
+    "blocks": {
+      "beginnerComments": {
+        "label": "Comentarios para principiantes",
+        "text": "Comenta el código para principiantes: explica en comentarios breves qué hace cada parte y por qué."
+      },
+      "noMagicNumbers": {
+        "label": "Sin números mágicos",
+        "text": "Sin números mágicos: define pines, tiempos y límites como constantes con nombre al principio del sketch."
+      },
+      "nonBlocking": {
+        "label": "No bloqueante",
+        "text": "Escribe código no bloqueante: mide el tiempo con `millis()` en lugar de `delay()`, para que el sketch siga respondiendo."
+      },
+      "lowRam": {
+        "label": "Ahorrar RAM",
+        "text": "Usa poca RAM: tipos de datos pequeños, sin búferes innecesarios, variables globales solo donde haga falta."
+      },
+      "defensive": {
+        "label": "Programación defensiva",
+        "text": "Programa de forma defensiva: comprueba la plausibilidad de los valores de retorno, las lecturas de sensores y las entradas, y gestiona los errores."
+      },
+      "isrSafe": {
+        "label": "Seguro para interrupciones",
+        "text": "Mantén cortas las rutinas de interrupción, declara las variables compartidas como `volatile` y no uses `Serial` ni `delay()` en las interrupciones."
+      },
+      "noDynamicMemory": {
+        "label": "Sin String ni malloc",
+        "text": "No uses memoria dinámica: nada de `String`, `malloc` ni `new`. Usa arrays `char` de tamaño fijo."
+      },
+      "flashStrings": {
+        "label": "Textos en flash",
+        "text": "Guarda los textos constantes en flash con `F()` o `PROGMEM` en lugar de en la RAM."
+      },
+      "fixedWidthTypes": {
+        "label": "Tipos de tamaño fijo",
+        "text": "Usa tipos de tamaño fijo como `uint8_t`, `int16_t` o `uint32_t` en lugar de `int` y `long`."
+      },
+      "explainChanges": {
+        "label": "Resumir los cambios",
+        "text": "Al final, resume brevemente qué has cambiado y por qué."
+      },
+      "keepStyle": {
+        "label": "Mantener el estilo",
+        "text": "Mantén el formato, la sangría y los nombres del código existente. No reformatees lo que no necesitas cambiar."
+      },
+      "smallSteps": {
+        "label": "Pasos pequeños",
+        "text": "Trabaja en pasos pequeños: en tareas más grandes expón primero el plan, luego llévalo a cabo paso a paso y compila después de cada paso."
+      }
+    }
+  },
+  "support": {
+    "title": "☕ Apoyar Agentuino",
+    "description": "Agentuino es gratuito y de código abierto. Si te gusta, ¡un pequeño apoyo es muy bienvenido!",
+    "coffee": "☕ Invítame a un café",
+    "sponsor": "❤️ GitHub Sponsors"
+  },
+  "agent": {
+    "auto": "Automático",
+    "autoDescription": "el primero instalado: Claude Code, Codex CLI, Mistral Vibe",
+    "installed": "instalado",
+    "notInstalled": "no encontrado",
+    "select": "Elegir el agente para chats nuevos (los chats existentes conservan su agente)",
+    "tooOld": "demasiado antiguo ({0}, necesita {1})",
+    "experimental": "experimental"
+  },
+  "update": {
+    "available": "Agentuino {0} está disponible (instalado: {1}).",
+    "download": "Descargar",
+    "later": "Más tarde",
+    "skip": "Omitir esta versión"
+  },
+  "configUpdate": {
+    "available": "Nueva configuración de agentes para Agentuino disponible (del {0}, instalada: {1}). Mantiene al día la conexión con Claude Code, Codex CLI y Mistral Vibe, por ejemplo cuando cambian sus opciones. ¿Aplicarla?",
+    "apply": "Aplicar",
+    "later": "Más tarde",
+    "skip": "Omitir esta versión",
+    "applied": "Configuración de agentes {0} aplicada. Se usa a partir de la siguiente tarea."
+  },
+  "uninstall": {
+    "confirm": "¿Desinstalar Agentuino? Se eliminarán la extensión y sus ajustes. Tus carpetas de proyecto «agentuino» en los sketches, con chats y notas, se conservan. Si ya no las necesitas, simplemente borra la carpeta «agentuino» del sketch; el sketch sigue funcionando sin ella.",
+    "button": "Desinstalar",
+    "done": "Agentuino se ha eliminado. Recarga el IDE para terminar.",
+    "reload": "Recargar",
+    "partial": "No se pudo eliminar todo. Cierra el IDE y borra a mano: {0}",
+    "notFound": "No se encontró Agentuino en ~/.arduinoIDE. Si está instalado en la carpeta del programa del IDE, elimínalo allí a mano.",
+    "vscode": "En VS Code, desinstala Agentuino desde la vista Extensiones."
+  },
+  "setup": {
+    "title": "¡Bienvenido a Agentuino!",
+    "intro": "Agentuino necesita un agente de IA que funcione en tu ordenador. Instala uno de ellos en un {0} e inicia sesión una vez:",
+    "terminal": {
+      "unix": "terminal",
+      "windows": "ventana de PowerShell"
+    },
+    "install": "Instalar:",
+    "login": "Iniciar sesión:",
+    "guide": "Abrir guía",
+    "notes": {
+      "claudecode": "Recomendado. Necesita una suscripción a Claude (Pro o Max) o acceso a la API.",
+      "codex": "Necesita Node.js y una cuenta de ChatGPT o una clave de API de OpenAI.",
+      "vibe": "Necesita acceso a Mistral (clave de API)."
+    },
+    "afterInstall": "Después de instalar, haz clic aquí en «Comprobar de nuevo»; normalmente no hace falta reiniciar el IDE.",
+    "recheck": "Comprobar de nuevo",
+    "found": "{0} encontrado. ¡Ahora describe lo que debe hacer tu Arduino!",
+    "stillMissing": "Todavía no se ha encontrado ningún agente. Si acabas de instalar uno, reinicia el IDE una vez."
+  }
+}

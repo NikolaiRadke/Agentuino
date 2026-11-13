@@ -112,7 +112,7 @@
     "fileNotFound": "File not found: {0}",
     "processFailed": "{0} exited with an error (code {1}): {2}",
     "agentError": "The agent reports an error: {0}",
-    "timeout": "No response from Claude Code for {0} minutes – stopped.",
+    "timeout": "No response from the agent for {0} minutes, stopped.",
     "busy": "The agent is still working. Wait or press Stop.",
     "unknown": "Unexpected error: {0}",
     "notLoggedIn": "{0} is not logged in. Open a terminal and log in: {1}",

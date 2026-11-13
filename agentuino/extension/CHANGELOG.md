@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- French, Spanish and Italian
+- Timeout message names the agent in general (was always "Claude Code")
+
 ## 0.8.0
 
 - agentuino-debug: with ArduDebug installed, the agent stops the program on the board at a

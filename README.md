@@ -43,7 +43,7 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 ### More
 - Attach files to a message, e.g. a photo of your breadboard or a datasheet
 - Input history with ↑ / ↓
-- German and English, following the IDE language
+- German, English, French, Spanish and Italian, following the IDE language
 - Agent options are kept up to date with a configuration file from this repository. Agentuino asks before it downloads a new one.
 
 ## Requirements
@@ -118,7 +118,7 @@ By default the agent runs with full permissions (`agentuino.permissionMode` = `b
 
 | Setting | Description |
 |---|---|
-| `agentuino.language` | UI language (`auto`, `de`, `en`) |
+| `agentuino.language` | UI language (`auto`, `de`, `en`, `es`, `fr`, `it`) |
 | `agentuino.agent` | Agent for new chats: `auto`, `claudecode`, `codex`, `vibe` |
 | `agentuino.compileCheck` | Compile after every task that changed code (default on) |
 | `agentuino.permissionMode` | `bypassPermissions` (default), `acceptEdits` or `auto` |

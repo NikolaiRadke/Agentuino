@@ -68,7 +68,7 @@ folders in the sketches are kept.
 
 | Setting | Description |
 |---|---|
-| `agentuino.language` | UI language (`auto`, `de`, `en`) |
+| `agentuino.language` | UI language (`auto`, `de`, `en`, `es`, `fr`, `it`) |
 | `agentuino.agent` | Agent for new chats: `auto`, `claudecode`, `codex`, `vibe` |
 | `agentuino.compileCheck` | Compile after every run that changed code, show flash/RAM or errors (default on) |
 | `agentuino.permissionMode` | `bypassPermissions` (default), `acceptEdits` or `auto` |
