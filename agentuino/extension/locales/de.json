@@ -118,7 +118,7 @@
     "notLoggedIn": "{0} ist nicht angemeldet. Öffne ein Terminal und melde dich an: {1}",
     "agentNotFound": "{0} wurde nicht gefunden. Installiere ihn ({1}) oder trage den Pfad in den Einstellungen unter „{2}“ ein.",
     "agentUnknown": "Unbekannter Agent: {0}",
-    "noAgent": "Kein Agent gefunden. Installiere Claude Code, Codex CLI oder Mistral Vibe und starte die IDE neu.",
+    "noAgent": "Kein Agent gefunden. Installiere Claude Code, Codex CLI, Mistral Vibe oder Antigravity CLI und starte die IDE neu.",
     "anAgent": "Der Agent",
     "agentTooOld": "{0} {1} ist zu alt, Agentuino braucht mindestens Version {2}. Aktualisieren im Terminal mit: {3}"
   },
@@ -306,7 +306,7 @@
   },
   "agent": {
     "auto": "Automatisch",
-    "autoDescription": "erster installierter: Claude Code, Codex CLI, Mistral Vibe",
+    "autoDescription": "erster installierter: Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI",
     "installed": "installiert",
     "notInstalled": "nicht gefunden",
     "select": "Agent für neue Chats wählen (bestehende Chats behalten ihren Agenten)",
@@ -320,7 +320,7 @@
     "skip": "Diese Version überspringen"
   },
   "configUpdate": {
-    "available": "Neue Agenten-Konfiguration für Agentuino verfügbar (Stand {0}, installiert: {1}). Sie hält die Anbindung an Claude Code, Codex CLI und Mistral Vibe aktuell, etwa wenn sich deren Optionen ändern. Übernehmen?",
+    "available": "Neue Agenten-Konfiguration für Agentuino verfügbar (Stand {0}, installiert: {1}). Sie hält die Anbindung an Claude Code, Codex CLI, Mistral Vibe und Antigravity CLI aktuell, etwa wenn sich deren Optionen ändern. Übernehmen?",
     "apply": "Übernehmen",
     "later": "Später",
     "skip": "Diese Fassung überspringen",
@@ -348,7 +348,8 @@
     "notes": {
       "claudecode": "Empfohlen. Braucht ein Claude-Abo (Pro oder Max) oder einen API-Zugang.",
       "codex": "Braucht Node.js und ein ChatGPT-Konto oder einen OpenAI-API-Schlüssel.",
-      "vibe": "Braucht einen Mistral-Zugang (API-Schlüssel)."
+      "vibe": "Braucht einen Mistral-Zugang (API-Schlüssel).",
+      "antigravity": "Kostenlos mit einem Google-Konto, mit wöchentlichen Limits. Starte agy einmal im Terminal und melde dich an."
     },
     "afterInstall": "Nach der Installation hier auf „Erneut prüfen“ klicken, ein Neustart der IDE ist meist nicht nötig.",
     "recheck": "Erneut prüfen",

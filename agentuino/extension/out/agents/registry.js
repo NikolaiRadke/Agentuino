@@ -16,7 +16,8 @@ const agentConfig = require('./agentConfig');
 const ADAPTERS = [
     require('./adapters/claudeCode'),
     require('./adapters/codex'),
-    require('./adapters/mistralVibe')
+    require('./adapters/mistralVibe'),
+    require('./adapters/antigravity')
 ];
 
 const AUTO = 'auto';

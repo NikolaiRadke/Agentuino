@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0
  *
  * Agentic coding for Arduino beginners: a chat that drives CLI agents
- * (Claude Code, Codex CLI, Mistral Vibe)
+ * (Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI)
  * inside the sketch folder of the Arduino IDE 2.x.
  */
 

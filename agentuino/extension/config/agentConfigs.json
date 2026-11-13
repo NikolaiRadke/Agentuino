@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": "2026-11-12",
+  "version": "2026-11-13",
   "agents": {
     "claudecode": {
       "name": "Claude Code",
@@ -119,6 +119,46 @@
       },
       "sessionNotFound": "session.*not found|no session",
       "authError": "401|unauthori[sz]ed|api key|setup|credential|login"
+    },
+    "antigravity": {
+      "name": "Antigravity CLI",
+      "experimental": true,
+      "command": "agy",
+      "versionArgs": ["--version"],
+      "helpArgs": [["--help"]],
+      "minVersion": "1.5.8",
+      "updateHint": "agy update",
+      "installUrl": "https://antigravity.google/docs/cli/",
+      "install": {
+        "unix": "curl -fsSL https://antigravity.google/cli/install.sh | bash",
+        "windows": "irm https://antigravity.google/cli/install.ps1 | iex"
+      },
+      "setupCommand": "agy",
+      "loginHint": "agy",
+      "candidates": {
+        "unix": [
+          "{home}/.local/bin/agy",
+          "/usr/local/bin/agy",
+          "/opt/homebrew/bin/agy",
+          "/usr/bin/agy"
+        ],
+        "windows": [
+          "{localAppData}/agy/bin/agy.exe",
+          "{home}/.local/bin/agy.exe"
+        ]
+      },
+      "args": {
+        "base": ["--output-format", "stream-json", "--input-format", "stream-json"],
+        "permissions": {
+          "bypassPermissions": ["--dangerously-skip-permissions"],
+          "acceptEdits": ["--mode", "accept-edits"],
+          "auto": ["--mode", "auto"]
+        },
+        "model": ["--model", "{model}"],
+        "resume": ["--conversation", "{session}"]
+      },
+      "sessionNotFound": "conversation .*not found",
+      "authError": "authenticat|log ?in"
     }
   }
 }

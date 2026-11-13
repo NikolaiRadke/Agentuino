@@ -34,7 +34,8 @@
     "beginner",
     "codex",
     "mistral",
-    "vibe"
+    "vibe",
+    "antigravity"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -126,13 +127,15 @@
             "auto",
             "claudecode",
             "codex",
-            "vibe"
+            "vibe",
+            "antigravity"
           ],
           "enumDescriptions": [
-            "First installed agent: Claude Code, Codex CLI, Mistral Vibe",
+            "First installed agent: Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI",
             "Claude Code",
             "Codex CLI",
-            "Mistral Vibe"
+            "Mistral Vibe",
+            "Antigravity CLI (experimental)"
           ],
           "description": "Agent for new chats. Existing chats keep their agent."
         },
@@ -180,6 +183,16 @@
           "type": "string",
           "default": "",
           "description": "Mistral Vibe model alias. Leave empty to use Vibe's active model."
+        },
+        "agentuino.antigravityPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Antigravity CLI (agy). Leave empty for auto-detection."
+        },
+        "agentuino.antigravityModel": {
+          "type": "string",
+          "default": "",
+          "description": "Antigravity CLI model (see 'agy models'). Leave empty to use the agy default."
         },
         "agentuino.arduinoCliPath": {
           "type": "string",

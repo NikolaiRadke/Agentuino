@@ -118,7 +118,7 @@
     "notLoggedIn": "{0} no ha iniciado sesión. Abre un terminal e inicia sesión: {1}",
     "agentNotFound": "No se encontró {0}. Instálalo ({1}) o indica la ruta en los ajustes, en «{2}».",
     "agentUnknown": "Agente desconocido: {0}",
-    "noAgent": "No se encontró ningún agente. Instala Claude Code, Codex CLI o Mistral Vibe y reinicia el IDE.",
+    "noAgent": "No se encontró ningún agente. Instala Claude Code, Codex CLI, Mistral Vibe o Antigravity CLI y reinicia el IDE.",
     "anAgent": "El agente",
     "agentTooOld": "{0} {1} es demasiado antiguo, Agentuino necesita al menos la versión {2}. Actualízalo en un terminal con: {3}"
   },
@@ -306,7 +306,7 @@
   },
   "agent": {
     "auto": "Automático",
-    "autoDescription": "el primero instalado: Claude Code, Codex CLI, Mistral Vibe",
+    "autoDescription": "el primero instalado: Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI",
     "installed": "instalado",
     "notInstalled": "no encontrado",
     "select": "Elegir el agente para chats nuevos (los chats existentes conservan su agente)",
@@ -320,7 +320,7 @@
     "skip": "Omitir esta versión"
   },
   "configUpdate": {
-    "available": "Nueva configuración de agentes para Agentuino disponible (del {0}, instalada: {1}). Mantiene al día la conexión con Claude Code, Codex CLI y Mistral Vibe, por ejemplo cuando cambian sus opciones. ¿Aplicarla?",
+    "available": "Nueva configuración de agentes para Agentuino disponible (del {0}, instalada: {1}). Mantiene al día la conexión con Claude Code, Codex CLI, Mistral Vibe y Antigravity CLI, por ejemplo cuando cambian sus opciones. ¿Aplicarla?",
     "apply": "Aplicar",
     "later": "Más tarde",
     "skip": "Omitir esta versión",
@@ -348,7 +348,8 @@
     "notes": {
       "claudecode": "Recomendado. Necesita una suscripción a Claude (Pro o Max) o acceso a la API.",
       "codex": "Necesita Node.js y una cuenta de ChatGPT o una clave de API de OpenAI.",
-      "vibe": "Necesita acceso a Mistral (clave de API)."
+      "vibe": "Necesita acceso a Mistral (clave de API).",
+      "antigravity": "Gratis con una cuenta de Google, con límites semanales. Ejecuta agy una vez en una terminal e inicia sesión."
     },
     "afterInstall": "Después de instalar, haz clic aquí en «Comprobar de nuevo»; normalmente no hace falta reiniciar el IDE.",
     "recheck": "Comprobar de nuevo",

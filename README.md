@@ -4,12 +4,12 @@
 
 Agentuino brings agentic coding into the **Arduino IDE 2.x**. You describe in a chat what your Arduino should do. An AI agent works directly in your sketch folder: it writes the code, compiles it, fixes its own errors and can even read what your board prints on the serial port. No copy and paste, no extra windows.
 
-Agentuino drives the command line agents **Claude Code**, **Mistral Vibe** and **Codex CLI** (experimental). It is the little sibling of [AI.duino](https://github.com/NikolaiRadke/AI.duino): no API keys, no feature menus, only the chat.
+Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Codex CLI** (experimental) and **Antigravity CLI** (experimental, free with a Google account). It is the little sibling of [AI.duino](https://github.com/NikolaiRadke/AI.duino): no API keys, no feature menus, only the chat.
 
 *Englisch? Kein Problem: Agentuino spricht Deutsch, sobald deine Arduino IDE auf Deutsch eingestellt ist.*
 
 > [!IMPORTANT]
-> Agentuino is a **beta**. It is tested on Linux with Claude Code and Mistral Vibe. Windows, macOS and Codex CLI are untested so far, feedback is very welcome!
+> Agentuino is a **beta**. It is tested on Linux with Claude Code and Mistral Vibe. Windows, macOS, Codex CLI and Antigravity CLI are untested so far, feedback is very welcome!
 
 🆕 What's new?
 * **13.11.2026** **V0.8.0**: the agent debugs your sketch with ArduDebug.
@@ -56,6 +56,7 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 | [Claude Code](https://code.claude.com) | `curl -fsSL https://claude.ai/install.sh \| bash` (Windows: `irm https://claude.ai/install.ps1 \| iex`) | Claude subscription or API account |
 | [Mistral Vibe](https://docs.mistral.ai/vibe) | `curl -LsSf https://mistral.ai/vibe/install.sh \| bash` (Windows: `uv tool install mistral-vibe`) | Version 3 or newer |
 | [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | Experimental, ChatGPT account |
+| [Antigravity CLI](https://antigravity.google/docs/cli/) | `curl -fsSL https://antigravity.google/cli/install.sh \| bash` (Windows: `irm https://antigravity.google/cli/install.ps1 \| iex`) | Experimental, free with a Google account (weekly limits) |
 
 If no agent is found, the chat shows these commands and checks again after you installed one.
 
@@ -119,11 +120,11 @@ By default the agent runs with full permissions (`agentuino.permissionMode` = `b
 | Setting | Description |
 |---|---|
 | `agentuino.language` | UI language (`auto`, `de`, `en`, `es`, `fr`, `it`) |
-| `agentuino.agent` | Agent for new chats: `auto`, `claudecode`, `codex`, `vibe` |
+| `agentuino.agent` | Agent for new chats: `auto`, `claudecode`, `codex`, `vibe`, `antigravity` |
 | `agentuino.compileCheck` | Compile after every task that changed code (default on) |
 | `agentuino.permissionMode` | `bypassPermissions` (default), `acceptEdits` or `auto` |
-| `agentuino.claudePath` / `codexPath` / `vibePath` | Agent path, empty = auto-detect |
-| `agentuino.claudeModel` / `codexModel` / `vibeModel` | Model, empty = agent default |
+| `agentuino.claudePath` / `codexPath` / `vibePath` / `antigravityPath` | Agent path, empty = auto-detect |
+| `agentuino.claudeModel` / `codexModel` / `vibeModel` / `antigravityModel` | Model, empty = agent default |
 | `agentuino.checkForUpdates` | Check for new versions and agent configurations at startup; nothing is stored without asking (default on) |
 | `agentuino.arduinoCliPath` | Path to arduino-cli, empty = the one bundled with the IDE |
 
@@ -136,7 +137,7 @@ By default the agent runs with full permissions (`agentuino.permissionMode` = `b
 Before publishing a changed `agentuino/extension/config/agentConfigs.json`, check it against the installed agents. Every option must appear in their help text:
 
 ```
-node .github/scripts/check-agent-configs.js [--codex=<path>] [--vibe=<path>]
+node .github/scripts/check-agent-configs.js [--codex=<path>] [--vibe=<path>] [--antigravity=<path>]
 ```
 
 `.github/scripts/package.sh` builds the VSIX and the release zip into `dist/`.

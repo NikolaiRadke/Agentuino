@@ -118,7 +118,7 @@
     "notLoggedIn": "{0} is not logged in. Open a terminal and log in: {1}",
     "agentNotFound": "{0} was not found. Install it ({1}) or set the path in the settings under '{2}'.",
     "agentUnknown": "Unknown agent: {0}",
-    "noAgent": "No agent found. Install Claude Code, Codex CLI or Mistral Vibe and restart the IDE.",
+    "noAgent": "No agent found. Install Claude Code, Codex CLI, Mistral Vibe or Antigravity CLI and restart the IDE.",
     "anAgent": "The agent",
     "agentTooOld": "{0} {1} is too old, Agentuino needs at least version {2}. Update in a terminal with: {3}"
   },
@@ -306,7 +306,7 @@
   },
   "agent": {
     "auto": "Automatic",
-    "autoDescription": "first installed: Claude Code, Codex CLI, Mistral Vibe",
+    "autoDescription": "first installed: Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI",
     "installed": "installed",
     "notInstalled": "not found",
     "select": "Choose the agent for new chats (existing chats keep their agent)",
@@ -320,7 +320,7 @@
     "skip": "Skip this version"
   },
   "configUpdate": {
-    "available": "New agent configuration for Agentuino available (dated {0}, installed: {1}). It keeps the connection to Claude Code, Codex CLI and Mistral Vibe up to date, e.g. when their options change. Apply it?",
+    "available": "New agent configuration for Agentuino available (dated {0}, installed: {1}). It keeps the connection to Claude Code, Codex CLI, Mistral Vibe and Antigravity CLI up to date, e.g. when their options change. Apply it?",
     "apply": "Apply",
     "later": "Later",
     "skip": "Skip this version",
@@ -348,7 +348,8 @@
     "notes": {
       "claudecode": "Recommended. Needs a Claude subscription (Pro or Max) or API access.",
       "codex": "Needs Node.js and a ChatGPT account or an OpenAI API key.",
-      "vibe": "Needs Mistral access (API key)."
+      "vibe": "Needs Mistral access (API key).",
+      "antigravity": "Free with a Google account, with weekly limits. Start agy once in a terminal and log in."
     },
     "afterInstall": "After installing, click 'Check again' here; restarting the IDE is usually not needed.",
     "recheck": "Check again",

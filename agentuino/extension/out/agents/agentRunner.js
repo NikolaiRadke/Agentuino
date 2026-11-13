@@ -173,7 +173,8 @@ class AgentRunner {
             });
 
             child.stdin.on('error', () => { /* process ended before reading stdin */ });
-            child.stdin.end(prompt);
+            // Some agents expect the prompt wrapped in their own input format
+            child.stdin.end(adapter.formatInput ? adapter.formatInput(prompt) : prompt);
         });
     }
 

@@ -17,7 +17,7 @@
 
 const path = require('path');
 const fs = require('fs');
-const { execFileSync } = require('child_process');
+const { execFileSync, spawnSync } = require('child_process');
 
 const EXTENSION_DIR = path.join(__dirname, '..', '..', 'agentuino', 'extension');
 const agentConfig = require(path.join(EXTENSION_DIR, 'out', 'agents', 'agentConfig'));
@@ -63,14 +63,12 @@ function which(command) {
  * @returns {string} Output
  */
 function run(toolPath, args) {
-    try {
-        return execFileSync(toolPath, args, {
-            encoding: 'utf8', timeout: HELP_TIMEOUT_MS, maxBuffer: MAX_HELP_BUFFER,
-            stdio: ['ignore', 'pipe', 'pipe'], shell: IS_WINDOWS && /\.cmd$/i.test(toolPath)
-        });
-    } catch (err) {
-        return `${err.stdout || ''}${err.stderr || ''}`;
-    }
+    // Some CLIs (e.g. agy) print their help to stderr and still exit with 0
+    const out = spawnSync(toolPath, args, {
+        encoding: 'utf8', timeout: HELP_TIMEOUT_MS, maxBuffer: MAX_HELP_BUFFER,
+        stdio: ['ignore', 'pipe', 'pipe'], shell: IS_WINDOWS && /\.cmd$/i.test(toolPath)
+    });
+    return `${out.stdout || ''}${out.stderr || ''}`;
 }
 
 /**

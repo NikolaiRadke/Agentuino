@@ -202,7 +202,7 @@ function toRegex(pattern) {
 }
 
 /**
- * Install locations with {home} and {appData} filled in
+ * Install locations with {home}, {appData} and {localAppData} filled in
  * @param {Object} agent - Agent entry
  * @param {boolean} windows - Windows paths
  * @returns {string[]} Paths
@@ -211,7 +211,8 @@ function expandCandidates(agent, windows) {
     const home = os.homedir();
     const values = {
         home,
-        appData: process.env.APPDATA || path.join(home, 'AppData', 'Roaming')
+        appData: process.env.APPDATA || path.join(home, 'AppData', 'Roaming'),
+        localAppData: process.env.LOCALAPPDATA || path.join(home, 'AppData', 'Local')
     };
     return (windows ? agent.candidates.windows : agent.candidates.unix)
         .map(entry => path.normalize(entry.replace(/\{(\w+)\}/g, (match, key) => values[key] ?? match)));

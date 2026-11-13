@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Antigravity CLI (agy) as fourth agent, experimental: free with a Google account
+  (weekly limits). Prompt via streaming JSON input, AGENTS.md goes into the prompt.
+- Install locations in agentConfigs.json may use {localAppData} (Windows)
+- check-agent-configs.js also reads help texts printed to stderr
 - French, Spanish and Italian
 - Timeout message names the agent in general (was always "Claude Code")
 
