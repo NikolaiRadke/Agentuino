@@ -63,6 +63,9 @@ const PARAMETER_NAMES = {
     Url: 'url'
 };
 
+const FILE_KEY_PATTERN = /path|file|uri/i;
+const FILE_URI_PREFIX = /^file:\/\//;
+
 // ===== ADAPTER =====
 
 /**
@@ -85,6 +88,11 @@ function normalizeParameters(parameters) {
     const result = {};
     for (const [key, value] of Object.entries(input)) {
         result[PARAMETER_NAMES[key] || key] = value;
+    }
+    // Unknown parameter names: take the first one that looks like a file
+    if (!result.file_path && !result.path && !result.command) {
+        const key = Object.keys(input).find(name => FILE_KEY_PATTERN.test(name) && typeof input[name] === 'string');
+        if (key) result.file_path = input[key].replace(FILE_URI_PREFIX, '');
     }
     return result;
 }
