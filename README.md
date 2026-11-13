@@ -1,4 +1,4 @@
-<img src="agentuino/extension/icons/agentuino-256.png" alt="Agentuino" width="160">
+![Agentuino](http://www.nikolairadke.de/aiduino/agentuino_banner.png)
 
 # Agentuino – Agentic coding for Arduino beginners
 
