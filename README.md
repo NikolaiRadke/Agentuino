@@ -4,7 +4,7 @@
 
 Agentuino brings agentic coding into the **Arduino IDE 2.x**. You describe in a chat what your Arduino should do. An AI agent works directly in your sketch folder: it writes the code, compiles it, fixes its own errors and can even read what your board prints on the serial port. No copy and paste, no extra windows.
 
-Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Codex CLI** (experimental) and **Antigravity CLI** (experimental, free with a Google account). It is the little sibling of [AI.duino](https://github.com/NikolaiRadke/AI.duino): no API keys, no feature menus, only the chat.
+Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Codex CLI** (experimental) and **Antigravity CLI** (free with a Google account). It is the little sibling of [AI.duino](https://github.com/NikolaiRadke/AI.duino): no API keys, no feature menus, only the chat.
 
 *Englisch? Kein Problem: Agentuino spricht Deutsch, sobald deine Arduino IDE auf Deutsch eingestellt ist.*
 
