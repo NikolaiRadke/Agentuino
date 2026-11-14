@@ -151,13 +151,13 @@ node --test tests/*.test.js
 
 The workflow *Tests* runs them on every push.
 
-`.github/scripts/package.sh` builds the VSIX and the release zip into `dist/`.
+`.github/scripts/package.sh` builds the VSIX and the release zip into `dist/` and puts the VSIX into `installer/`.
 
 ## Content
 
 ```
 ├── agentuino/     The extension (VSIX content)
-├── installer/     Installer scripts, the release zip adds the VSIX
+├── installer/     Installer scripts and the VSIX of the current release
 └── .github/       Funding, maintenance scripts
 ```
 
