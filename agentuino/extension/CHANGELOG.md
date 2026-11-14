@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.1
 
 - uninstall.json for the Extension Manager
 - Workflows use actions/checkout and actions/setup-node v5 (Node 24)
