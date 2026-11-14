@@ -175,9 +175,9 @@
       "serialRules": [
         "- Lee la salida serie solo con `agentuino-serial`. No uses cat, stty, screen, Python ni `arduino-cli monitor` para ello: se cuelgan, bloquean el puerto o pierden datos.",
         "- El sketch sigue funcionando mientras lees, así que la salida empieza a mitad de camino y la primera línea puede estar incompleta. Que la placa se reinicie al abrir el puerto depende de la placa.",
-        "- `--send \"texto\"` envía una línea al sketch después del inicio (para `Serial.read()`).",
-        "- Si el comando informa de un puerto ocupado, o no llega nada tras una subida, probablemente el monitor serie del IDE ocupa el puerto. Pide al usuario que lo abra y lo cierre una vez, o que termine la sesión de depuración.",
-        "- Si el sketch se subió con «Optimizar para depuración» (ArduDebug), el puerto serie pertenece al depurador y el monitor solo muestra caracteres ilegibles. No los interpretes; pide al usuario que suba sin esta opción."
+        "- `--send \"texto\"` envía una línea al sketch después del inicio (para `Serial.read()`). Añade `--no-newline` si el sketch lee caracteres sueltos; si no, también lee el salto de línea como entrada.",
+        "- Si el comando informa de un puerto ocupado, o no llega nada tras una subida, probablemente el monitor serie del IDE ocupa el puerto. Pide al usuario que lo abra y lo cierre una vez.",
+        "- Un sketch subido con «Optimizar para depuración» (ArduDebug) se lee como uno normal, incluso durante una sesión de depuración. Los caracteres ilegibles suelen indicar una velocidad en baudios incorrecta: usa la de `Serial.begin()`."
       ],
       "serialBoardCode": "- Ves lo que se está ejecutando en la placa. No es necesariamente el código actual: sube solo después de preguntar, o el usuario sube él mismo desde el IDE.",
       "serialBoardCodeAuto": "- Ves lo que se está ejecutando en la placa. Después de una subida correcta, es el código actual.",
@@ -186,10 +186,12 @@
       "debugIntro": "ArduDebug está instalado. Con él detienes el programa en la placa en una línea y lees variables, sin cambiar el código. El comando compila por sí mismo una versión de depuración con la variante ArduDebug de la placa:",
       "debugRules": [
         "- Ofrece la depuración cuando busques un error y sea importante lo que pasa en tiempo de ejecución. Pregunta antes si el usuario lo quiere.",
-        "- En la placa debe ejecutarse una versión de depuración. Si el comando informa de que no hay ninguna, pregunta al usuario si puedes subir una y luego llama al comando con `--upload`. Dile: en una versión de depuración los pines 0, 1 y 2 (Uno, Nano) o el pin 7 (Leonardo) pertenecen al depurador, y el monitor serie solo muestra caracteres ilegibles. `agentuino-debug` entrega él mismo la salida de `Serial`, `agentuino-serial` no funciona entonces.",
+        "- En la placa debe ejecutarse una versión de depuración. Si el comando informa de que no hay ninguna, pregunta al usuario si puedes subir una y luego llama al comando con `--upload`. Dile: en una versión de depuración los pines 0, 1 y 2 (Uno, Nano) o el pin 7 (Leonardo) pertenecen al depurador. `agentuino-debug` entrega él mismo la salida de `Serial` de la ejecución; `agentuino-serial` y el monitor serie también funcionan con una versión de depuración.",
         "- Si el sketch controla motores, calefactores, relés o similares, pregunta antes de cada parada: en un punto de interrupción el hardware se queda en su estado.",
         "- Como máximo 8 puntos de interrupción. Los puntos de interrupción en rutinas de interrupción nunca se alcanzan. Con puntos de interrupción el programa va más lento, y mientras está detenido `millis()` no sigue contando.",
-        "- Cuando la depuración haya cumplido su función: corrige el error en el sketch, quita todo lo que añadiste solo para depurar y luego pregunta si puedes subir la versión normal: `agentuino-debug --restore`.",
+        "- Un punto de interrupción en la línea justo después de un bucle de espera (p. ej. `while (Serial.available() == 0);`) puede alcanzarse mientras el programa todavía espera. Comprueba con las variables si realmente salió del bucle, o pon el punto de interrupción una línea más abajo.",
+        "- Si el sketch necesita una entrada antes de llegar al punto que quieres examinar, pásala con `agentuino-debug --send \"texto\"` (añade `--no-newline` para caracteres sueltos). No ejecutes `agentuino-serial` en paralelo para ello.",
+        "- Cuando la depuración haya cumplido su función: corrige el error en el sketch y quita todo lo que añadiste solo para depurar. La versión de depuración puede quedarse en la placa. Sube la versión normal con `agentuino-debug --restore` solo si el usuario lo pide.",
         "- No llames nunca directamente a `ardudebug-bridge` ni a `avr-gdb`, solo a través de `agentuino-debug`."
       ]
     }

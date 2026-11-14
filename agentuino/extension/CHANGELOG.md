@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.1.0 (in progress)
+
+Adjustments to ArduDebug 1.8.8-5.
+
+- agentuino-debug attaches to the bridge like a Serial Monitor (ATTACH handoff):
+  the Serial output arrives even with the IDE's Serial Monitor open
+- agentuino-debug reports the Serial output up to the stop only, not the random
+  rest read after detaching
+- agentuino-debug --send TEXT [--no-newline]: input for Serial.read() during the run
+- agentuino-debug retries once after "no answer from the board" (a Leonardo can
+  still be restarting after the previous session)
+- agentuino-debug warns if the ArduDebug package is older than 1.8.8-5
+- agentuino-serial reads during a debug session through the ArduDebug monitor
+- agentuino-serial --no-newline: send without the newline (single characters)
+- Both tools: --help, unknown options are reported instead of ignored
+- Debug builds no longer count as unreadable: agent rules and hints updated,
+  --restore only when the user asks for it
+- New agent rules: breakpoint right after a waiting loop, input via --send
+
 ## 1.0.0
 
 First stable version, tested on Linux and Windows.

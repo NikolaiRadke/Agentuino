@@ -175,9 +175,9 @@
       "serialRules": [
         "- Leggi l'output seriale solo con `agentuino-serial`. Non usare cat, stty, screen, Python o `arduino-cli monitor` per questo: si bloccano, occupano la porta o perdono dati.",
         "- Lo sketch continua a funzionare mentre leggi, quindi l'output inizia a metà e la prima riga può essere incompleta. Se la scheda si riavvia all'apertura della porta dipende dalla scheda.",
-        "- `--send \"testo\"` invia una riga allo sketch dopo l'avvio (per `Serial.read()`).",
-        "- Se il comando segnala una porta occupata, o dopo un caricamento non arriva nulla, probabilmente il monitor seriale dell'IDE occupa la porta. Chiedi all'utente di aprirlo e chiuderlo una volta, o di terminare la sessione di debug.",
-        "- Se lo sketch è stato caricato con «Ottimizza per il debug» (ArduDebug), la porta seriale appartiene al debugger e il monitor mostra solo caratteri illeggibili. Non interpretarli; chiedi all'utente di caricare senza questa opzione."
+        "- `--send \"testo\"` invia una riga allo sketch dopo l'avvio (per `Serial.read()`). Aggiungi `--no-newline` se lo sketch legge singoli caratteri, altrimenti legge anche il ritorno a capo come input.",
+        "- Se il comando segnala una porta occupata, o dopo un caricamento non arriva nulla, probabilmente il monitor seriale dell'IDE occupa la porta. Chiedi all'utente di aprirlo e chiuderlo una volta.",
+        "- Uno sketch caricato con «Ottimizza per il debug» (ArduDebug) si legge come uno normale, anche durante una sessione di debug. Caratteri illeggibili di solito indicano un baud rate sbagliato: usa quello di `Serial.begin()`."
       ],
       "serialBoardCode": "- Vedi ciò che sta girando sulla scheda. Non è per forza il codice attuale: carica solo dopo aver chiesto, oppure l'utente carica da sé dall'IDE.",
       "serialBoardCodeAuto": "- Vedi ciò che sta girando sulla scheda. Dopo un caricamento riuscito, è il codice attuale.",
@@ -186,10 +186,12 @@
       "debugIntro": "ArduDebug è installato. Con esso fermi il programma sulla scheda a una riga e leggi le variabili, senza modificare il codice. Il comando compila da sé una versione di debug con la variante ArduDebug della scheda:",
       "debugRules": [
         "- Proponi il debug quando cerchi un errore ed è importante ciò che succede durante l'esecuzione. Chiedi prima se l'utente lo desidera.",
-        "- Sulla scheda deve girare una versione di debug. Se il comando segnala che non ce n'è nessuna, chiedi all'utente se puoi caricarne una, poi richiama il comando con `--upload`. Spiega: in una versione di debug i pin 0, 1 e 2 (Uno, Nano) o il pin 7 (Leonardo) appartengono al debugger, e il monitor seriale mostra solo caratteri illeggibili. `agentuino-debug` fornisce da sé l'output di `Serial`, `agentuino-serial` allora non funziona.",
+        "- Sulla scheda deve girare una versione di debug. Se il comando segnala che non ce n'è nessuna, chiedi all'utente se puoi caricarne una, poi richiama il comando con `--upload`. Spiega: in una versione di debug i pin 0, 1 e 2 (Uno, Nano) o il pin 7 (Leonardo) appartengono al debugger. `agentuino-debug` fornisce da sé l'output di `Serial` dell'esecuzione; anche `agentuino-serial` e il monitor seriale funzionano con una versione di debug.",
         "- Se lo sketch controlla motori, riscaldatori, relè o simili, chiedi prima di ogni arresto: a un breakpoint l'hardware resta nel suo stato.",
         "- Al massimo 8 breakpoint. I breakpoint nelle routine di interrupt non vengono mai raggiunti. Con i breakpoint il programma è più lento, e mentre è fermo `millis()` non continua a contare.",
-        "- Quando il debug ha raggiunto il suo scopo: correggi l'errore nello sketch, rimuovi tutto ciò che hai aggiunto solo per il debug, poi chiedi se puoi caricare la versione normale: `agentuino-debug --restore`.",
+        "- Un breakpoint sulla riga subito dopo un ciclo di attesa (ad es. `while (Serial.available() == 0);`) può scattare mentre il programma sta ancora aspettando. Controlla con le variabili se il ciclo è stato davvero lasciato, oppure metti il breakpoint una riga più in basso.",
+        "- Se lo sketch ha bisogno di un input prima di raggiungere il punto che vuoi esaminare, passalo con `agentuino-debug --send \"testo\"` (aggiungi `--no-newline` per singoli caratteri). Non avviare `agentuino-serial` in parallelo per questo.",
+        "- Quando il debug ha raggiunto il suo scopo: correggi l'errore nello sketch e rimuovi tutto ciò che hai aggiunto solo per il debug. La versione di debug può restare sulla scheda. Carica la versione normale con `agentuino-debug --restore` solo se l'utente lo chiede.",
         "- Non chiamare mai direttamente `ardudebug-bridge` o `avr-gdb`, solo tramite `agentuino-debug`."
       ]
     }

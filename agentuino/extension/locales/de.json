@@ -175,9 +175,9 @@
       "serialRules": [
         "- Lies die serielle Ausgabe ausschließlich mit `agentuino-serial`. Benutze dafür nicht cat, stty, screen, Python oder `arduino-cli monitor`: Sie hängen, blockieren den Port oder verlieren Daten.",
         "- Der Sketch läuft beim Lesen weiter, die Ausgabe beginnt mitten im Lauf und die erste Zeile kann unvollständig sein. Ob das Board beim Öffnen des Ports neu startet, hängt vom Board ab.",
-        "- Mit `--send \"Text\"` schickst du nach dem Start eine Zeile an den Sketch (für `Serial.read()`).",
-        "- Meldet der Befehl einen belegten Port oder kommt nach einem Upload nichts an, hält vermutlich der serielle Monitor der IDE den Port. Bitte den Nutzer, ihn einmal zu öffnen und wieder zu schließen oder die Debug-Sitzung zu beenden.",
-        "- Wurde mit „Für Debugging optimieren“ (Optimize for Debugging, ArduDebug) hochgeladen, gehört der serielle Port dem Debugger und der Monitor zeigt nur unlesbare Zeichen. Werte sie nicht aus, sondern bitte den Nutzer, ohne diese Option hochzuladen."
+        "- Mit `--send \"Text\"` schickst du nach dem Start eine Zeile an den Sketch (für `Serial.read()`). Liest der Sketch einzelne Zeichen, nimm zusätzlich `--no-newline`, sonst liest er auch den Zeilenumbruch als Eingabe.",
+        "- Meldet der Befehl einen belegten Port oder kommt nach einem Upload nichts an, hält vermutlich der serielle Monitor der IDE den Port. Bitte den Nutzer, ihn einmal zu öffnen und wieder zu schließen.",
+        "- Ein Sketch, der mit „Für Debugging optimieren“ (Optimize for Debugging, ArduDebug) hochgeladen wurde, lässt sich wie ein normaler lesen, auch während einer Debug-Sitzung. Unlesbare Zeichen bedeuten meist eine falsche Baudrate: Nimm die aus `Serial.begin()`."
       ],
       "serialBoardCode": "- Du siehst, was gerade auf dem Board läuft. Das ist nicht unbedingt der aktuelle Code: Hochladen nur nach Rückfrage, oder der Nutzer lädt selbst über die IDE hoch.",
       "serialBoardCodeAuto": "- Du siehst, was gerade auf dem Board läuft. Nach einem erfolgreichen Hochladen ist das der aktuelle Code.",
@@ -186,10 +186,12 @@
       "debugIntro": "ArduDebug ist installiert. Damit hältst du das Programm auf dem Board an einer Zeile an und liest Variablen, ohne den Code zu ändern. Der Befehl kompiliert dafür selbst einen Debug-Build mit der ArduDebug-Variante des Boards:",
       "debugRules": [
         "- Biete das Debuggen an, wenn du einen Fehler suchst und wichtig ist, was zur Laufzeit passiert. Frag vorher, ob der Nutzer das möchte.",
-        "- Dafür muss ein Debug-Build auf dem Board laufen. Meldet der Befehl, dass keiner läuft, frag den Nutzer, ob du ihn hochladen darfst, und rufe den Befehl dann mit `--upload` auf. Sag dabei: Im Debug-Build gehören Pin 0, 1 und 2 (Uno, Nano) bzw. Pin 7 (Leonardo) dem Debugger, und der serielle Monitor zeigt nur unlesbare Zeichen. Die `Serial`-Ausgabe liefert `agentuino-debug` selbst mit, `agentuino-serial` funktioniert dann nicht.",
+        "- Dafür muss ein Debug-Build auf dem Board laufen. Meldet der Befehl, dass keiner läuft, frag den Nutzer, ob du ihn hochladen darfst, und rufe den Befehl dann mit `--upload` auf. Sag dabei: Im Debug-Build gehören Pin 0, 1 und 2 (Uno, Nano) bzw. Pin 7 (Leonardo) dem Debugger. Die `Serial`-Ausgabe des Laufs liefert `agentuino-debug` selbst mit; `agentuino-serial` und der serielle Monitor funktionieren auch mit einem Debug-Build.",
         "- Steuert der Sketch Motoren, Heizungen, Relais oder Ähnliches, frag vor jedem Anhalten: Im Haltepunkt bleibt die Hardware in ihrem Zustand stehen.",
         "- Höchstens 8 Haltepunkte. Haltepunkte in Interrupt-Routinen werden nie erreicht. Mit Haltepunkten läuft das Programm langsamer, und während es angehalten ist, zählt `millis()` nicht weiter.",
-        "- Hat das Debuggen seinen Zweck erfüllt: Behebe den Fehler im Sketch, entferne alles, was du nur zum Debuggen eingebaut hast, und frag dann, ob du den normalen Build hochladen darfst: `agentuino-debug --restore`.",
+        "- Ein Haltepunkt in der Zeile direkt nach einer Warteschleife (z. B. `while (Serial.available() == 0);`) kann schon greifen, während das Programm noch wartet. Prüfe an den Variablen, ob die Schleife wirklich verlassen wurde, oder setze den Haltepunkt eine Zeile später.",
+        "- Braucht der Sketch eine Eingabe, bevor er die Stelle erreicht, die du untersuchen willst, gib sie mit `agentuino-debug --send \"Text\"` mit (bei einzelnen Zeichen zusätzlich `--no-newline`). Starte dafür nicht parallel `agentuino-serial`.",
+        "- Hat das Debuggen seinen Zweck erfüllt: Behebe den Fehler im Sketch und entferne alles, was du nur zum Debuggen eingebaut hast. Der Debug-Build darf auf dem Board bleiben. Lade den normalen Build mit `agentuino-debug --restore` nur hoch, wenn der Nutzer das möchte.",
         "- Rufe `ardudebug-bridge` und `avr-gdb` nie direkt auf, nur über `agentuino-debug`."
       ]
     }

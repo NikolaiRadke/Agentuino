@@ -16,6 +16,7 @@
  * Usage:
  *   agentuino-debug --break FILE:LINE [--break ...] [--print a,b] [--locals] [--hits N] [--seconds N]
  *   agentuino-debug --pause [--print a,b] [--locals] [--seconds N]
+ *   --send TEXT [--no-newline]       input for Serial.read() during the run
  *   agentuino-debug --upload ...     upload the debug build first (only after the user agreed)
  *   agentuino-debug --restore        upload the normal build again (only after the user agreed)
  *
@@ -30,7 +31,7 @@ const crypto = require('crypto');
 const net = require('net');
 const path = require('path');
 const { spawn } = require('child_process');
-const { IS_WINDOWS, getToolEnv, runCli, stopProcess, cutText } = require('./toolUtils');
+const { IS_WINDOWS, DEBUG_VENDOR, SUPPORTED_ARCH, getToolEnv, runCli, stopProcess, cutText, toDebugFqbn } = require('./toolUtils');
 
 // ===== CONSTANTS =====
 
@@ -47,9 +48,18 @@ const CONNECT_ATTEMPTS = 2;
 // Builds go to the temp folder: sketchbooks are often synced (Dropbox, OneDrive)
 const TEMP_DIR_NAME = 'agentuino-debug';
 const HASH_LENGTH = 8;
-const DEBUG_VENDOR = 'ardudebug';
-const SUPPORTED_VENDORS = ['arduino', 'ardudebug'];
-const SUPPORTED_ARCH = 'avr';
+// Board package version with plain-text Serial in debug builds and the monitor handoff
+const MIN_ARDUDEBUG_VERSION = '1.8.8-5';
+// The bridge writes its handoff port to <tmp>/ardudebug-bridge-<port name>
+const HANDOFF_PREFIX = 'ardudebug-bridge-';
+const HANDOFF_WAIT_MS = 3000;
+const HANDOFF_POLL_MS = 100;
+// Serial output still on its way when the program stops (USB, bridge, socket)
+const SERIAL_SETTLE_MS = 200;
+// A Leonardo can still be re-enumerating after the previous session
+const BRIDGE_RETRY_DELAY_MS = 2000;
+// Input is sent this long after the program was started; the stub buffers it until Serial.read()
+const SEND_DELAY_MS = 500;
 const BRIDGE_STATUS = /^(Info |Warn |Error|Debug)\s*:/;
 // Lines of a failed arduino-cli call shown to the agent
 const CLI_ERROR_LINES = 15;
@@ -63,6 +73,27 @@ const EXIT_PORT = 4;
 
 // ===== ARGUMENTS =====
 
+const USAGE = [
+    'Usage:',
+    '  agentuino-debug --break FILE:LINE [--break ...] [--print a,b] [--locals] [--hits N] [--seconds N]',
+    '  agentuino-debug --pause [--print a,b] [--locals] [--seconds N]',
+    '',
+    '  --break FILE:LINE  stop at this line, e.g. --break sketch.ino:25 (at most 8)',
+    '  --print a,b        print these variables or expressions at each stop',
+    '  --locals           print all local variables at each stop',
+    `  --hits N           stop up to N times at the breakpoints (default ${DEFAULT_HITS}, at most ${MAX_HITS})`,
+    `  --seconds N        wait at most N seconds (default ${DEFAULT_SECONDS}, at most ${MAX_SECONDS})`,
+    '  --pause            let the program run for --seconds, then stop and show where it is',
+    '  --send TEXT        send TEXT and a newline to the sketch once the run started (for Serial.read())',
+    '  --no-newline       send TEXT without the newline (for sketches that read single characters)',
+    '  --upload           upload the debug build first (only after the user agreed)',
+    '  --restore          upload the normal build again (only if the user asks for it)',
+    '  --port PORT        serial port, default: the port selected in the IDE',
+    '',
+    'setup() may already have run when the debugger attaches, so breakpoints there may not be reached.',
+    `Exit codes: 0 ok, 1 error, 2 not available, ${EXIT_NO_DEBUG_BUILD} no debug build on the board, ${EXIT_PORT} port busy or missing.`
+].join('\n');
+
 /**
  * Parse the command line
  * @param {string[]} argv - Arguments
@@ -70,7 +101,7 @@ const EXIT_PORT = 4;
  */
 function parseArgs(argv) {
     const options = { breaks: [], prints: [], locals: false, hits: DEFAULT_HITS, seconds: DEFAULT_SECONDS,
-        pause: false, upload: false, restore: false, port: null };
+        pause: false, upload: false, restore: false, port: null, send: null, newline: true, help: false, unknown: [] };
     for (let i = 0; i < argv.length; i++) {
         const [key, inline] = argv[i].split(/=(.*)/s);
         const value = () => (inline !== undefined ? inline : argv[++i]) || '';
@@ -84,23 +115,13 @@ function parseArgs(argv) {
             case '--upload': options.upload = true; break;
             case '--restore': options.restore = true; break;
             case '--port': options.port = value(); break;
-            default: break;
+            case '--send': options.send = value(); break;
+            case '--no-newline': options.newline = false; break;
+            case '--help': case '-h': options.help = true; break;
+            default: options.unknown.push(key); break;
         }
     }
     return options;
-}
-
-/**
- * FQBN of the ArduDebug variant of a board, with LTO off (needed for debugging)
- * @param {string} fqbn - Board of the IDE, e.g. arduino:avr:nano:cpu=atmega328
- * @returns {string|null} e.g. ardudebug:avr:nano:cpu=atmega328,lto=off, null if not an AVR board
- */
-function toDebugFqbn(fqbn) {
-    const [vendor, arch, board, options = ''] = String(fqbn || '').split(':');
-    if (!SUPPORTED_VENDORS.includes(vendor) || arch !== SUPPORTED_ARCH || !board) return null;
-    const list = options.split(',').filter(o => o && !o.startsWith('lto='));
-    list.push('lto=off');
-    return `${DEBUG_VENDOR}:${SUPPORTED_ARCH}:${board}:${list.join(',')}`;
 }
 
 /**
@@ -187,6 +208,66 @@ function startBridge(info, gdbPort, serial) {
         bridge.on('error', fail);
         bridge.on('exit', () => { if (!listening) fail(new Error('the bridge stopped')); });
     });
+}
+
+/**
+ * Connect to the bridge's handoff port and send ATTACH
+ * @param {number} tcpPort - Handoff port
+ * @param {string[]} serial - Collects the sketch's Serial output
+ * @returns {Promise<net.Socket|null>} Attached connection, null on failure
+ */
+function sendAttach(tcpPort, serial) {
+    return new Promise(resolve => {
+        const socket = net.connect(tcpPort, '127.0.0.1');
+        let answer = '';
+        let attached = false;
+        const timer = setTimeout(() => done(null), HANDOFF_WAIT_MS);
+        const done = (result) => {
+            clearTimeout(timer);
+            if (!result) socket.destroy();
+            resolve(result);
+        };
+        socket.setEncoding('utf8');
+        socket.on('connect', () => socket.write('ATTACH\n'));
+        socket.on('data', text => {
+            if (attached) {
+                serial.push(text);
+                return;
+            }
+            answer += text;
+            const newline = answer.indexOf('\n');
+            if (newline < 0) return;
+            if (answer.slice(0, newline).trim() !== 'OK') return done(null);
+            attached = true;
+            if (answer.length > newline + 1) serial.push(answer.slice(newline + 1));
+            done(socket);
+        });
+        socket.on('error', () => { if (!attached) done(null); });
+    });
+}
+
+/**
+ * Attach to the running bridge like a Serial Monitor (ArduDebug 1.8.8-5 and later).
+ * While a monitor is attached (e.g. the IDE's), the bridge sends the Serial output
+ * only to monitors, not to its stdout. Attaching ourselves gets the output in any case.
+ * @param {string} port - Serial port of the board, e.g. /dev/ttyACM0 or COM3
+ * @param {string[]} serial - Collects the sketch's Serial output
+ * @returns {Promise<net.Socket|null>} Connection, null if the bridge offers none (older package)
+ */
+async function attachToBridge(port, serial) {
+    const file = path.join(os.tmpdir(), `${HANDOFF_PREFIX}${path.basename(port)}`);
+    const deadline = Date.now() + HANDOFF_WAIT_MS;
+    // The file may not be written yet, or may be left over from an earlier session
+    while (Date.now() < deadline) {
+        let tcpPort = null;
+        try {
+            tcpPort = Number(fs.readFileSync(file, 'utf8').match(/(\d+)\s*$/)?.[1]) || null;
+        } catch { /* not written yet */ }
+        const socket = tcpPort ? await sendAttach(tcpPort, serial) : null;
+        if (socket) return socket;
+        await new Promise(r => setTimeout(r, HANDOFF_POLL_MS));
+    }
+    return null;
 }
 
 // ===== GDB (machine interface) =====
@@ -382,30 +463,82 @@ async function build(env, fqbn, buildPath, debug, upload, port) {
 }
 
 /**
- * Check that the ArduDebug board package is installed
+ * Installed version of the ArduDebug board package
  * @param {Object} env - Tool settings
- * @returns {Promise<boolean>} Installed
+ * @returns {Promise<string|null>} Version, '' if installed but unknown, null if not installed
  */
-async function hasArdudebug(env) {
+async function getArdudebugVersion(env) {
     const result = await runCli(env, ['core', 'list', '--format', 'json']);
-    return result.code === 0 && result.stdout.includes(`"${DEBUG_VENDOR}:${SUPPORTED_ARCH}"`);
+    if (result.code !== 0) return null;
+    const id = `${DEBUG_VENDOR}:${SUPPORTED_ARCH}`;
+    try {
+        const data = JSON.parse(result.stdout);
+        // arduino-cli 1.x: {platforms: [...]}, older versions: [...]
+        const platforms = Array.isArray(data) ? data : (data.platforms || []);
+        const platform = platforms.find(p => p.id === id);
+        return platform ? String(platform.installed_version || platform.installed || '') : null;
+    } catch {
+        return result.stdout.includes(`"${id}"`) ? '' : null;
+    }
+}
+
+/**
+ * Compare package versions like 1.8.8-5 numerically. Not semver: "-5" is a
+ * package revision here, so 1.8.8-5 is newer than 1.8.8.
+ * @param {string} a - Version
+ * @param {string} b - Version
+ * @returns {number} <0, 0 or >0
+ */
+function compareVersions(a, b) {
+    const parse = (v) => String(v).split(/[.-]/).map(n => parseInt(n, 10) || 0);
+    const pa = parse(a);
+    const pb = parse(b);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+        const diff = (pa[i] || 0) - (pb[i] || 0);
+        if (diff !== 0) return diff;
+    }
+    return 0;
 }
 
 /**
  * The debug run: bridge, GDB, breakpoints or pause, report
  * @param {Object} info - From "arduino-cli debug --info"
  * @param {Object} options - Parsed options
+ * @param {string|null} port - Serial port for the monitor handoff, null to skip it (older package)
  * @returns {Promise<string[]>} Report lines
  */
-async function debugRun(info, options) {
+async function debugRun(info, options, port) {
     const serial = [];
-    const gdbPort = await freePort();
-    const bridge = await startBridge(info, gdbPort, serial);
+    let gdbPort = await freePort();
+    let bridge;
+    try {
+        bridge = await startBridge(info, gdbPort, serial);
+    } catch (err) {
+        if (err.code !== 'NO_DEBUG_BUILD') throw err;
+        // "No answer" right after a session can be a board that is still restarting
+        await new Promise(r => setTimeout(r, BRIDGE_RETRY_DELAY_MS));
+        gdbPort = await freePort();
+        bridge = await startBridge(info, gdbPort, serial);
+    }
+    // The program waits for GDB, so no Serial output is lost before attaching
+    const monitor = port ? await attachToBridge(port, serial) : null;
     const prefix = info.toolchain_prefix.endsWith('-') ? info.toolchain_prefix : `${info.toolchain_prefix}-`;
     const gdb = new Gdb(path.join(info.toolchain_path, `${prefix}gdb${IS_WINDOWS ? '.exe' : ''}`), info.executable, serial);
     const report = [];
+    let stoppedOutput = null;
+    let sent = false;
+    // Input goes through the handoff connection, once, after the first continue
+    const sendInput = () => {
+        if (options.send === null || sent) return;
+        sent = true;
+        const text = options.newline ? `${options.send}\n` : options.send;
+        setTimeout(() => { if (!monitor.destroyed) monitor.write(text); }, SEND_DELAY_MS);
+    };
 
     try {
+        if (options.send !== null && !monitor) {
+            throw new Error('--send needs the ArduDebug board package 1.8.8-5 or newer (no connection to the bridge)');
+        }
         // Without async mode GDB accepts no command (interrupt) while the program runs
         await gdb.send('-gdb-set mi-async on');
         let connected;
@@ -428,6 +561,7 @@ async function debugRun(info, options) {
         const deadline = Date.now() + options.seconds * MS_PER_SECOND;
         if (options.pause) {
             await gdb.send('-exec-continue');
+            sendInput();
             await new Promise(r => setTimeout(r, options.seconds * MS_PER_SECOND));
             await gdb.send('-exec-interrupt');
             const stop = await gdb.waitForStop(GDB_COMMAND_TIMEOUT_MS);
@@ -436,6 +570,7 @@ async function debugRun(info, options) {
         } else {
             for (let hit = 1; hit <= options.hits; hit++) {
                 await gdb.send('-exec-continue');
+                sendInput();
                 const stop = await gdb.waitForStop(Math.max(deadline - Date.now(), 0));
                 if (!stop) {
                     await gdb.send('-exec-interrupt');
@@ -449,23 +584,34 @@ async function debugRun(info, options) {
             }
         }
 
+        // Keep only the output up to the stop: after detaching, the program runs on and
+        // the amount read until the bridge stops would be random
+        await new Promise(r => setTimeout(r, SERIAL_SETTLE_MS));
+        stoppedOutput = serial.join('');
+
         // Leave the board running without breakpoints
         await gdb.send('-break-delete');
         await gdb.send('-target-detach');
         await gdb.send('-gdb-exit').catch(() => {});
     } finally {
+        monitor?.destroy();
         gdb.stop();
         stopProcess(bridge);
     }
 
     // GDB delivers target output in pieces, the bridge in whole lines
-    const output = cutText(serial.join('').replace(/\r\n/g, '\n').trim());
-    report.push(output ? `Serial output during the run:\n${output}` : 'No Serial output during the run.');
+    const output = cutText((stoppedOutput ?? serial.join('')).replace(/\r\n/g, '\n').trim());
+    report.push(output ? `Serial output up to the stop:\n${output}` : 'No Serial output up to the stop.');
     return report;
 }
 
 async function main() {
     const options = parseArgs(process.argv.slice(2));
+    if (options.help || options.unknown.length) {
+        if (options.unknown.length) console.log(`Unknown option: ${options.unknown.join(' ')}`);
+        console.log(USAGE);
+        process.exit(options.help ? EXIT_OK : EXIT_ERROR);
+    }
     const env = getToolEnv();
     const port = options.port || env.port;
     const sketchName = path.basename(env.sketch);
@@ -484,7 +630,7 @@ async function main() {
     // Back to the normal sketch
     if (options.restore) {
         const error = await build(env, env.fqbn, path.join(debugDir, NORMAL_BUILD_DIR), false, true, port);
-        console.log(error || 'The normal build is on the board again. The Serial Monitor works again.');
+        console.log(error || 'The normal build is on the board again.');
         process.exit(error ? EXIT_ERROR : EXIT_OK);
     }
 
@@ -493,9 +639,16 @@ async function main() {
         console.log(`Debugging needs an AVR board (Uno, Nano, Leonardo, Mega …). Selected board: ${env.fqbn || 'none'}.`);
         process.exit(EXIT_NOT_AVAILABLE);
     }
-    if (!(await hasArdudebug(env))) {
+    const ardudebugVersion = await getArdudebugVersion(env);
+    if (ardudebugVersion === null) {
         console.log('The ArduDebug board package is not installed. See https://github.com/NikolaiRadke/ArduDebug');
         process.exit(EXIT_NOT_AVAILABLE);
+    }
+    const outdated = ardudebugVersion && compareVersions(ardudebugVersion, MIN_ARDUDEBUG_VERSION) < 0;
+    if (outdated) {
+        console.log(`Note: ArduDebug ${ardudebugVersion} is installed, ${MIN_ARDUDEBUG_VERSION} or newer is recommended`);
+        console.log('(readable Serial in debug builds, Serial output with the Serial Monitor open, Leonardo fix on Windows).');
+        console.log('Tell the user to update the ArduDebug board package in the Boards Manager.');
     }
     if (!options.pause && options.breaks.length === 0) {
         console.log('Give at least one --break FILE:LINE, or --pause.');
@@ -521,7 +674,7 @@ async function main() {
     }
 
     try {
-        const report = await debugRun(JSON.parse(infoResult.stdout), options);
+        const report = await debugRun(JSON.parse(infoResult.stdout), options, outdated ? null : port);
         console.log(`--- ArduDebug run of ${sketchName} on ${port} ---`);
         report.forEach(line => console.log(line));
         console.log('--- breakpoints removed, the program keeps running (debug build) ---');

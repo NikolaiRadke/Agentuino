@@ -175,9 +175,9 @@
       "serialRules": [
         "- Lis la sortie série uniquement avec `agentuino-serial`. N'utilise pas cat, stty, screen, Python ni `arduino-cli monitor` pour cela : ils bloquent, occupent le port ou perdent des données.",
         "- Le sketch continue de tourner pendant la lecture, la sortie commence donc en cours de route et la première ligne peut être incomplète. Le redémarrage de la carte à l'ouverture du port dépend de la carte.",
-        "- `--send \"texte\"` envoie une ligne au sketch après le démarrage (pour `Serial.read()`).",
-        "- Si la commande signale un port occupé, ou si rien n'arrive après un téléversement, le moniteur série de l'IDE occupe probablement le port. Demande à l'utilisateur de l'ouvrir puis de le fermer une fois, ou de terminer la session de débogage.",
-        "- Si le sketch a été téléversé avec « Optimiser pour le débogage » (ArduDebug), le port série appartient au débogueur et le moniteur n'affiche que des caractères illisibles. Ne les interprète pas ; demande à l'utilisateur de téléverser sans cette option."
+        "- `--send \"texte\"` envoie une ligne au sketch après le démarrage (pour `Serial.read()`). Ajoute `--no-newline` si le sketch lit des caractères un par un, sinon il lit aussi le saut de ligne comme saisie.",
+        "- Si la commande signale un port occupé, ou si rien n'arrive après un téléversement, le moniteur série de l'IDE occupe probablement le port. Demande à l'utilisateur de l'ouvrir puis de le fermer une fois.",
+        "- Un sketch téléversé avec « Optimiser pour le débogage » (ArduDebug) se lit comme un sketch normal, même pendant une session de débogage. Des caractères illisibles signifient le plus souvent un mauvais débit : utilise celui de `Serial.begin()`."
       ],
       "serialBoardCode": "- Tu vois ce qui tourne actuellement sur la carte. Ce n'est pas forcément le code actuel : téléverse uniquement après avoir demandé, ou l'utilisateur téléverse lui-même depuis l'IDE.",
       "serialBoardCodeAuto": "- Tu vois ce qui tourne actuellement sur la carte. Après un téléversement réussi, c'est le code actuel.",
@@ -186,10 +186,12 @@
       "debugIntro": "ArduDebug est installé. Il te permet d'arrêter le programme sur la carte à une ligne donnée et de lire des variables, sans modifier le code. La commande compile elle-même une version de débogage avec la variante ArduDebug de la carte :",
       "debugRules": [
         "- Propose le débogage quand tu cherches une erreur et que ce qui se passe à l'exécution compte. Demande d'abord si l'utilisateur le souhaite.",
-        "- Une version de débogage doit tourner sur la carte. Si la commande signale qu'aucune ne tourne, demande à l'utilisateur si tu peux en téléverser une, puis lance la commande avec `--upload`. Précise : dans une version de débogage, les broches 0, 1 et 2 (Uno, Nano) ou la broche 7 (Leonardo) appartiennent au débogueur, et le moniteur série n'affiche que des caractères illisibles. `agentuino-debug` fournit lui-même la sortie `Serial`, `agentuino-serial` ne fonctionne plus alors.",
+        "- Une version de débogage doit tourner sur la carte. Si la commande signale qu'aucune ne tourne, demande à l'utilisateur si tu peux en téléverser une, puis lance la commande avec `--upload`. Précise : dans une version de débogage, les broches 0, 1 et 2 (Uno, Nano) ou la broche 7 (Leonardo) appartiennent au débogueur. `agentuino-debug` fournit lui-même la sortie `Serial` de l'exécution ; `agentuino-serial` et le moniteur série fonctionnent aussi avec une version de débogage.",
         "- Si le sketch commande des moteurs, des chauffages, des relais ou autres, demande avant chaque arrêt : à un point d'arrêt, le matériel reste dans son état.",
         "- 8 points d'arrêt au maximum. Les points d'arrêt dans les routines d'interruption ne sont jamais atteints. Avec des points d'arrêt, le programme tourne plus lentement, et pendant l'arrêt `millis()` ne compte plus.",
-        "- Quand le débogage a rempli son rôle : corrige l'erreur dans le sketch, retire tout ce que tu as ajouté uniquement pour le débogage, puis demande si tu peux téléverser la version normale : `agentuino-debug --restore`.",
+        "- Un point d'arrêt sur la ligne juste après une boucle d'attente (p. ex. `while (Serial.available() == 0);`) peut être atteint alors que le programme attend encore. Vérifie avec les variables si la boucle a vraiment été quittée, ou place le point d'arrêt une ligne plus loin.",
+        "- Si le sketch a besoin d'une saisie avant d'atteindre l'endroit que tu veux examiner, transmets-la avec `agentuino-debug --send \"texte\"` (ajoute `--no-newline` pour des caractères isolés). Ne lance pas `agentuino-serial` en parallèle pour cela.",
+        "- Quand le débogage a rempli son rôle : corrige l'erreur dans le sketch et retire tout ce que tu as ajouté uniquement pour le débogage. La version de débogage peut rester sur la carte. Ne téléverse la version normale avec `agentuino-debug --restore` que si l'utilisateur le demande.",
         "- N'appelle jamais `ardudebug-bridge` ni `avr-gdb` directement, uniquement via `agentuino-debug`."
       ]
     }

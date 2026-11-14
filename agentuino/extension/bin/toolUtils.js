@@ -19,6 +19,9 @@ const CLI_ENV = { ARDUINO_UPDATER_ENABLE_NOTIFICATION: 'false' };
 // Long output keeps its start and its end
 const KEEP_HEAD_CHARS = 4000;
 const KEEP_TAIL_CHARS = 12000;
+const DEBUG_VENDOR = 'ardudebug';
+const SUPPORTED_VENDORS = ['arduino', 'ardudebug'];
+const SUPPORTED_ARCH = 'avr';
 
 /**
  * Settings Agentuino passes to its tools
@@ -83,4 +86,17 @@ function cutText(text) {
     return `${text.slice(0, KEEP_HEAD_CHARS)}\n… (${skipped} characters cut) …\n${text.slice(-KEEP_TAIL_CHARS)}`;
 }
 
-module.exports = { IS_WINDOWS, getToolEnv, runCli, stopProcess, cutText };
+/**
+ * FQBN of the ArduDebug variant of a board, with LTO off (needed for debugging)
+ * @param {string} fqbn - Board of the IDE, e.g. arduino:avr:nano:cpu=atmega328
+ * @returns {string|null} e.g. ardudebug:avr:nano:cpu=atmega328,lto=off, null if not an AVR board
+ */
+function toDebugFqbn(fqbn) {
+    const [vendor, arch, board, options = ''] = String(fqbn || '').split(':');
+    if (!SUPPORTED_VENDORS.includes(vendor) || arch !== SUPPORTED_ARCH || !board) return null;
+    const list = options.split(',').filter(o => o && !o.startsWith('lto='));
+    list.push('lto=off');
+    return `${DEBUG_VENDOR}:${SUPPORTED_ARCH}:${board}:${list.join(',')}`;
+}
+
+module.exports = { IS_WINDOWS, DEBUG_VENDOR, SUPPORTED_ARCH, getToolEnv, runCli, stopProcess, cutText, toDebugFqbn };
