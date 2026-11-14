@@ -131,7 +131,7 @@ By default the agent runs with full permissions (`agentuino.permissionMode` = `b
 
 ## Uninstall
 
-⚙ → *Uninstall Agentuino* removes the extension, its settings, your own semantic anchors, the downloaded agent configuration and the debug builds. The [Extension Manager](https://github.com/NikolaiRadke/Extension-Manager) does the same through `uninstall.json`, except for the debug builds in the temp folder. The `agentuino/` folders in your sketches are kept; delete them by hand if you don't need them anymore.
+⚙ → *Uninstall Agentuino* removes the extension, its settings, your own semantic anchors, the downloaded agent configuration and the debug builds. The [Extension Manager](https://github.com/NikolaiRadke/Extension-Manager) does the same through `uninstall.json`. The `agentuino/` folders in your sketches are kept; delete them by hand if you don't need them anymore.
 
 ## For maintainers
 

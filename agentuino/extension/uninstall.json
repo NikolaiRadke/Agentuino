@@ -2,7 +2,8 @@
   "name": "Agentuino",
   "version": "1.0.0",
   "directories": [
-    "~/.agentuino"
+    "~/.agentuino",
+    "{tmp}/agentuino-debug"
   ],
   "files": [
     "~/.arduinoIDE/extensions/agentuino.vsix",
