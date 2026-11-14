@@ -102,6 +102,7 @@
     "restored": "Hinweis: Ich habe den Code auf den Stand vor meinem Auftrag „{0}“ zurückgesetzt. Alle Änderungen seitdem sind rückgängig gemacht. Lies die Dateien neu, bevor du weiterarbeitest. Prüfe auch, ob Einträge in agentuino/memory.md zu diesem Auftrag noch stimmen, und entferne überholte.",
     "instructions": "Projektanweisungen (aus {0}), bitte beachten:",
     "fixErrors": "Der Sketch lässt sich nicht kompilieren. Ausgabe des Compilers:\n\n```\n{0}\n```\n\nBitte behebe die Fehler und kompiliere danach zur Kontrolle. Nicht hochladen.",
+    "fixErrorsAutoUpload": "Der Sketch lässt sich nicht kompilieren. Ausgabe des Compilers:\n\n```\n{0}\n```\n\nBitte behebe die Fehler und kompiliere danach zur Kontrolle. Lade hoch, sobald er fehlerfrei kompiliert.",
     "checkOk": "Hinweis: Agentuino hat den Sketch nach deinem letzten Auftrag selbst kompiliert, erfolgreich für {0} ({1}). Solange sich der Code nicht ändert, musst du nicht erneut kompilieren.",
     "checkFailed": "Hinweis: Agentuino hat den Sketch nach deinem letzten Auftrag selbst kompiliert, für {0} ist es fehlgeschlagen:\n{1}"
   },
@@ -158,6 +159,7 @@
       "buildTitle": "## Kompilieren und Hochladen",
       "compile": "Kompiliere nach jeder Code-Änderung und behebe Fehler selbstständig:",
       "upload": "Hochladen nur, wenn der Nutzer ausdrücklich darum bittet:",
+      "uploadAuto": "Hochladen nach jedem erfolgreichen Kompilieren, ohne Rückfrage (Anker \"Automatisch hochladen\"):",
       "knowledgeTitle": "## Wissensdateien",
       "knowledgeIntro": "Lies diese Dateien, wenn sie für die Aufgabe relevant sind:",
       "knowledgeNone": "Keine Dateien vorhanden.",
@@ -173,11 +175,12 @@
       "serialRules": [
         "- Lies die serielle Ausgabe ausschließlich mit `agentuino-serial`. Benutze dafür nicht cat, stty, screen, Python oder `arduino-cli monitor`: Sie hängen, blockieren den Port oder verlieren Daten.",
         "- Der Sketch läuft beim Lesen weiter, die Ausgabe beginnt mitten im Lauf und die erste Zeile kann unvollständig sein. Ob das Board beim Öffnen des Ports neu startet, hängt vom Board ab.",
-        "- Du siehst, was gerade auf dem Board läuft. Das ist nicht unbedingt der aktuelle Code: Hochladen nur nach Rückfrage, oder der Nutzer lädt selbst über die IDE hoch.",
         "- Mit `--send \"Text\"` schickst du nach dem Start eine Zeile an den Sketch (für `Serial.read()`).",
         "- Meldet der Befehl einen belegten Port oder kommt nach einem Upload nichts an, hält vermutlich der serielle Monitor der IDE den Port. Bitte den Nutzer, ihn einmal zu öffnen und wieder zu schließen oder die Debug-Sitzung zu beenden.",
         "- Wurde mit „Für Debugging optimieren“ (Optimize for Debugging, ArduDebug) hochgeladen, gehört der serielle Port dem Debugger und der Monitor zeigt nur unlesbare Zeichen. Werte sie nicht aus, sondern bitte den Nutzer, ohne diese Option hochzuladen."
       ],
+      "serialBoardCode": "- Du siehst, was gerade auf dem Board läuft. Das ist nicht unbedingt der aktuelle Code: Hochladen nur nach Rückfrage, oder der Nutzer lädt selbst über die IDE hoch.",
+      "serialBoardCodeAuto": "- Du siehst, was gerade auf dem Board läuft. Nach einem erfolgreichen Hochladen ist das der aktuelle Code.",
       "codeRulesTitle": "## Regeln für den Code",
       "debugTitle": "## Debuggen mit ArduDebug",
       "debugIntro": "ArduDebug ist installiert. Damit hältst du das Programm auf dem Board an einer Zeile an und liest Variablen, ohne den Code zu ändern. Der Befehl kompiliert dafür selbst einen Debug-Build mit der ArduDebug-Variante des Boards:",
@@ -223,7 +226,7 @@
     "title": "⚓ Semantische Anker",
     "forSketch": "Für den Sketch {0}",
     "noSketch": "Kein Sketch geöffnet: Hier legst du den Standard für neue Sketche fest.",
-    "intro": "Angehakte Anker stehen als Regeln in den Projektanweisungen (AGENTS.md) und gelten ab der nächsten Nachricht. Die Sicherheitsregeln, etwa nie von selbst hochzuladen, gelten immer.",
+    "intro": "Angehakte Anker stehen als Regeln in den Projektanweisungen (AGENTS.md) und gelten ab der nächsten Nachricht. Die Sicherheitsregeln gelten immer. Nur \"Automatisch hochladen\" erlaubt dem Agenten, selbst hochzuladen: Nutze das nur, wenn das Board nichts Gefährliches steuert.",
     "groups": {
       "basic": "Grundlagen",
       "pro": "Fortgeschritten",
@@ -294,6 +297,10 @@
       "smallSteps": {
         "label": "In kleinen Schritten",
         "text": "Arbeite in kleinen Schritten: Nenne bei größeren Aufgaben erst den Plan, setze ihn dann Schritt für Schritt um und kompiliere nach jedem Schritt."
+      },
+      "autoUpload": {
+        "label": "Automatisch hochladen",
+        "text": "Automatisch hochladen: Lade den Sketch nach jeder Codeänderung, die fehlerfrei kompiliert, ohne Rückfrage auf das Board und sage Bescheid. Nie hochladen, solange Fehler bestehen. Ist der Port unbekannt oder sind mehrere Boards angeschlossen, frage nach."
       }
     }
   },

@@ -355,6 +355,7 @@ function buildAutoSection(sketchPath, config) {
     const memoryRel = `${PROJECT_DIR_NAME}/${FILES.memory}`;
     const knowledgeRel = `${PROJECT_DIR_NAME}/${SUBDIRS.knowledge}`;
 
+    const autoUpload = ruleBlocks.isAutoUpload(config);
     const lines = [
         AUTO_START,
         t('project.auto.notice'),
@@ -366,7 +367,8 @@ function buildAutoSection(sketchPath, config) {
         t('project.auto.ruleSrc'),
         t('project.auto.ruleProjectDir', PROJECT_DIR_NAME, memoryRel),
         t('project.auto.ruleMemory', memoryRel),
-        t('project.auto.ruleNoUpload'),
+        // The anchor "Upload automatically" replaces the rule (see code rules)
+        ...(autoUpload ? [] : [t('project.auto.ruleNoUpload')]),
         t('project.auto.ruleLibraries')
     ];
 
@@ -401,7 +403,7 @@ function buildAutoSection(sketchPath, config) {
             `${cli} compile --fqbn ${fqbn} .`,
             '```',
             '',
-            t('project.auto.upload'),
+            t(autoUpload ? 'project.auto.uploadAuto' : 'project.auto.upload'),
             '',
             '```',
             `${cli} upload --fqbn ${fqbn} --port ${port || UNKNOWN_PORT_PLACEHOLDER} .`,
@@ -421,7 +423,8 @@ function buildAutoSection(sketchPath, config) {
             SERIAL_EXAMPLE,
             '```',
             '',
-            ...t.strings.project.auto.serialRules
+            ...t.strings.project.auto.serialRules,
+            t(autoUpload ? 'project.auto.serialBoardCodeAuto' : 'project.auto.serialBoardCode')
         );
         if (config.context.ardudebug && DEBUG_BOARD_PATTERN.test(fqbn)) {
             lines.push(

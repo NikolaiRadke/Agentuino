@@ -102,6 +102,7 @@
     "restored": "Remarque : j'ai rétabli le code dans l'état d'avant ma tâche « {0} ». Toutes les modifications depuis sont annulées. Relis les fichiers avant de continuer. Vérifie aussi si les entrées de agentuino/memory.md sur cette tâche sont encore vraies et supprime celles qui sont dépassées.",
     "instructions": "Instructions du projet (de {0}), merci de les suivre :",
     "fixErrors": "Le sketch ne compile pas. Sortie du compilateur :\n\n```\n{0}\n```\n\nCorrige les erreurs puis compile à nouveau pour vérifier. Ne téléverse pas.",
+    "fixErrorsAutoUpload": "Le sketch ne compile pas. Sortie du compilateur :\n\n```\n{0}\n```\n\nCorrige les erreurs puis compile à nouveau pour vérifier. Téléverse dès qu'il compile sans erreur.",
     "checkOk": "Remarque : après ta dernière tâche, Agentuino a compilé le sketch lui-même, avec succès pour {0} ({1}). Tant que le code ne change pas, tu n'as pas besoin de recompiler.",
     "checkFailed": "Remarque : après ta dernière tâche, Agentuino a compilé le sketch lui-même, sans succès pour {0} :\n{1}"
   },
@@ -158,6 +159,7 @@
       "buildTitle": "## Compiler et téléverser",
       "compile": "Compile après chaque modification du code et corrige toi-même les erreurs :",
       "upload": "Téléverse uniquement si l'utilisateur le demande explicitement :",
+      "uploadAuto": "Téléverse après chaque compilation réussie, sans demander (ancre « Téléverser automatiquement ») :",
       "knowledgeTitle": "## Fichiers de connaissances",
       "knowledgeIntro": "Lis ces fichiers lorsqu'ils sont utiles pour la tâche :",
       "knowledgeNone": "Aucun fichier disponible.",
@@ -173,11 +175,12 @@
       "serialRules": [
         "- Lis la sortie série uniquement avec `agentuino-serial`. N'utilise pas cat, stty, screen, Python ni `arduino-cli monitor` pour cela : ils bloquent, occupent le port ou perdent des données.",
         "- Le sketch continue de tourner pendant la lecture, la sortie commence donc en cours de route et la première ligne peut être incomplète. Le redémarrage de la carte à l'ouverture du port dépend de la carte.",
-        "- Tu vois ce qui tourne actuellement sur la carte. Ce n'est pas forcément le code actuel : téléverse uniquement après avoir demandé, ou l'utilisateur téléverse lui-même depuis l'IDE.",
         "- `--send \"texte\"` envoie une ligne au sketch après le démarrage (pour `Serial.read()`).",
         "- Si la commande signale un port occupé, ou si rien n'arrive après un téléversement, le moniteur série de l'IDE occupe probablement le port. Demande à l'utilisateur de l'ouvrir puis de le fermer une fois, ou de terminer la session de débogage.",
         "- Si le sketch a été téléversé avec « Optimiser pour le débogage » (ArduDebug), le port série appartient au débogueur et le moniteur n'affiche que des caractères illisibles. Ne les interprète pas ; demande à l'utilisateur de téléverser sans cette option."
       ],
+      "serialBoardCode": "- Tu vois ce qui tourne actuellement sur la carte. Ce n'est pas forcément le code actuel : téléverse uniquement après avoir demandé, ou l'utilisateur téléverse lui-même depuis l'IDE.",
+      "serialBoardCodeAuto": "- Tu vois ce qui tourne actuellement sur la carte. Après un téléversement réussi, c'est le code actuel.",
       "codeRulesTitle": "## Règles pour le code",
       "debugTitle": "## Déboguer avec ArduDebug",
       "debugIntro": "ArduDebug est installé. Il te permet d'arrêter le programme sur la carte à une ligne donnée et de lire des variables, sans modifier le code. La commande compile elle-même une version de débogage avec la variante ArduDebug de la carte :",
@@ -223,7 +226,7 @@
     "title": "⚓ Ancres sémantiques",
     "forSketch": "Pour le sketch {0}",
     "noSketch": "Aucun sketch ouvert : tu définis ici les valeurs par défaut pour les nouveaux sketches.",
-    "intro": "Les ancres cochées sont écrites comme règles dans les instructions du projet (AGENTS.md) et s'appliquent dès le message suivant. Les règles de sécurité, comme ne jamais téléverser de sa propre initiative, s'appliquent toujours.",
+    "intro": "Les ancres cochées sont écrites comme règles dans les instructions du projet (AGENTS.md) et s'appliquent dès le message suivant. Les règles de sécurité s'appliquent toujours. Seule « Téléverser automatiquement » permet à l'agent de téléverser de sa propre initiative : utilise-la seulement si la carte ne pilote rien de dangereux.",
     "groups": {
       "basic": "Bases",
       "pro": "Avancé",
@@ -294,6 +297,10 @@
       "smallSteps": {
         "label": "Petites étapes",
         "text": "Travaille par petites étapes : pour les tâches plus importantes, présente d'abord le plan, puis réalise-le étape par étape en compilant après chaque étape."
+      },
+      "autoUpload": {
+        "label": "Téléverser automatiquement",
+        "text": "Téléverser automatiquement : après chaque modification du code qui compile sans erreur, téléverse le sketch sur la carte sans demander et signale-le. Ne téléverse jamais tant qu'il reste des erreurs. Si le port est inconnu ou si plusieurs cartes sont branchées, demande."
       }
     }
   },

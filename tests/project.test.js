@@ -163,3 +163,21 @@ test('uninstall.json for the Extension Manager lists every setting', () => {
     assert.deepEqual([...config.settings].sort(), [...settings].sort());
     assert.deepEqual(config.directories, ['~/.agentuino', '{tmp}/agentuino-debug']);
 });
+
+test('anchor "Upload automatically" replaces the no-upload rule', () => {
+    const sketch = env.makeSketch('AutoUpload');
+    projectManager.ensureProject(sketch, { language: 'en', context: UNO });
+    assert.ok(agentsFile(sketch).includes(t('project.auto.ruleNoUpload')));
+    assert.ok(agentsFile(sketch).includes(t('project.auto.serialBoardCode')));
+
+    const config = projectManager.readConfig(sketch);
+    config.rules = ['autoUpload'];
+    projectManager.writeConfig(sketch, config);
+    projectManager.ensureProject(sketch, { language: 'en', context: UNO });
+    const text = agentsFile(sketch);
+    assert.ok(!text.includes(t('project.auto.ruleNoUpload')));
+    assert.ok(text.includes(t('project.auto.uploadAuto')));
+    assert.ok(text.includes(t('project.auto.serialBoardCodeAuto')));
+    assert.ok(text.includes(t('rules.blocks.autoUpload.text')));
+    assert.ok(!ruleBlocks.getDefaults().includes('autoUpload'));
+});

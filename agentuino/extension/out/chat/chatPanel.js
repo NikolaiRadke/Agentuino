@@ -21,6 +21,7 @@ const toolDetector = require('../agents/toolDetector');
 const chatStore = require('./chatStore');
 const backupManager = require('../utils/backupManager');
 const links = require('../utils/links');
+const ruleBlocks = require('../utils/ruleBlocks');
 const registry = require('../agents/registry');
 const { AgentRunner } = require('../agents/agentRunner');
 const { shorten, createError } = require('../agents/agentUtils');
@@ -729,7 +730,7 @@ class ChatPanel {
 
             this.addEntry('info', t('compile.autoFix', attempt + 1, MAX_COMPILE_ATTEMPTS));
             const before = backupManager.getCodeFingerprint(sketchPath);
-            result = await this.runAgent(sketchPath, agent, t('prompt.fixErrors', check.errorText), settings, true);
+            result = await this.runAgent(sketchPath, agent, this.fixPrompt(sketchPath, check.errorText), settings, true);
             if (result && !result.stopped && !result.isError
                 && backupManager.getCodeFingerprint(sketchPath) === before) {
                 this.addEntry('info', t('compile.noChange'));
@@ -875,11 +876,22 @@ class ChatPanel {
      * Let the agent fix the errors of a failed compile check
      * @param {number} time - Time of the compile entry
      */
+    /**
+     * Repair prompt; with "Upload automatically" the agent uploads once the code compiles
+     * @param {string} sketchPath - Sketch folder
+     * @param {string} errorText - Compiler errors
+     * @returns {string} Prompt
+     */
+    fixPrompt(sketchPath, errorText) {
+        const autoUpload = ruleBlocks.isAutoUpload(projectManager.readConfig(sketchPath));
+        return this.deps.getT()(autoUpload ? 'prompt.fixErrorsAutoUpload' : 'prompt.fixErrors', errorText);
+    }
+
     async fixErrors(time) {
         const t = this.deps.getT();
         const entry = this.chat?.messages.find(m => m.time === time && m.role === 'compile');
         if (!entry || !entry.data || entry.data.ok) return;
-        await this.send(t('compile.fixRequest'), t('prompt.fixErrors', entry.data.errorText || entry.data.errors.join('\n')));
+        await this.send(t('compile.fixRequest'), this.fixPrompt(this.sketchPath, entry.data.errorText || entry.data.errors.join('\n')));
     }
 
     /**

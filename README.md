@@ -39,7 +39,7 @@ With [ArduDebug](https://github.com/NikolaiRadke/ArduDebug) installed, the agent
 Switch code rules on with a click, per sketch: beginner-friendly comments, no magic numbers, non-blocking code, save RAM, interrupt-safe and more. Create your own anchors for rules you need again and again. New sketches start with your default selection.
 
 ### Safe by default
-The agent **never uploads on its own**, because a board can drive motors or relays. It installs libraries and board packages only after asking.
+The agent **never uploads on its own**, because a board can drive motors or relays. Only if you switch on the semantic anchor *Upload automatically* for a sketch, it uploads after every change that compiles. It installs libraries and board packages only after asking.
 
 ### More
 - Attach files to a message, e.g. a photo of your breadboard or a datasheet

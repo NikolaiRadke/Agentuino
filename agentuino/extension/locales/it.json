@@ -102,6 +102,7 @@
     "restored": "Nota: ho ripristinato il codice allo stato precedente alla mia attività «{0}». Tutte le modifiche successive sono state annullate. Rileggi i file prima di continuare. Controlla anche se le voci in agentuino/memory.md su questa attività sono ancora valide e rimuovi quelle superate.",
     "instructions": "Istruzioni del progetto (da {0}), per favore seguile:",
     "fixErrors": "Lo sketch non compila. Output del compilatore:\n\n```\n{0}\n```\n\nCorreggi gli errori e compila di nuovo per verificare. Non caricare.",
+    "fixErrorsAutoUpload": "Lo sketch non compila. Output del compilatore:\n\n```\n{0}\n```\n\nCorreggi gli errori e compila di nuovo per verificare. Carica non appena compila senza errori.",
     "checkOk": "Nota: dopo la tua ultima attività Agentuino ha compilato lo sketch da solo, con successo per {0} ({1}). Finché il codice non cambia, non devi ricompilare.",
     "checkFailed": "Nota: dopo la tua ultima attività Agentuino ha compilato lo sketch da solo, senza successo per {0}:\n{1}"
   },
@@ -158,6 +159,7 @@
       "buildTitle": "## Compilare e caricare",
       "compile": "Compila dopo ogni modifica del codice e correggi gli errori da solo:",
       "upload": "Carica solo quando l'utente lo chiede esplicitamente:",
+      "uploadAuto": "Carica dopo ogni compilazione riuscita, senza chiedere (ancora «Caricamento automatico»):",
       "knowledgeTitle": "## File di conoscenza",
       "knowledgeIntro": "Leggi questi file quando sono utili per l'attività:",
       "knowledgeNone": "Nessun file disponibile.",
@@ -173,11 +175,12 @@
       "serialRules": [
         "- Leggi l'output seriale solo con `agentuino-serial`. Non usare cat, stty, screen, Python o `arduino-cli monitor` per questo: si bloccano, occupano la porta o perdono dati.",
         "- Lo sketch continua a funzionare mentre leggi, quindi l'output inizia a metà e la prima riga può essere incompleta. Se la scheda si riavvia all'apertura della porta dipende dalla scheda.",
-        "- Vedi ciò che sta girando sulla scheda. Non è per forza il codice attuale: carica solo dopo aver chiesto, oppure l'utente carica da sé dall'IDE.",
         "- `--send \"testo\"` invia una riga allo sketch dopo l'avvio (per `Serial.read()`).",
         "- Se il comando segnala una porta occupata, o dopo un caricamento non arriva nulla, probabilmente il monitor seriale dell'IDE occupa la porta. Chiedi all'utente di aprirlo e chiuderlo una volta, o di terminare la sessione di debug.",
         "- Se lo sketch è stato caricato con «Ottimizza per il debug» (ArduDebug), la porta seriale appartiene al debugger e il monitor mostra solo caratteri illeggibili. Non interpretarli; chiedi all'utente di caricare senza questa opzione."
       ],
+      "serialBoardCode": "- Vedi ciò che sta girando sulla scheda. Non è per forza il codice attuale: carica solo dopo aver chiesto, oppure l'utente carica da sé dall'IDE.",
+      "serialBoardCodeAuto": "- Vedi ciò che sta girando sulla scheda. Dopo un caricamento riuscito, è il codice attuale.",
       "codeRulesTitle": "## Regole per il codice",
       "debugTitle": "## Debug con ArduDebug",
       "debugIntro": "ArduDebug è installato. Con esso fermi il programma sulla scheda a una riga e leggi le variabili, senza modificare il codice. Il comando compila da sé una versione di debug con la variante ArduDebug della scheda:",
@@ -223,7 +226,7 @@
     "title": "⚓ Ancore semantiche",
     "forSketch": "Per lo sketch {0}",
     "noSketch": "Nessuno sketch aperto: qui imposti i valori predefiniti per i nuovi sketch.",
-    "intro": "Le ancore selezionate vengono scritte come regole nelle istruzioni del progetto (AGENTS.md) e valgono dal messaggio successivo. Le regole di sicurezza, come non caricare mai di propria iniziativa, valgono sempre.",
+    "intro": "Le ancore selezionate vengono scritte come regole nelle istruzioni del progetto (AGENTS.md) e valgono dal messaggio successivo. Le regole di sicurezza valgono sempre. Solo «Caricamento automatico» permette all'agente di caricare di propria iniziativa: usala solo se la scheda non comanda nulla di pericoloso.",
     "groups": {
       "basic": "Basi",
       "pro": "Avanzate",
@@ -294,6 +297,10 @@
       "smallSteps": {
         "label": "Piccoli passi",
         "text": "Lavora a piccoli passi: per attività più grandi esponi prima il piano, poi realizzalo passo dopo passo compilando dopo ogni passo."
+      },
+      "autoUpload": {
+        "label": "Caricamento automatico",
+        "text": "Caricamento automatico: dopo ogni modifica del codice che compila senza errori, carica lo sketch sulla scheda senza chiedere e avvisa. Non caricare mai finché restano errori. Se la porta è sconosciuta o sono collegate più schede, chiedi."
       }
     }
   },

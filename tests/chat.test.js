@@ -180,3 +180,13 @@ test('webview messages cannot reach files outside the chats or open other URLs',
     await ide.message({ command: 'openUrl', url: 'https://code.claude.com' });
     assert.deepEqual(ide.opened, ['https://code.claude.com']);
 });
+
+test('with "Upload automatically" the repair run may upload', async () => {
+    const sketch = await newSketch('AutoFixUpload');
+    await ide.send('Hello');
+    const config = projectManager.readConfig(sketch);
+    config.rules = ['autoUpload'];
+    projectManager.writeConfig(sketch, config);
+    await ide.send('WRITE_BROKEN');
+    assert.match(lastPrompt(), /Upload as soon as it compiles without errors/);
+});

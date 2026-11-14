@@ -2,6 +2,8 @@
 
 ## 0.9.1
 
+- New semantic anchor "Upload automatically" (off by default): the agent uploads
+  after every change that compiles, also after an automatic repair
 - uninstall.json for the Extension Manager
 - Workflows use actions/checkout and actions/setup-node v5 (Node 24)
 

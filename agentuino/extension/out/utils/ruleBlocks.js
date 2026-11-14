@@ -45,8 +45,12 @@ const BUILTIN_BLOCKS = [
     { key: 'fixedWidthTypes', group: 'pro', defaultEnabled: false },
     { key: 'explainChanges', group: 'workflow', defaultEnabled: true },
     { key: 'keepStyle', group: 'workflow', defaultEnabled: false },
-    { key: 'smallSteps', group: 'workflow', defaultEnabled: false }
+    { key: 'smallSteps', group: 'workflow', defaultEnabled: false },
+    { key: 'autoUpload', group: 'workflow', defaultEnabled: false }
 ];
+
+// Anchor that lifts the "never upload on your own" rule
+const AUTO_UPLOAD = 'autoUpload';
 
 // ===== STORAGE =====
 
@@ -144,6 +148,15 @@ function listBlocks(t, state = loadState()) {
 }
 
 /**
+ * Whether the agent may upload on its own in this sketch
+ * @param {Object} config - Project config
+ * @returns {boolean} True if the anchor "Upload automatically" is active
+ */
+function isAutoUpload(config) {
+    return getActiveKeys(config).includes(AUTO_UPLOAD);
+}
+
+/**
  * Texts of the active blocks for AGENTS.md, one line each
  * @param {Object} config - Project config
  * @param {Function} t - Translator in the project language
@@ -218,6 +231,7 @@ module.exports = {
     getActiveKeys,
     listBlocks,
     getActiveTexts,
+    isAutoUpload,
     saveCustom,
     deleteCustom
 };

@@ -102,6 +102,7 @@
     "restored": "Note: I have reset the code to the state before my task \"{0}\". All changes since then are undone. Read the files again before you continue. Also check whether entries in agentuino/memory.md about this task are still true and remove outdated ones.",
     "instructions": "Project instructions (from {0}), please follow them:",
     "fixErrors": "The sketch does not compile. Compiler output:\n\n```\n{0}\n```\n\nPlease fix the errors and compile again to check. Do not upload.",
+    "fixErrorsAutoUpload": "The sketch does not compile. Compiler output:\n\n```\n{0}\n```\n\nPlease fix the errors and compile again to check. Upload as soon as it compiles without errors.",
     "checkOk": "Note: after your last task Agentuino compiled the sketch itself, successfully for {0} ({1}). As long as the code does not change, you do not need to compile again.",
     "checkFailed": "Note: after your last task Agentuino compiled the sketch itself, it failed for {0}:\n{1}"
   },
@@ -158,6 +159,7 @@
       "buildTitle": "## Compiling and uploading",
       "compile": "Compile after every code change and fix errors on your own:",
       "upload": "Upload only when the user explicitly asks for it:",
+      "uploadAuto": "Upload after every successful compile, without asking (anchor \"Upload automatically\"):",
       "knowledgeTitle": "## Knowledge files",
       "knowledgeIntro": "Read these files when they are relevant to the task:",
       "knowledgeNone": "No files available.",
@@ -173,11 +175,12 @@
       "serialRules": [
         "- Read the serial output only with `agentuino-serial`. Do not use cat, stty, screen, Python or `arduino-cli monitor` for it: they hang, block the port or lose data.",
         "- The sketch keeps running while you read, so the output starts in the middle and the first line may be incomplete. Whether opening the port restarts the board depends on the board.",
-        "- You see what currently runs on the board. That is not necessarily the current code: upload only after asking, or the user uploads in the IDE.",
         "- `--send \"text\"` sends a line to the sketch after the start (for `Serial.read()`).",
         "- If the command reports a busy port, or nothing arrives after an upload, the Serial Monitor of the IDE probably holds the port. Ask the user to open and close it once, or to end the debug session.",
         "- If the sketch was uploaded with \"Optimize for Debugging\" (ArduDebug), the serial port belongs to the debugger and the monitor only shows unreadable characters. Do not interpret them; ask the user to upload without this option."
       ],
+      "serialBoardCode": "- You see what currently runs on the board. That is not necessarily the current code: upload only after asking, or the user uploads in the IDE.",
+      "serialBoardCodeAuto": "- You see what currently runs on the board. After a successful upload that is the current code.",
       "codeRulesTitle": "## Code rules",
       "debugTitle": "## Debugging with ArduDebug",
       "debugIntro": "ArduDebug is installed. With it you stop the program on the board at a line and read variables, without changing the code. The command builds a debug build with the ArduDebug variant of the board itself:",
@@ -223,7 +226,7 @@
     "title": "⚓ Semantic anchors",
     "forSketch": "For the sketch {0}",
     "noSketch": "No sketch open: here you set the defaults for new sketches.",
-    "intro": "Checked anchors are written as rules into the project instructions (AGENTS.md) and apply from the next message on. The safety rules, like never uploading on its own, always apply.",
+    "intro": "Checked anchors are written as rules into the project instructions (AGENTS.md) and apply from the next message on. The safety rules always apply. Only \"Upload automatically\" lets the agent upload on its own: use it only when the board drives nothing that could be dangerous.",
     "groups": {
       "basic": "Basics",
       "pro": "Advanced",
@@ -294,6 +297,10 @@
       "smallSteps": {
         "label": "Small steps",
         "text": "Work in small steps: for larger tasks first state the plan, then implement it step by step and compile after each step."
+      },
+      "autoUpload": {
+        "label": "Upload automatically",
+        "text": "Upload automatically: after every code change that compiles without errors, upload the sketch to the board without asking and say so. Never upload while errors remain. If the port is unknown or several boards are connected, ask."
       }
     }
   },

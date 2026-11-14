@@ -102,6 +102,7 @@
     "restored": "Nota: he restablecido el código al estado anterior a mi tarea «{0}». Todos los cambios desde entonces están deshechos. Vuelve a leer los archivos antes de continuar. Comprueba también si las entradas de agentuino/memory.md sobre esta tarea siguen siendo correctas y elimina las obsoletas.",
     "instructions": "Instrucciones del proyecto (de {0}), síguelas por favor:",
     "fixErrors": "El sketch no compila. Salida del compilador:\n\n```\n{0}\n```\n\nCorrige los errores y vuelve a compilar para comprobarlo. No lo subas.",
+    "fixErrorsAutoUpload": "El sketch no compila. Salida del compilador:\n\n```\n{0}\n```\n\nCorrige los errores y vuelve a compilar para comprobarlo. Súbelo en cuanto compile sin errores.",
     "checkOk": "Nota: después de tu última tarea, Agentuino compiló el sketch por sí mismo, con éxito para {0} ({1}). Mientras el código no cambie, no necesitas volver a compilar.",
     "checkFailed": "Nota: después de tu última tarea, Agentuino compiló el sketch por sí mismo y falló para {0}:\n{1}"
   },
@@ -158,6 +159,7 @@
       "buildTitle": "## Compilar y subir",
       "compile": "Compila después de cada cambio en el código y corrige los errores por tu cuenta:",
       "upload": "Sube solo cuando el usuario lo pida expresamente:",
+      "uploadAuto": "Sube después de cada compilación correcta, sin preguntar (ancla «Subir automáticamente»):",
       "knowledgeTitle": "## Archivos de conocimiento",
       "knowledgeIntro": "Lee estos archivos cuando sean relevantes para la tarea:",
       "knowledgeNone": "No hay archivos disponibles.",
@@ -173,11 +175,12 @@
       "serialRules": [
         "- Lee la salida serie solo con `agentuino-serial`. No uses cat, stty, screen, Python ni `arduino-cli monitor` para ello: se cuelgan, bloquean el puerto o pierden datos.",
         "- El sketch sigue funcionando mientras lees, así que la salida empieza a mitad de camino y la primera línea puede estar incompleta. Que la placa se reinicie al abrir el puerto depende de la placa.",
-        "- Ves lo que se está ejecutando en la placa. No es necesariamente el código actual: sube solo después de preguntar, o el usuario sube él mismo desde el IDE.",
         "- `--send \"texto\"` envía una línea al sketch después del inicio (para `Serial.read()`).",
         "- Si el comando informa de un puerto ocupado, o no llega nada tras una subida, probablemente el monitor serie del IDE ocupa el puerto. Pide al usuario que lo abra y lo cierre una vez, o que termine la sesión de depuración.",
         "- Si el sketch se subió con «Optimizar para depuración» (ArduDebug), el puerto serie pertenece al depurador y el monitor solo muestra caracteres ilegibles. No los interpretes; pide al usuario que suba sin esta opción."
       ],
+      "serialBoardCode": "- Ves lo que se está ejecutando en la placa. No es necesariamente el código actual: sube solo después de preguntar, o el usuario sube él mismo desde el IDE.",
+      "serialBoardCodeAuto": "- Ves lo que se está ejecutando en la placa. Después de una subida correcta, es el código actual.",
       "codeRulesTitle": "## Reglas para el código",
       "debugTitle": "## Depurar con ArduDebug",
       "debugIntro": "ArduDebug está instalado. Con él detienes el programa en la placa en una línea y lees variables, sin cambiar el código. El comando compila por sí mismo una versión de depuración con la variante ArduDebug de la placa:",
@@ -223,7 +226,7 @@
     "title": "⚓ Anclas semánticas",
     "forSketch": "Para el sketch {0}",
     "noSketch": "Ningún sketch abierto: aquí defines los valores predeterminados para sketches nuevos.",
-    "intro": "Las anclas marcadas se escriben como reglas en las instrucciones del proyecto (AGENTS.md) y se aplican a partir del siguiente mensaje. Las reglas de seguridad, como no subir nunca por cuenta propia, se aplican siempre.",
+    "intro": "Las anclas marcadas se escriben como reglas en las instrucciones del proyecto (AGENTS.md) y se aplican a partir del siguiente mensaje. Las reglas de seguridad se aplican siempre. Solo «Subir automáticamente» permite al agente subir por su cuenta: úsala solo si la placa no controla nada peligroso.",
     "groups": {
       "basic": "Básicas",
       "pro": "Avanzadas",
@@ -294,6 +297,10 @@
       "smallSteps": {
         "label": "Pasos pequeños",
         "text": "Trabaja en pasos pequeños: en tareas más grandes expón primero el plan, luego llévalo a cabo paso a paso y compila después de cada paso."
+      },
+      "autoUpload": {
+        "label": "Subir automáticamente",
+        "text": "Subir automáticamente: después de cada cambio de código que compile sin errores, sube el sketch a la placa sin preguntar y avisa. No subas nunca mientras queden errores. Si el puerto es desconocido o hay varias placas conectadas, pregunta."
       }
     }
   },
