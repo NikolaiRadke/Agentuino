@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.9.1
+## 1.0.0
+
+First stable version, tested on Linux and Windows.
 
 - New semantic anchor "Upload automatically" (off by default): the agent uploads
   after every change that compiles, also after an automatic repair
