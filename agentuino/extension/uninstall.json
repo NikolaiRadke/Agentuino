@@ -1,0 +1,34 @@
+{
+  "name": "Agentuino",
+  "version": "1.0.0",
+  "directories": [
+    "~/.agentuino"
+  ],
+  "files": [
+    "~/.arduinoIDE/extensions/agentuino.vsix",
+    "~/.arduinoIDE/deployedPlugins/agentuino"
+  ],
+  "globalState": [],
+  "settings": [
+    "agentuino.language",
+    "agentuino.agent",
+    "agentuino.compileCheck",
+    "agentuino.permissionMode",
+    "agentuino.claudePath",
+    "agentuino.claudeModel",
+    "agentuino.codexPath",
+    "agentuino.codexModel",
+    "agentuino.vibePath",
+    "agentuino.vibeModel",
+    "agentuino.antigravityPath",
+    "agentuino.antigravityModel",
+    "agentuino.arduinoCliPath",
+    "agentuino.checkForUpdates",
+    "agentuino.skipUpdateVersion",
+    "agentuino.skipConfigVersion"
+  ],
+  "confirm": {
+    "enabled": true,
+    "double": false
+  }
+}

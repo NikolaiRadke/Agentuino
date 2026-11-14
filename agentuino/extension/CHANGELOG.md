@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- uninstall.json for the Extension Manager
+- Workflows use actions/checkout and actions/setup-node v5 (Node 24)
+
 ## 0.9.0
 
 - Antigravity CLI (agy) as fourth agent, experimental: free with a Google account

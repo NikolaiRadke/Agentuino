@@ -156,3 +156,10 @@ test('uninstall leaves nothing behind outside the sketches', () => {
     assert.ok(fs.existsSync(other));
     assert.ok(projectManager.isProject(sketch));
 });
+
+test('uninstall.json for the Extension Manager lists every setting', () => {
+    const config = JSON.parse(fs.readFileSync(path.join(env.EXTENSION, 'uninstall.json'), 'utf8'));
+    const settings = Object.keys(env.ext('package.json').contributes.configuration.properties);
+    assert.deepEqual([...config.settings].sort(), [...settings].sort());
+    assert.deepEqual(config.directories, ['~/.agentuino']);
+});
