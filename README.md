@@ -62,7 +62,7 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 If no agent is found, the chat shows these commands and checks again after you installed one.
 
 > [!NOTE]
-> The agents are not free: they use your subscription or API account. The chat shows the cost of the current chat when the agent reports it.
+> Claude Code, Mistral Vibe and Codex CLI use your subscription or API account, Antigravity CLI is free with weekly limits. The chat shows the cost of the current chat when the agent reports it.
 
 ## Installation
 
