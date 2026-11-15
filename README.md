@@ -2,7 +2,7 @@
 
 # Agentuino – Agentic coding for Arduino beginners
 
-Agentuino brings agentic coding into the **Arduino IDE 2.x**. You describe in a chat what your Arduino should do. An AI agent works directly in your sketch folder: it writes the code, compiles it, fixes its own errors and can even read what your board prints on the serial port. No copy and paste, no extra windows.
+Agentuino brings agentic coding into the **Arduino IDE 2.x** and **VS Code**. You describe in a chat what your Arduino should do. An AI agent works directly in your sketch folder: it writes the code, compiles it, fixes its own errors and can even read what your board prints on the serial port. No copy and paste, no extra windows.
 
 Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Codex CLI** (experimental), **Antigravity CLI** (free with a Google account) and **OpenCode** (any provider, local models via Ollama included). It is the little sibling of [AI.duino](https://github.com/NikolaiRadke/AI.duino): no API keys, no feature menus, only the chat.
 
@@ -49,7 +49,7 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 
 ## Requirements
 
-- Arduino IDE 2.x (Linux, Windows or macOS)
+- Arduino IDE 2.x or VS Code (Linux, Windows or macOS)
 - One agent, installed and logged in:
 
 | Agent | Install | Note |
@@ -66,6 +66,8 @@ If no agent is found, the chat shows these commands and checks again after you i
 > Claude Code, Mistral Vibe and Codex CLI use your subscription or API account, Antigravity CLI is free with weekly limits, OpenCode costs whatever your provider charges (nothing for local models). The chat shows the cost of the current chat when the agent reports it.
 
 ## Installation
+
+### Arduino IDE
 
 1. Download `agentuino-<version>.zip` from the [latest release](https://github.com/NikolaiRadke/Agentuino/releases/latest) and unpack it.
 2. Run the installer in it:
@@ -88,6 +90,12 @@ Run `install_agentuino_windows.bat`.
 3. Restart the Arduino IDE.
 
 Agentuino checks for new versions at startup and shows a notice with a link to the release.
+
+### VS Code
+
+Install Agentuino from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=NikolaiRadke.agentuino). [ArduDebug](https://github.com/NikolaiRadke/ArduDebug) comes along and sets up its board package when you open the chat for the first time. You can remove ArduDebug on its own, Agentuino then works without debugging.
+
+In VS Code, Agentuino needs [arduino-cli](https://arduino.github.io/arduino-cli/latest/installation/) in your PATH, or its path in the setting `agentuino.arduinoCliPath`.
 
 ## Usage
 
