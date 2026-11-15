@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": "2026-11-13",
+  "version": "2026-11-15",
   "agents": {
     "claudecode": {
       "name": "Claude Code",
@@ -159,6 +159,48 @@
       },
       "sessionNotFound": "conversation .*not found",
       "authError": "authenticat|log ?in|oauth|credential|401|unauthori[sz]ed"
+    },
+    "opencode": {
+      "name": "OpenCode",
+      "experimental": true,
+      "command": "opencode",
+      "versionArgs": ["--version"],
+      "helpArgs": [["run", "--help"]],
+      "minVersion": "1.18.0",
+      "updateHint": "opencode upgrade",
+      "installUrl": "https://opencode.ai/docs/",
+      "install": {
+        "unix": "curl -fsSL https://opencode.ai/install | bash",
+        "windows": "npm install -g opencode-ai"
+      },
+      "setupCommand": "opencode auth login",
+      "loginHint": "opencode auth login",
+      "candidates": {
+        "unix": [
+          "{home}/.opencode/bin/opencode",
+          "{home}/.npm-global/bin/opencode",
+          "{home}/.local/bin/opencode",
+          "/usr/local/bin/opencode",
+          "/opt/homebrew/bin/opencode",
+          "/usr/bin/opencode"
+        ],
+        "windows": [
+          "{appData}/npm/opencode.cmd",
+          "{home}/.opencode/bin/opencode.exe"
+        ]
+      },
+      "args": {
+        "base": ["run", "--format", "json"],
+        "permissions": {
+          "bypassPermissions": ["--auto"],
+          "acceptEdits": [],
+          "auto": []
+        },
+        "model": ["--model", "{model}"],
+        "resume": ["--session", "{session}"]
+      },
+      "sessionNotFound": "session not found",
+      "authError": "401|unauthori[sz]ed|api key|authenticat|oauth|credential|log ?in|ProviderAuthError"
     }
   }
 }

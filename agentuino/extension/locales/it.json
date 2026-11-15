@@ -123,7 +123,7 @@
     "notLoggedIn": "{0} non ha effettuato l'accesso. Apri un terminale ed effettua l'accesso: {1}",
     "agentNotFound": "{0} non trovato. Installalo ({1}) o imposta il percorso nelle impostazioni alla voce «{2}».",
     "agentUnknown": "Agente sconosciuto: {0}",
-    "noAgent": "Nessun agente trovato. Installa Claude Code, Codex CLI, Mistral Vibe o Antigravity CLI e riavvia l'IDE.",
+    "noAgent": "Nessun agente trovato. Installa Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI o OpenCode e riavvia l'IDE.",
     "anAgent": "L'agente",
     "agentTooOld": "{0} {1} è troppo vecchio, Agentuino richiede almeno la versione {2}. Aggiornalo in un terminale con: {3}"
   },
@@ -319,7 +319,7 @@
   },
   "agent": {
     "auto": "Automatico",
-    "autoDescription": "il primo installato: Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI",
+    "autoDescription": "il primo installato: Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI, OpenCode",
     "installed": "installato",
     "notInstalled": "non trovato",
     "select": "Scegli l'agente per le nuove chat (le chat esistenti mantengono il loro agente)",
@@ -362,7 +362,8 @@
       "claudecode": "Consigliato. Richiede un abbonamento Claude (Pro o Max) o l'accesso API.",
       "codex": "Richiede Node.js e un account ChatGPT o una chiave API di OpenAI.",
       "vibe": "Richiede un accesso Mistral (chiave API).",
-      "antigravity": "Gratuito con un account Google, con limiti settimanali. Avvia agy una volta in un terminale ed effettua l'accesso."
+      "antigravity": "Gratuito con un account Google, con limiti settimanali. Avvia agy una volta in un terminale ed effettua l'accesso.",
+      "opencode": "Funziona con molti provider, anche con modelli locali tramite Ollama. Esegui una volta opencode auth login in un terminale, oppure configura un modello locale nella configurazione di OpenCode. Con la modalità di permessi «acceptEdits» OpenCode è meno restrittivo degli altri agenti."
     },
     "afterInstall": "Dopo l'installazione fai clic qui su «Verifica di nuovo»; di solito non serve riavviare l'IDE.",
     "recheck": "Verifica di nuovo",

@@ -1,12 +1,12 @@
 # Security Policy
 
-Agentuino starts an AI agent (Claude Code, Mistral Vibe, Codex CLI or Antigravity CLI) on your computer. This document explains what the agent may do and how to report a problem.
+Agentuino starts an AI agent (Claude Code, Mistral Vibe, Codex CLI, Antigravity CLI or OpenCode) on your computer. This document explains what the agent may do and how to report a problem.
 
 ## What the agent can do
 
 - By default the agent runs with full permissions (`agentuino.permissionMode` = `bypassPermissions`). It can read and write files and run commands in your user account without asking. Compiling with arduino-cli needs this.
 - The rules Agentuino writes into `agentuino/AGENTS.md` tell the agent to stay inside the sketch folder, never to upload on its own (unless you switch on the anchor *Upload automatically* for a sketch) and to install libraries only after asking. These rules are instructions to the agent, **not a sandbox**.
-- `acceptEdits` only allows file edits, `auto` lets the agent's own safety check decide. With these modes compiling may fail or ask for permission the chat cannot answer.
+- `acceptEdits` only allows file edits, `auto` lets the agent's own safety check decide. With these modes compiling may fail or ask for permission the chat cannot answer. OpenCode has no mode of its own for this: with `acceptEdits` and `auto` it uses its default rules, which allow file edits and commands inside the project.
 - Files you attach and the chat protocols stay in the sketch folder. What the agent sends to its provider is governed by that provider's terms.
 
 ## What Agentuino stores

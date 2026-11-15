@@ -23,6 +23,8 @@
     "agentuino.vibeModel",
     "agentuino.antigravityPath",
     "agentuino.antigravityModel",
+    "agentuino.opencodePath",
+    "agentuino.opencodeModel",
     "agentuino.arduinoCliPath",
     "agentuino.checkForUpdates",
     "agentuino.skipUpdateVersion",

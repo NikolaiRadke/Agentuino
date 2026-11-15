@@ -4,7 +4,7 @@
 
 Agentuino brings agentic coding into the **Arduino IDE 2.x**. You describe in a chat what your Arduino should do. An AI agent works directly in your sketch folder: it writes the code, compiles it, fixes its own errors and can even read what your board prints on the serial port. No copy and paste, no extra windows.
 
-Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Codex CLI** (experimental) and **Antigravity CLI** (free with a Google account). It is the little sibling of [AI.duino](https://github.com/NikolaiRadke/AI.duino): no API keys, no feature menus, only the chat.
+Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Codex CLI** (experimental), **Antigravity CLI** (free with a Google account) and **OpenCode** (experimental, any provider including local models via Ollama). It is the little sibling of [AI.duino](https://github.com/NikolaiRadke/AI.duino): no API keys, no feature menus, only the chat.
 
 *Englisch? Kein Problem: Agentuino spricht Deutsch, sobald deine Arduino IDE auf Deutsch eingestellt ist.*
 
@@ -12,7 +12,7 @@ Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Co
 > Agentuino is tested on Linux and Windows. macOS and Codex CLI are untested so far: please tell how it went in the [issues](https://github.com/NikolaiRadke/Agentuino/issues), it works or not.
 
 🆕 What's new?
-* **15.11.2026** **V1.1.0**: fits ArduDebug 1.8.8-5, the agent can type into the sketch while debugging. Command output folds out in the chat. Antigravity CLI is no longer experimental.  
+* **15.11.2026** **V1.1.0**: fits ArduDebug 1.8.8-5, the agent can type into the sketch while debugging. Command output folds out in the chat. Antigravity CLI is no longer experimental, new: OpenCode with any provider, local models included.  
     -- More news? Check the [newsblog](NEWS.md).
 
 ## Features
@@ -55,11 +55,12 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 | [Mistral Vibe](https://docs.mistral.ai/vibe) | `curl -LsSf https://mistral.ai/vibe/install.sh \| bash` (Windows: `uv tool install mistral-vibe`) | Version 3 or newer |
 | [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | Experimental, ChatGPT account |
 | [Antigravity CLI](https://antigravity.google/docs/cli/) | `curl -fsSL https://antigravity.google/cli/install.sh \| bash` (Windows: `irm https://antigravity.google/cli/install.ps1 \| iex`) | Free with a Google account (weekly limits) |
+| [OpenCode](https://opencode.ai/docs/) | `curl -fsSL https://opencode.ai/install \| bash` (Windows: `npm install -g opencode-ai`) | Experimental, version 1.18 or newer (not 2.x). Many providers, local models via Ollama |
 
 If no agent is found, the chat shows these commands and checks again after you installed one.
 
 > [!NOTE]
-> Claude Code, Mistral Vibe and Codex CLI use your subscription or API account, Antigravity CLI is free with weekly limits. The chat shows the cost of the current chat when the agent reports it.
+> Claude Code, Mistral Vibe and Codex CLI use your subscription or API account, Antigravity CLI is free with weekly limits, OpenCode costs whatever your provider charges (nothing for local models). The chat shows the cost of the current chat when the agent reports it.
 
 ## Installation
 
@@ -118,11 +119,11 @@ By default the agent runs with full permissions (`agentuino.permissionMode` = `b
 | Setting | Description |
 |---|---|
 | `agentuino.language` | UI language (`auto`, `de`, `en`, `es`, `fr`, `it`) |
-| `agentuino.agent` | Agent for new chats: `auto`, `claudecode`, `codex`, `vibe`, `antigravity` |
+| `agentuino.agent` | Agent for new chats: `auto`, `claudecode`, `codex`, `vibe`, `antigravity`, `opencode` |
 | `agentuino.compileCheck` | Compile after every task that changed code (default on) |
 | `agentuino.permissionMode` | `bypassPermissions` (default), `acceptEdits` or `auto` |
-| `agentuino.claudePath` / `codexPath` / `vibePath` / `antigravityPath` | Agent path, empty = auto-detect |
-| `agentuino.claudeModel` / `codexModel` / `vibeModel` / `antigravityModel` | Model, empty = agent default |
+| `agentuino.claudePath` / `codexPath` / `vibePath` / `antigravityPath` / `opencodePath` | Agent path, empty = auto-detect |
+| `agentuino.claudeModel` / `codexModel` / `vibeModel` / `antigravityModel` / `opencodeModel` | Model, empty = agent default. OpenCode takes `provider/model`, e.g. `ollama/qwen2.5-coder` |
 | `agentuino.checkForUpdates` | Check for new versions and agent configurations at startup; nothing is stored without asking (default on) |
 | `agentuino.arduinoCliPath` | Path to arduino-cli, empty = the one bundled with the IDE |
 
@@ -135,7 +136,7 @@ By default the agent runs with full permissions (`agentuino.permissionMode` = `b
 Before publishing a changed `agentuino/extension/config/agentConfigs.json`, check it against the installed agents. Every option must appear in their help text:
 
 ```
-node .github/scripts/check-agent-configs.js [--codex=<path>] [--vibe=<path>] [--antigravity=<path>]
+node .github/scripts/check-agent-configs.js [--codex=<path>] [--vibe=<path>] [--antigravity=<path>] [--opencode=<path>]
 ```
 
 The workflow *Check agent configs* does the same on GitHub: it installs all agents with the commands from the file and runs the check, on every change of the file and every Monday. A red run means an agent changed its options or its install command.

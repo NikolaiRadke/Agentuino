@@ -35,7 +35,9 @@
     "codex",
     "mistral",
     "vibe",
-    "antigravity"
+    "antigravity",
+    "opencode",
+    "ollama"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -128,14 +130,16 @@
             "claudecode",
             "codex",
             "vibe",
-            "antigravity"
+            "antigravity",
+            "opencode"
           ],
           "enumDescriptions": [
-            "First installed agent: Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI",
+            "First installed agent: Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI, OpenCode",
             "Claude Code",
             "Codex CLI",
             "Mistral Vibe",
-            "Antigravity CLI"
+            "Antigravity CLI",
+            "OpenCode (experimental)"
           ],
           "description": "Agent for new chats. Existing chats keep their agent."
         },
@@ -193,6 +197,16 @@
           "type": "string",
           "default": "",
           "description": "Antigravity CLI model (see 'agy models'). Leave empty to use the agy default."
+        },
+        "agentuino.opencodePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to OpenCode. Leave empty for auto-detection."
+        },
+        "agentuino.opencodeModel": {
+          "type": "string",
+          "default": "",
+          "description": "OpenCode model as provider/model (e.g. 'ollama/qwen2.5-coder', see 'opencode models'). Leave empty to use the OpenCode default."
         },
         "agentuino.arduinoCliPath": {
           "type": "string",

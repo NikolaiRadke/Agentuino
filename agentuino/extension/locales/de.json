@@ -123,7 +123,7 @@
     "notLoggedIn": "{0} ist nicht angemeldet. Öffne ein Terminal und melde dich an: {1}",
     "agentNotFound": "{0} wurde nicht gefunden. Installiere ihn ({1}) oder trage den Pfad in den Einstellungen unter „{2}“ ein.",
     "agentUnknown": "Unbekannter Agent: {0}",
-    "noAgent": "Kein Agent gefunden. Installiere Claude Code, Codex CLI, Mistral Vibe oder Antigravity CLI und starte die IDE neu.",
+    "noAgent": "Kein Agent gefunden. Installiere Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI oder OpenCode und starte die IDE neu.",
     "anAgent": "Der Agent",
     "agentTooOld": "{0} {1} ist zu alt, Agentuino braucht mindestens Version {2}. Aktualisieren im Terminal mit: {3}"
   },
@@ -319,7 +319,7 @@
   },
   "agent": {
     "auto": "Automatisch",
-    "autoDescription": "erster installierter: Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI",
+    "autoDescription": "erster installierter: Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI, OpenCode",
     "installed": "installiert",
     "notInstalled": "nicht gefunden",
     "select": "Agent für neue Chats wählen (bestehende Chats behalten ihren Agenten)",
@@ -362,7 +362,8 @@
       "claudecode": "Empfohlen. Braucht ein Claude-Abo (Pro oder Max) oder einen API-Zugang.",
       "codex": "Braucht Node.js und ein ChatGPT-Konto oder einen OpenAI-API-Schlüssel.",
       "vibe": "Braucht einen Mistral-Zugang (API-Schlüssel).",
-      "antigravity": "Kostenlos mit einem Google-Konto, mit wöchentlichen Limits. Starte agy einmal im Terminal und melde dich an."
+      "antigravity": "Kostenlos mit einem Google-Konto, mit wöchentlichen Limits. Starte agy einmal im Terminal und melde dich an.",
+      "opencode": "Arbeitet mit vielen Anbietern, auch mit lokalen Modellen über Ollama. Führe einmal opencode auth login im Terminal aus oder richte ein lokales Modell in der Konfiguration von OpenCode ein. Mit dem Berechtigungsmodus „acceptEdits“ ist OpenCode weniger streng als die anderen Agenten."
     },
     "afterInstall": "Nach der Installation hier auf „Erneut prüfen“ klicken, ein Neustart der IDE ist meist nicht nötig.",
     "recheck": "Erneut prüfen",

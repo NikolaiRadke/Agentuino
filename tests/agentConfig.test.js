@@ -19,7 +19,7 @@ const IDS = registry.getAll().map(adapter => adapter.id);
 
 test('shipped file is valid and has an entry for every adapter', () => {
     assert.equal(agentConfig.validate(bundled(), IDS), null);
-    assert.deepEqual(IDS, ['claudecode', 'codex', 'vibe', 'antigravity']);
+    assert.deepEqual(IDS, ['claudecode', 'codex', 'vibe', 'antigravity', 'opencode']);
 });
 
 test('one bad field rejects the whole file', () => {

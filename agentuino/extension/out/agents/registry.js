@@ -17,7 +17,8 @@ const ADAPTERS = [
     require('./adapters/claudeCode'),
     require('./adapters/codex'),
     require('./adapters/mistralVibe'),
-    require('./adapters/antigravity')
+    require('./adapters/antigravity'),
+    require('./adapters/openCode')
 ];
 
 const AUTO = 'auto';

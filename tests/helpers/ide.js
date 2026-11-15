@@ -19,6 +19,7 @@ const DEFAULT_SETTINGS = {
     codexPath: env.fake('codex'),
     vibePath: env.fake('vibe'),
     antigravityPath: env.fake('agy'),
+    opencodePath: env.fake('opencode'),
     arduinoCliPath: env.fake('arduino-cli')
 };
 

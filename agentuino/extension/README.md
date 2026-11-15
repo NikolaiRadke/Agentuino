@@ -9,8 +9,10 @@ the agent works directly in your sketch folder, compiles on its own and fixes er
 
 - Arduino IDE 2.x
 - One CLI agent, installed and logged in:
-  [Claude Code](https://code.claude.com), [Codex CLI](https://github.com/openai/codex)
-  or [Mistral Vibe](https://docs.mistral.ai/vibe) (version 3 or newer). Codex support is experimental.
+  [Claude Code](https://code.claude.com), [Codex CLI](https://github.com/openai/codex),
+  [Mistral Vibe](https://docs.mistral.ai/vibe) (version 3 or newer), [Antigravity CLI](https://antigravity.google/docs/cli/)
+  or [OpenCode](https://opencode.ai/docs/) (1.18 or newer, also with local models via Ollama).
+  Codex and OpenCode support is experimental.
 
 ## How it works
 

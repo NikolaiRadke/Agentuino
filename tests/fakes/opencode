@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+/*
+ * Fake OpenCode (run --format json), lines shaped like opencode 1.18.32.
+ * Prompt words: AUTH_FAIL. Resuming the session "gone" fails like the real one.
+ * Calls go to $FAKE_AGENT_LOG.
+ */
+
+"use strict";
+
+const fs = require('fs');
+const path = require('path');
+
+const args = process.argv.slice(2);
+const out = event => process.stdout.write(JSON.stringify(event) + '\n');
+if (args.includes('--version')) {
+    console.log('1.18.32');
+    process.exit(0);
+}
+
+let prompt = '';
+process.stdin.on('data', data => { prompt += data; });
+process.stdin.on('end', () => {
+    if (process.env.FAKE_AGENT_LOG) {
+        fs.appendFileSync(process.env.FAKE_AGENT_LOG, JSON.stringify({ agent: 'opencode', args, prompt }) + '\n');
+    }
+    const resume = args.indexOf('--session');
+    const sessionID = resume >= 0 ? args[resume + 1] : 'ses_opencode1';
+    if (sessionID === 'gone') {
+        process.stderr.write('\x1b[91m\x1b[1mError: \x1b[0mSession not found\n');
+        process.exit(1);
+    }
+    const line = (type, part) => out({ type, timestamp: Date.now(), sessionID, part: { sessionID, ...part } });
+    if (prompt.includes('AUTH_FAIL')) {
+        out({ type: 'error', timestamp: Date.now(), sessionID, error: { name: 'ProviderAuthError', data: { message: 'Invalid API key' } } });
+        process.exit(1);
+    }
+    const file = path.join(process.cwd(), 'Test.ino');
+    line('step_start', { type: 'step-start' });
+    line('tool_use', { type: 'tool', tool: 'bash', callID: 'call-1', state: { status: 'completed',
+        input: { command: 'arduino-cli compile .' }, output: 'Sketch uses 444 bytes\n',
+        metadata: { output: 'Sketch uses 444 bytes\n', exit: 0, truncated: false }, title: 'arduino-cli compile .' } });
+    line('tool_use', { type: 'tool', tool: 'edit', callID: 'call-2', state: { status: 'completed',
+        input: { filePath: file, oldString: 'a', newString: 'b' }, output: 'Edit applied successfully.', metadata: {} } });
+    line('step_finish', { type: 'step-finish', reason: 'tool-calls', cost: 0.001, tokens: { total: 10 } });
+    line('step_start', { type: 'step-start' });
+    line('text', { type: 'text', text: 'OpenCode answer.' });
+    line('step_finish', { type: 'step-finish', reason: 'stop', cost: 0.002, tokens: { total: 10 } });
+});

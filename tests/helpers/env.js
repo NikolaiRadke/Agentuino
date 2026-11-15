@@ -38,7 +38,7 @@ function ext(rel) {
 
 /**
  * Path of a fake tool
- * @param {string} name - arduino-cli, claude, codex, vibe or agy
+ * @param {string} name - arduino-cli, claude, codex, vibe, agy or opencode
  * @returns {string} Path
  */
 function fake(name) {

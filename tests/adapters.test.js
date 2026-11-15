@@ -13,12 +13,13 @@ const fs = require('fs');
 const registry = env.ext('out/agents/registry.js');
 const { AgentRunner } = env.ext('out/agents/agentRunner.js');
 
-const FAKES = { claudecode: 'claude', codex: 'codex', vibe: 'vibe', antigravity: 'agy' };
+const FAKES = { claudecode: 'claude', codex: 'codex', vibe: 'vibe', antigravity: 'agy', opencode: 'opencode' };
 const EXPECTED = {
     claudecode: { session: 'claude-session-1', text: 'Written.', tool: 'Write' },
     codex: { session: 'codex-thread-1', text: 'Codex answer.', tool: 'Bash' },
     vibe: { session: 'vibe-session-1', text: 'Vibe answer.', tool: 'Edit' },
-    antigravity: { session: 'agy-conversation-1', text: 'Agy answer.', tool: 'Read' }
+    antigravity: { session: 'agy-conversation-1', text: 'Agy answer.', tool: 'Read' },
+    opencode: { session: 'ses_opencode1', text: 'OpenCode answer.', tool: 'Edit' }
 };
 
 const sketch = env.makeSketch('Test');
@@ -73,7 +74,7 @@ for (const id of Object.keys(FAKES)) {
     });
 }
 
-for (const id of ['claudecode', 'codex', 'vibe']) {
+for (const id of ['claudecode', 'codex', 'vibe', 'opencode']) {
     test(`${id}: a lost session is reported so the chat can start a new one`, async () => {
         await assert.rejects(run(id, 'hello', 'gone'), { code: 'SESSION_NOT_FOUND' });
     });
@@ -144,6 +145,14 @@ test('shell output: claudecode, codex and vibe pass it on for shell calls only',
     assert.equal(agy.length, 4);
     assert.equal(agy[0].id, 'step-2');
     assert.deepEqual(agy[1], { type: 'toolOutput', id: 'step-2', output: 'hallo\r\n', failed: false });
+
+    // Real lines of opencode 1.18.32 (shortened)
+    const call = (callID, command, output, exit) => ({ type: 'tool_use', sessionID: 'ses_1', part: { type: 'tool', tool: 'bash', callID,
+        state: { status: 'completed', input: { command }, output, metadata: { output, exit, truncated: false }, title: command } } });
+    const oc = outputs('opencode', [call('c1', 'echo hallo', 'hallo\n', 0), call('c2', 'ls /gibtsnicht', 'ls: nicht gefunden\n', 2)]);
+    assert.deepEqual(oc[0], { type: 'tool', name: 'Bash', detail: 'echo hallo', id: 'c1' });
+    assert.deepEqual(oc[1], { type: 'toolOutput', id: 'c1', output: 'hallo\n', failed: false });
+    assert.equal(oc[3].failed, true);
     assert.equal(agy[3].failed, true);
     assert.equal(agy[3].output, "ls: Zugriff auf '/gibtsnicht' nicht möglich\r\n");
 });
