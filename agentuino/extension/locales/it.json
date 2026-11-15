@@ -61,7 +61,10 @@
     "fixErrors": "🔧 Fai correggere all'agente",
     "checkLabel": "Verifica di Agentuino",
     "noOutput": "(nessun output)",
-    "outputCut": "… {0} caratteri omessi …"
+    "outputCut": "… {0} caratteri omessi …",
+    "loginButton": "Accedi in un terminale",
+    "loginOpened": "È aperto un terminale con {0}. Accedi lì ({1}), poi invia di nuovo la tua richiesta.",
+    "loginNoTerminal": "Nessun terminale trovato. Aprine uno e accedi con: {0}"
   },
   "tools": {
     "Read": "Legge {0}",

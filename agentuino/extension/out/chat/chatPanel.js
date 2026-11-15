@@ -14,6 +14,7 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const crypto = require('crypto');
 
 const projectManager = require('../utils/projectManager');
@@ -26,6 +27,7 @@ const registry = require('../agents/registry');
 const { AgentRunner } = require('../agents/agentRunner');
 const { shorten, createError } = require('../agents/agentUtils');
 const { CompileChecker } = require('../utils/compileChecker');
+const { openInTerminal } = require('../utils/terminal');
 
 // ===== CONSTANTS =====
 
@@ -240,6 +242,7 @@ class ChatPanel {
                 agents: registry.getAll().map(adapter => ({
                     name: adapter.experimental ? `${adapter.name} (${t('agent.experimental')})` : adapter.name,
                     note: t(`setup.notes.${adapter.id}`),
+                    id: adapter.id,
                     install: adapter.install[platform],
                     login: adapter.setupCommand,
                     url: adapter.installUrl
@@ -249,6 +252,7 @@ class ChatPanel {
                     login: t('setup.login'),
                     guide: t('setup.guide'),
                     copy: t('chat.copy'),
+                    openLogin: t('chat.loginButton'),
                     recheck: t('setup.recheck'),
                     after: t('setup.afterInstall')
                 }
@@ -367,6 +371,7 @@ class ChatPanel {
                     if (links.isWebUrl(msg.url)) await vscode.env.openExternal(vscode.Uri.parse(msg.url));
                     break;
                 case 'copy': await this.copyToClipboard(msg.text); break;
+                case 'openLogin': await this.openLogin(msg.agent); break;
                 case 'requestPaste':
                     this.post({ command: 'paste', text: await vscode.env.clipboard.readText() });
                     break;
@@ -395,6 +400,25 @@ class ChatPanel {
         if (!text) return;
         await vscode.env.clipboard.writeText(text);
         vscode.window.setStatusBarMessage(this.deps.getT()('chat.copied'), COPIED_MESSAGE_MS);
+    }
+
+    /**
+     * Open the system terminal with the login command of an agent
+     * @param {string} agentId - Agent
+     */
+    async openLogin(agentId) {
+        const adapter = registry.get(agentId);
+        if (!adapter?.setupCommand) return;
+        const t = this.deps.getT();
+        const [command, ...args] = adapter.setupCommand.split(' ');
+        // The IDE's PATH often lacks the agent's folder, the full path always works
+        const toolPath = await toolDetector.findAgent(adapter, this.deps.getSettings().paths[adapter.id]) || command;
+        const opened = await openInTerminal(toolPath, args, this.sketchPath || os.homedir());
+        if (opened) {
+            vscode.window.showInformationMessage(t('chat.loginOpened', adapter.name, adapter.loginHint));
+        } else {
+            vscode.window.showWarningMessage(t('chat.loginNoTerminal', adapter.setupCommand));
+        }
     }
 
     // ===== PROJECT HELPERS =====
@@ -717,10 +741,12 @@ class ChatPanel {
             if (result.stopped) {
                 this.addEntry('info', t('chat.stopped'));
             } else if (result.isError) {
-                const message = result.errorType === 'auth'
+                const auth = result.errorType === 'auth';
+                const message = auth
                     ? t('errors.notLoggedIn', adapter.name, adapter.loginHint)
                     : t('errors.agentError', result.result);
-                this.addEntry('error', message);
+                // A login error gets a button that opens the login in a terminal (live only)
+                this.addEntry('error', message, undefined, auth ? { loginAgent: adapter.id } : undefined);
             }
             return result;
         } catch (err) {

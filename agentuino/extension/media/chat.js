@@ -257,8 +257,9 @@
      * @param {number} time - Message timestamp (identifies the reset point)
      * @param {Object} [data] - Compile result
      * @param {string} [toolId] - Shell call whose output may follow (live only)
+     * @param {string} [loginAgent] - Agent to log in to, adds a button (live only)
      */
-    function addEntry(role, text, time, data, toolId) {
+    function addEntry(role, text, time, data, toolId, loginAgent) {
         const entry = document.createElement('div');
         entry.className = `entry ${role}`;
 
@@ -296,10 +297,25 @@
         } else {
             entry.textContent = role === 'activity' ? `› ${text}` : text;
             if (toolId) entry.dataset.toolId = toolId;
+            if (loginAgent) entry.append(' ', createLoginButton(texts.loginButton, loginAgent));
         }
 
         elements.messages.appendChild(entry);
         elements.messages.scrollTop = elements.messages.scrollHeight;
+    }
+
+    /**
+     * Button that opens the login of an agent in the system terminal
+     * @param {string} label - Button text
+     * @param {string} agent - Agent ID
+     * @returns {HTMLButtonElement} Button
+     */
+    function createLoginButton(label, agent) {
+        const button = document.createElement('button');
+        button.className = 'link-btn';
+        button.textContent = label;
+        button.addEventListener('click', () => vscode.postMessage({ command: 'openLogin', agent }));
+        return button;
     }
 
     /**
@@ -439,7 +455,7 @@
         intro.textContent = setup.intro;
         card.append(title, intro);
 
-        const commandLine = (label, command) => {
+        const commandLine = (label, command, agent) => {
             const row = document.createElement('div');
             row.className = 'setup-row';
             const key = document.createElement('span');
@@ -448,6 +464,7 @@
             const code = document.createElement('code');
             code.textContent = command;
             row.append(key, code, createCopyButton(labels.copy, () => command));
+            if (agent) row.append(createLoginButton(labels.openLogin, agent));
             return row;
         };
 
@@ -463,7 +480,7 @@
             guide.className = 'link-btn';
             guide.textContent = labels.guide;
             guide.addEventListener('click', () => vscode.postMessage({ command: 'openUrl', url: agent.url }));
-            block.append(name, note, commandLine(labels.install, agent.install), commandLine(labels.login, agent.login), guide);
+            block.append(name, note, commandLine(labels.install, agent.install), commandLine(labels.login, agent.login, agent.id), guide);
             card.appendChild(block);
         });
 
@@ -741,7 +758,7 @@
                 break;
             case 'entry':
                 elements.messages.querySelector('.welcome')?.remove();
-                addEntry(msg.role, msg.text, msg.time, msg.data, msg.toolId);
+                addEntry(msg.role, msg.text, msg.time, msg.data, msg.toolId, msg.loginAgent);
                 updateRestoreButtons();
                 break;
             case 'toolOutput':

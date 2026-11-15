@@ -40,6 +40,7 @@
         "resume": ["--resume", "{session}"]
       },
       "sessionNotFound": "no conversation found",
+      "authError": "/login|not logged in|login expired|oauth|authentication_(error|failed)|invalid api key",
       "titleModel": "haiku"
     },
     "codex": {
@@ -79,7 +80,7 @@
         "tail": ["-"]
       },
       "sessionNotFound": "no (conversation|session|thread|rollout) found|not found",
-      "authError": "401|unauthori[sz]ed|not logged in|login required|api key"
+      "authError": "401|unauthori[sz]ed|not logged in|login required|api key|oauth|refresh|expired"
     },
     "vibe": {
       "name": "Mistral Vibe",
@@ -157,7 +158,7 @@
         "resume": ["--conversation", "{session}"]
       },
       "sessionNotFound": "conversation .*not found",
-      "authError": "authenticat|log ?in"
+      "authError": "authenticat|log ?in|oauth|credential|401|unauthori[sz]ed"
     }
   }
 }

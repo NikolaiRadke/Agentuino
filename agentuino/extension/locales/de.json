@@ -61,7 +61,10 @@
     "fixErrors": "🔧 Fehler beheben lassen",
     "checkLabel": "Prüfung durch Agentuino",
     "noOutput": "(keine Ausgabe)",
-    "outputCut": "… {0} Zeichen ausgelassen …"
+    "outputCut": "… {0} Zeichen ausgelassen …",
+    "loginButton": "Im Terminal anmelden",
+    "loginOpened": "Ein Terminal mit {0} ist offen. Melde dich dort an ({1}) und schick deine Anfrage danach noch einmal.",
+    "loginNoTerminal": "Kein Terminal gefunden. Öffne eins und melde dich an mit: {0}"
   },
   "tools": {
     "Read": "Liest {0}",

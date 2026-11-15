@@ -81,7 +81,9 @@ function createParser({ cwd, sessionId }) {
                     sessionId: event.session_id || parser.sessionId,
                     result: event.result || '',
                     isError: !!event.is_error,
-                    errorType: parser.apiError === 'authentication_failed' ? 'auth' : parser.apiError,
+                    // Expired or revoked logins often come only as text ("· Please run /login")
+                    errorType: parser.apiError === 'authentication_failed'
+                        || (event.is_error && adapter.authError?.test(event.result || '')) ? 'auth' : parser.apiError,
                     costUsd: typeof event.total_cost_usd === 'number' ? event.total_cost_usd : null
                 };
             }

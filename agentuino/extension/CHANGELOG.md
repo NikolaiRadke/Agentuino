@@ -21,6 +21,9 @@ Adjustments to ArduDebug 1.8.8-5.
 - Chat: the output of shell commands folds out under their activity line
   (all four agents; live only, not stored in the chat files)
 - Antigravity CLI is no longer experimental
+- Login errors: "Log in in a terminal" opens the system terminal with the agent's
+  login command (also on the setup card); expired and revoked logins of Claude Code,
+  Codex and Antigravity are recognized
 - compareVersions treats "-" as a separator (1.8.8-5 is newer than 1.8.8)
 
 ## 1.0.0

@@ -61,7 +61,10 @@
     "fixErrors": "🔧 Let the agent fix it",
     "checkLabel": "Check by Agentuino",
     "noOutput": "(no output)",
-    "outputCut": "… {0} characters left out …"
+    "outputCut": "… {0} characters left out …",
+    "loginButton": "Log in in a terminal",
+    "loginOpened": "A terminal with {0} is open. Log in there ({1}), then send your request again.",
+    "loginNoTerminal": "No terminal found. Open one and log in with: {0}"
   },
   "tools": {
     "Read": "Reading {0}",

@@ -148,6 +148,20 @@ test('shell output: claudecode, codex and vibe pass it on for shell calls only',
     assert.equal(agy[3].output, "ls: Zugriff auf '/gibtsnicht' nicht möglich\r\n");
 });
 
+test('auth errors: expired or revoked logins that come only as text', () => {
+    const claude = text => {
+        const parser = registry.get('claudecode').createParser({ cwd: sketch, sessionId: null });
+        parser.onEvent({ type: 'result', is_error: true, result: text, session_id: 's' });
+        return parser.finish().errorType;
+    };
+    assert.equal(claude('Login expired · Please run /login'), 'auth');
+    assert.equal(claude('Failed to authenticate: OAuth token revoked'), 'auth');
+    assert.equal(claude('API Error: 401 {"type":"error","error":{"type":"authentication_error"}} · Please run /login'), 'auth');
+    assert.notEqual(claude('Prompt is too long'), 'auth');
+    assert.ok(registry.get('codex').authError.test('Your access token could not be refreshed'));
+    assert.ok(registry.get('antigravity').authError.test('OAuth credentials missing'));
+});
+
 test('claudecode: generates a chat title with a single call', async () => {
     const title = await registry.get('claudecode').generateTitle(env.fake('claude'), 'Title please');
     assert.equal(title, 'Test title');

@@ -61,7 +61,10 @@
     "fixErrors": "🔧 Laisser l'agent corriger",
     "checkLabel": "Vérification par Agentuino",
     "noOutput": "(aucune sortie)",
-    "outputCut": "… {0} caractères omis …"
+    "outputCut": "… {0} caractères omis …",
+    "loginButton": "Se connecter dans un terminal",
+    "loginOpened": "Un terminal avec {0} est ouvert. Connecte-toi là-bas ({1}), puis renvoie ta demande.",
+    "loginNoTerminal": "Aucun terminal trouvé. Ouvres-en un et connecte-toi avec : {0}"
   },
   "tools": {
     "Read": "Lit {0}",
