@@ -4,7 +4,7 @@
 
 Agentuino brings agentic coding into the **Arduino IDE 2.x**. You describe in a chat what your Arduino should do. An AI agent works directly in your sketch folder: it writes the code, compiles it, fixes its own errors and can even read what your board prints on the serial port. No copy and paste, no extra windows.
 
-Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Codex CLI** (experimental), **Antigravity CLI** (free with a Google account) and **OpenCode** (experimental, any provider including local models via Ollama). It is the little sibling of [AI.duino](https://github.com/NikolaiRadke/AI.duino): no API keys, no feature menus, only the chat.
+Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Codex CLI** (experimental), **Antigravity CLI** (free with a Google account) and **OpenCode** (any provider, local models via Ollama included). It is the little sibling of [AI.duino](https://github.com/NikolaiRadke/AI.duino): no API keys, no feature menus, only the chat.
 
 *Englisch? Kein Problem: Agentuino spricht Deutsch, sobald deine Arduino IDE auf Deutsch eingestellt ist.*
 
@@ -55,7 +55,7 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 | [Mistral Vibe](https://docs.mistral.ai/vibe) | `curl -LsSf https://mistral.ai/vibe/install.sh \| bash` (Windows: `uv tool install mistral-vibe`) | Version 3 or newer |
 | [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | Experimental, ChatGPT account |
 | [Antigravity CLI](https://antigravity.google/docs/cli/) | `curl -fsSL https://antigravity.google/cli/install.sh \| bash` (Windows: `irm https://antigravity.google/cli/install.ps1 \| iex`) | Free with a Google account (weekly limits) |
-| [OpenCode](https://opencode.ai/docs/) | `curl -fsSL https://opencode.ai/install \| bash` (Windows: `npm install -g opencode-ai`) | Experimental, version 1.18 or newer (not 2.x). Many providers, local models via Ollama |
+| [OpenCode](https://opencode.ai/docs/) | `curl -fsSL https://opencode.ai/install \| bash` (Windows: `npm install -g opencode-ai`) | Version 1.18 or newer (not 2.x). Many providers, local models via Ollama |
 
 If no agent is found, the chat shows these commands and checks again after you installed one.
 

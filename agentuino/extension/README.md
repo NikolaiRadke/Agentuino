@@ -12,7 +12,7 @@ the agent works directly in your sketch folder, compiles on its own and fixes er
   [Claude Code](https://code.claude.com), [Codex CLI](https://github.com/openai/codex),
   [Mistral Vibe](https://docs.mistral.ai/vibe) (version 3 or newer), [Antigravity CLI](https://antigravity.google/docs/cli/)
   or [OpenCode](https://opencode.ai/docs/) (1.18 or newer, also with local models via Ollama).
-  Codex and OpenCode support is experimental.
+  Codex support is experimental.
 
 ## How it works
 

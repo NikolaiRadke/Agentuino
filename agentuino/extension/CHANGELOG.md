@@ -21,7 +21,7 @@ Adjustments to ArduDebug 1.8.8-5.
 - Chat: the output of shell commands folds out under their activity line
   (all four agents; live only, not stored in the chat files)
 - Antigravity CLI is no longer experimental
-- OpenCode as fifth agent, experimental (opencode run --format json, checked against
+- OpenCode as fifth agent (opencode run --format json, checked against
   1.18.32): many providers, local models via Ollama (agentuino.opencodeModel = ollama/<model>)
 - Login errors: "Log in in a terminal" opens the system terminal with the agent's
   login command (also on the setup card); expired and revoked logins of Claude Code,

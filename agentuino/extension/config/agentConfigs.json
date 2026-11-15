@@ -162,7 +162,6 @@
     },
     "opencode": {
       "name": "OpenCode",
-      "experimental": true,
       "command": "opencode",
       "versionArgs": ["--version"],
       "helpArgs": [["run", "--help"]],

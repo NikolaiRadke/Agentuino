@@ -139,7 +139,7 @@
             "Codex CLI",
             "Mistral Vibe",
             "Antigravity CLI",
-            "OpenCode (experimental)"
+            "OpenCode"
           ],
           "description": "Agent for new chats. Existing chats keep their agent."
         },
