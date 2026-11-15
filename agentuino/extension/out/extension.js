@@ -103,6 +103,24 @@ function findSketch() {
     return lastSketchPath && projectManager.isSketchFolder(lastSketchPath) ? lastSketchPath : null;
 }
 
+const ARDUDEBUG_EXTENSION = 'NikolaiRadke.ardudebug';
+let ardudebugSetupTried = false;
+
+/**
+ * Let the ArduDebug extension install its board package (VS Code only, once per session)
+ * @returns {Promise<boolean>} True if the setup ran without error
+ */
+async function setupArdudebug() {
+    if (ardudebugSetupTried || !vscode.extensions.getExtension(ARDUDEBUG_EXTENSION)) return false;
+    ardudebugSetupTried = true;
+    try {
+        await vscode.commands.executeCommand('ardudebug.setup');
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 /**
  * Collect tool paths, board and port for AGENTS.md
  * @param {string} sketchPath - Sketch folder
@@ -115,7 +133,10 @@ async function collectContext(sketchPath) {
     const board = boardDetector.getBoardInfo(sketchPath);
     const port = board.port || (cliPath ? await toolDetector.detectSerialPort(cliPath, configFile) : null);
 
-    const ardudebug = cliPath ? await toolDetector.hasArdudebug(cliPath, configFile) : false;
+    let ardudebug = cliPath ? await toolDetector.hasArdudebug(cliPath, configFile) : false;
+    if (!ardudebug && cliPath && await setupArdudebug()) {
+        ardudebug = await toolDetector.hasArdudebug(cliPath, configFile, true);
+    }
 
     const context = { cliPath, configFile, port, ardudebug };
     if (board.fqbn) Object.assign(context, { fqbn: board.fqbn, boardName: board.boardName });

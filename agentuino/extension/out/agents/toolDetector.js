@@ -223,11 +223,12 @@ let coreCache = { time: 0, key: null, installed: false };
  * Check whether the ArduDebug board package is installed ('arduino-cli core list')
  * @param {string} cliPath - arduino-cli executable
  * @param {string|null} configFile - arduino-cli config file
+ * @param {boolean} [force=false] - Ignore the cache
  * @returns {Promise<boolean>} Installed
  */
-function hasArdudebug(cliPath, configFile) {
+function hasArdudebug(cliPath, configFile, force = false) {
     const key = `${cliPath}|${configFile}`;
-    if (key === coreCache.key && Date.now() - coreCache.time < CORE_CACHE_MS) {
+    if (!force && key === coreCache.key && Date.now() - coreCache.time < CORE_CACHE_MS) {
         return Promise.resolve(coreCache.installed);
     }
     const args = ['core', 'list', '--format', 'json'];

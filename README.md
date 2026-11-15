@@ -1,4 +1,4 @@
-![Agentuino](http://www.nikolairadke.de/aiduino/agentuino_banner.png)
+![Agentuino](https://www.nikolairadke.de/aiduino/agentuino_banner.png)
 
 # Agentuino – Agentic coding for Arduino beginners
 
@@ -45,7 +45,7 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 - Agent options are kept up to date with a configuration file from this repository. Agentuino asks before it downloads a new one.
 
 ## Screenshot
-![Screenshot](http://www.nikolairadke.de/aiduino/agentuino_screenshot.png)
+![Screenshot](https://www.nikolairadke.de/aiduino/agentuino_screenshot.png)
 
 ## Requirements
 

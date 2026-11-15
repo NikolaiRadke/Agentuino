@@ -95,6 +95,8 @@ function startIde(overrides = {}) {
                 }),
                 onDidChangeConfiguration: () => ({ dispose() {} })
             },
+            // No other extensions, like in the Arduino IDE
+            extensions: { getExtension: () => undefined },
             commands: {
                 registerCommand: (name, callback) => { commands[name] = callback; return { dispose() {} }; },
                 executeCommand: async () => undefined
