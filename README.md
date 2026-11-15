@@ -44,6 +44,9 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 - German, English, French, Spanish and Italian, following the IDE language
 - Agent options are kept up to date with a configuration file from this repository. Agentuino asks before it downloads a new one.
 
+## Screenshot
+![Screenshot](http://www.nikolairadke.de/aiduino/agentuino_screenshot.png)
+
 ## Requirements
 
 - Arduino IDE 2.x (Linux, Windows or macOS)
