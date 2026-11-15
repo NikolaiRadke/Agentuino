@@ -16,7 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { describeToolInput, parseJson } = require('../agentUtils');
+const { describeToolInput, parseJson, contentText } = require('../agentUtils');
 const { defineAdapter } = require('../agentConfig');
 
 // ===== CONSTANTS =====
@@ -40,30 +40,22 @@ const TOOL_NAMES = {
 // ===== ADAPTER =====
 
 /**
- * Get the text of a message content (string or list of parts)
- * @param {*} content - Message content
- * @returns {string} Text
- */
-function contentText(content) {
-    if (typeof content === 'string') return content;
-    if (Array.isArray(content)) {
-        return content.map(part => (typeof part === 'string' ? part : part?.text || '')).join('');
-    }
-    return '';
-}
-
-/**
  * Create a parser for one run
  * @param {Object} context - {cwd, sessionId}
  * @returns {Object} Parser with onEvent() and finish()
  */
 function createParser({ cwd, sessionId }) {
+    // IDs of shell calls whose output is still to come
+    const shellCalls = new Set();
     const parser = {
         sessionId,
 
         onEvent(event) {
             // Accept both plain messages and wrapped ones ({message: {...}})
             const message = event.role ? event : event.message;
+            if (message?.role === 'tool' && shellCalls.delete(message.tool_call_id)) {
+                return [{ type: 'toolOutput', id: message.tool_call_id, output: contentText(message.content), failed: false }];
+            }
             if (!message || message.role !== 'assistant') return [];
 
             const out = [];
@@ -74,11 +66,11 @@ function createParser({ cwd, sessionId }) {
                 const rawName = call.function?.name || call.name || '';
                 const rawArgs = call.function?.arguments ?? call.arguments;
                 const args = typeof rawArgs === 'string' ? parseJson(rawArgs) : rawArgs;
-                out.push({
-                    type: 'tool',
-                    name: TOOL_NAMES[rawName] || rawName,
-                    detail: describeToolInput(args, cwd)
-                });
+                const name = TOOL_NAMES[rawName] || rawName;
+                // Only shell calls get an id: their output can be shown under the line
+                const id = name === 'Bash' && call.id ? call.id : undefined;
+                if (id) shellCalls.add(id);
+                out.push({ type: 'tool', name, detail: describeToolInput(args, cwd), ...(id && { id }) });
             }
             return out;
         },

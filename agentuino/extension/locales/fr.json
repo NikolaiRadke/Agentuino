@@ -59,7 +59,9 @@
     "chooseAgent": "Choisir l'agent pour ce nouveau chat",
     "noAgent": "aucun agent",
     "fixErrors": "🔧 Laisser l'agent corriger",
-    "checkLabel": "Vérification par Agentuino"
+    "checkLabel": "Vérification par Agentuino",
+    "noOutput": "(aucune sortie)",
+    "outputCut": "… {0} caractères omis …"
   },
   "tools": {
     "Read": "Lit {0}",

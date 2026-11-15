@@ -10,6 +10,8 @@
  * init, step_update and result (checked against agy 1.5.8 and the headless docs).
  * Text arrives in fragments (text_delta) per step and is joined until the step
  * is DONE. Tool names and parameters are not documented (read_file uses {Path}), so parsing is tolerant.
+ * A tool step comes as ACTIVE, then DONE with tool_info.output; for run_command the
+ * output starts with a header ("Command exited with code N.", "Command output:").
  * agy has no option for an instructions file, so Agentuino puts AGENTS.md
  * into the prompt.
  */
@@ -25,6 +27,9 @@ const STEP_DONE = 'DONE';
 const STEP_TEXT = 'agent_response';
 const STEP_TOOL = 'tool';
 const STATUS_SUCCESS = 'SUCCESS';
+// Header of run_command output (checked against agy 1.5.8)
+const EXIT_CODE_PATTERN = /Command exited with code (\d+)/;
+const OUTPUT_MARKER = 'Command output:\n';
 
 // Antigravity tool names mapped to Agentuino tool labels
 const TOOL_NAMES = {
@@ -99,6 +104,21 @@ function normalizeParameters(parameters) {
 }
 
 /**
+ * Split run_command output into the command's output and its result
+ * @param {string} raw - tool_info.output
+ * @returns {{output: string, failed: boolean}} Output without the header
+ */
+function commandOutput(raw) {
+    const text = String(raw || '');
+    const code = text.match(EXIT_CODE_PATTERN);
+    const marker = text.indexOf(OUTPUT_MARKER);
+    return {
+        output: marker >= 0 ? text.slice(marker + OUTPUT_MARKER.length) : text,
+        failed: code ? Number(code[1]) !== 0 : false
+    };
+}
+
+/**
  * Create a parser for one run
  * @param {Object} context - {cwd, sessionId}
  * @returns {Object} Parser with onEvent() and finish()
@@ -106,6 +126,8 @@ function normalizeParameters(parameters) {
 function createParser({ cwd, sessionId }) {
     const texts = new Map();
     const toolsShown = new Set();
+    // Shell steps whose output is still to come
+    const shellSteps = new Set();
     let initSent = false;
     let textShown = false;
 
@@ -154,18 +176,25 @@ function createParser({ cwd, sessionId }) {
                 return [{ type: 'text', text }];
             }
 
-            if (step.step_type === STEP_TOOL && !toolsShown.has(key)) {
+            if (step.step_type === STEP_TOOL) {
                 const info = step.tool_info || {};
-                const input = normalizeParameters(info.parameters);
-                // Wait for the parameters, they may come with a later update of the step
-                if (!input && !done) return [];
-                toolsShown.add(key);
-                const rawName = info.name || step.tool_name || '';
-                return [{
-                    type: 'tool',
-                    name: TOOL_NAMES[rawName] || rawName,
-                    detail: describeToolInput(input, cwd)
-                }];
+                const out = [];
+                if (!toolsShown.has(key)) {
+                    const input = normalizeParameters(info.parameters);
+                    // Wait for the parameters, they may come with a later update of the step
+                    if (!input && !done) return [];
+                    toolsShown.add(key);
+                    const rawName = info.name || step.tool_name || '';
+                    const name = TOOL_NAMES[rawName] || rawName;
+                    // Only shell steps get an id: their output can be shown under the line
+                    const id = name === 'Bash' ? `step-${key}` : undefined;
+                    if (id) shellSteps.add(key);
+                    out.push({ type: 'tool', name, detail: describeToolInput(input, cwd), ...(id && { id }) });
+                }
+                if (done && shellSteps.delete(key)) {
+                    out.push({ type: 'toolOutput', id: `step-${key}`, ...commandOutput(info.output) });
+                }
+                return out;
             }
             return [];
         },

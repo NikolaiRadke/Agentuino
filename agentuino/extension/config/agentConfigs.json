@@ -122,7 +122,6 @@
     },
     "antigravity": {
       "name": "Antigravity CLI",
-      "experimental": true,
       "command": "agy",
       "versionArgs": ["--version"],
       "helpArgs": [["--help"]],

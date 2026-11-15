@@ -2,7 +2,7 @@
   "name": "agentuino",
   "displayName": "Agentuino",
   "description": "Agentic coding for Arduino beginners: chat with Claude Code, Codex CLI or Mistral Vibe directly in the Arduino IDE.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "Apache-2.0",
   "publisher": "NikolaiRadke",
   "icon": "icons/agentuino.png",
@@ -135,7 +135,7 @@
             "Claude Code",
             "Codex CLI",
             "Mistral Vibe",
-            "Antigravity CLI (experimental)"
+            "Antigravity CLI"
           ],
           "description": "Agent for new chats. Existing chats keep their agent."
         },

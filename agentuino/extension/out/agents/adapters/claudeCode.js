@@ -13,7 +13,7 @@
 
 const os = require('os');
 const { spawn } = require('child_process');
-const { describeToolInput, prepareSpawn, buildEnv, parseJson } = require('../agentUtils');
+const { describeToolInput, prepareSpawn, buildEnv, parseJson, contentText } = require('../agentUtils');
 const { defineAdapter } = require('../agentConfig');
 
 // ===== CONSTANTS =====
@@ -29,6 +29,8 @@ const MAX_TITLE_CHARS = 60;
  * @returns {Object} Parser with onEvent() and finish()
  */
 function createParser({ cwd, sessionId }) {
+    // IDs of shell calls whose output is still to come
+    const shellCalls = new Set();
     const parser = {
         sessionId,
         apiError: null,
@@ -54,7 +56,21 @@ function createParser({ cwd, sessionId }) {
                     if (block.type === 'text' && block.text?.trim()) {
                         out.push({ type: 'text', text: block.text });
                     } else if (block.type === 'tool_use') {
-                        out.push({ type: 'tool', name: block.name, detail: describeToolInput(block.input, cwd) });
+                        // Only shell calls get an id: their output can be shown under the line
+                        const id = block.name === 'Bash' && block.id ? block.id : undefined;
+                        if (id) shellCalls.add(id);
+                        out.push({ type: 'tool', name: block.name, detail: describeToolInput(block.input, cwd), ...(id && { id }) });
+                    }
+                }
+                return out;
+            }
+
+            // Tool results come back as user messages
+            if (event.type === 'user' && !event.parent_tool_use_id) {
+                const out = [];
+                for (const block of event.message?.content || []) {
+                    if (block?.type === 'tool_result' && shellCalls.delete(block.tool_use_id)) {
+                        out.push({ type: 'toolOutput', id: block.tool_use_id, output: contentText(block.content), failed: !!block.is_error });
                     }
                 }
                 return out;

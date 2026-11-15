@@ -12,7 +12,7 @@ Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Co
 > Agentuino is tested on Linux and Windows. macOS and Codex CLI are untested so far: please tell how it went in the [issues](https://github.com/NikolaiRadke/Agentuino/issues), it works or not.
 
 🆕 What's new?
-* **14.11.2026** **V1.0.0**: the first stable version, tested on Windows. New anchor *Upload automatically*.  
+* **15.11.2026** **V1.1.0**: fits ArduDebug 1.8.8-5, the agent can type into the sketch while debugging. Command output folds out in the chat. Antigravity CLI is no longer experimental.  
     -- More news? Check the [newsblog](NEWS.md).
 
 ## Features
@@ -54,7 +54,7 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 | [Claude Code](https://code.claude.com) | `curl -fsSL https://claude.ai/install.sh \| bash` (Windows: `irm https://claude.ai/install.ps1 \| iex`) | Claude subscription or API account |
 | [Mistral Vibe](https://docs.mistral.ai/vibe) | `curl -LsSf https://mistral.ai/vibe/install.sh \| bash` (Windows: `uv tool install mistral-vibe`) | Version 3 or newer |
 | [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | Experimental, ChatGPT account |
-| [Antigravity CLI](https://antigravity.google/docs/cli/) | `curl -fsSL https://antigravity.google/cli/install.sh \| bash` (Windows: `irm https://antigravity.google/cli/install.ps1 \| iex`) | Experimental, free with a Google account (weekly limits) |
+| [Antigravity CLI](https://antigravity.google/docs/cli/) | `curl -fsSL https://antigravity.google/cli/install.sh \| bash` (Windows: `irm https://antigravity.google/cli/install.ps1 \| iex`) | Free with a Google account (weekly limits) |
 
 If no agent is found, the chat shows these commands and checks again after you installed one.
 

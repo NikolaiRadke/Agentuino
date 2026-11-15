@@ -31,7 +31,7 @@ const crypto = require('crypto');
 const net = require('net');
 const path = require('path');
 const { spawn } = require('child_process');
-const { IS_WINDOWS, DEBUG_VENDOR, SUPPORTED_ARCH, getToolEnv, runCli, stopProcess, cutText, toDebugFqbn } = require('./toolUtils');
+const { IS_WINDOWS, DEBUG_VENDOR, SUPPORTED_ARCH, compareVersions, getToolEnv, runCli, stopProcess, cutText, toDebugFqbn } = require('./toolUtils');
 
 // ===== CONSTANTS =====
 
@@ -480,24 +480,6 @@ async function getArdudebugVersion(env) {
     } catch {
         return result.stdout.includes(`"${id}"`) ? '' : null;
     }
-}
-
-/**
- * Compare package versions like 1.8.8-5 numerically. Not semver: "-5" is a
- * package revision here, so 1.8.8-5 is newer than 1.8.8.
- * @param {string} a - Version
- * @param {string} b - Version
- * @returns {number} <0, 0 or >0
- */
-function compareVersions(a, b) {
-    const parse = (v) => String(v).split(/[.-]/).map(n => parseInt(n, 10) || 0);
-    const pa = parse(a);
-    const pb = parse(b);
-    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-        const diff = (pa[i] || 0) - (pb[i] || 0);
-        if (diff !== 0) return diff;
-    }
-    return 0;
 }
 
 /**

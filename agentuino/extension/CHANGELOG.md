@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 (in progress)
+## 1.1.0
 
 Adjustments to ArduDebug 1.8.8-5.
 
@@ -18,6 +18,10 @@ Adjustments to ArduDebug 1.8.8-5.
 - Debug builds no longer count as unreadable: agent rules and hints updated,
   --restore only when the user asks for it
 - New agent rules: breakpoint right after a waiting loop, input via --send
+- Chat: the output of shell commands folds out under their activity line
+  (all four agents; live only, not stored in the chat files)
+- Antigravity CLI is no longer experimental
+- compareVersions treats "-" as a separator (1.8.8-5 is newer than 1.8.8)
 
 ## 1.0.0
 

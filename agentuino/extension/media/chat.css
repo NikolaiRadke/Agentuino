@@ -197,6 +197,46 @@ main {
     font-family: var(--vscode-editor-font-family);
 }
 
+/* Activity line of a shell command with its output to fold out */
+.entry.activity:has(details[open]) {
+    opacity: 1;
+}
+
+.tool-output > summary {
+    list-style: none;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.tool-output > summary::-webkit-details-marker {
+    display: none;
+}
+
+.tool-output > summary::before {
+    content: '› ';
+}
+
+.tool-output[open] > summary::before {
+    content: '⌄ ';
+}
+
+.tool-output > summary:hover {
+    text-decoration: underline;
+}
+
+.tool-output > summary.failed::after {
+    content: ' ✗';
+    color: var(--vscode-errorForeground);
+}
+
+.tool-output > pre {
+    margin: 4px 0;
+    max-height: 300px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
 .entry.info, .entry.welcome {
     font-style: italic;
     opacity: 0.8;

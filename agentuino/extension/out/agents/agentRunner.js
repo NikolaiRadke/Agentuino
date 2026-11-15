@@ -62,7 +62,7 @@ class AgentRunner {
      * @param {string} options.instructionsFile - AGENTS.md relative to cwd
      * @param {string[]} options.pathDirs - Folders the agent's commands need in PATH
      * @param {Object} options.env - Additional environment variables
-     * @param {Function} options.onEvent - Receives {type:'init'|'text'|'tool', ...}
+     * @param {Function} options.onEvent - Receives {type:'init'|'text'|'tool'|'toolOutput', ...}
      * @returns {Promise<Object>} {sessionId, result, isError, errorType, costUsd, stopped}
      */
     run({ adapter, toolPath, prompt, cwd, sessionId = null, model = '', permissionMode = '',

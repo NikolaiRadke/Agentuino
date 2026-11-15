@@ -41,6 +41,11 @@ const MAX_COMPILE_ATTEMPTS = 3;
 const OUTPUT_CHANNEL_NAME = 'Agentuino';
 // Agentuino's own commands for the agent (agentuino-serial)
 const TOOLS_DIR = 'bin';
+// Command output shown under an activity line keeps its start and its end
+const OUTPUT_HEAD_CHARS = 2000;
+const OUTPUT_TAIL_CHARS = 6000;
+// Colors and cursor moves of terminal output
+const ANSI_ESCAPE = /\x1b\[[0-9;?]*[A-Za-z]/g;
 
 /**
  * Format a cost in dollars; tiny amounts are shown as "< 0.01"
@@ -49,6 +54,20 @@ const TOOLS_DIR = 'bin';
  */
 function formatCost(cost) {
     return cost > 0 && cost < MIN_SHOWN_COST ? `< ${MIN_SHOWN_COST}` : cost.toFixed(COST_DECIMALS);
+}
+
+/**
+ * Prepare command output for the chat: no terminal codes, long output shortened
+ * @param {string} output - Raw output
+ * @param {Function} t - Translation function
+ * @returns {string} Output to show
+ */
+function prepareOutput(output, t) {
+    const text = String(output || '').replace(ANSI_ESCAPE, '').replace(/\r\n/g, '\n').trimEnd();
+    if (!text.trim()) return t('chat.noOutput');
+    if (text.length <= OUTPUT_HEAD_CHARS + OUTPUT_TAIL_CHARS) return text;
+    const skipped = text.length - OUTPUT_HEAD_CHARS - OUTPUT_TAIL_CHARS;
+    return `${text.slice(0, OUTPUT_HEAD_CHARS)}\n${t('chat.outputCut', skipped)}\n${text.slice(-OUTPUT_TAIL_CHARS)}`;
 }
 
 class ChatPanel {
@@ -120,10 +139,11 @@ class ChatPanel {
      * @param {string} role - 'user' | 'agent' | 'activity' | 'info' | 'error' | 'compile'
      * @param {string} text - Text
      * @param {Object} [data] - Extra data for the webview (compile result)
+     * @param {Object} [live] - Extra fields for the webview only, not stored (toolId)
      */
-    addEntry(role, text, data) {
+    addEntry(role, text, data, live) {
         const time = Date.now();
-        this.post({ command: 'entry', role, text, time, data });
+        this.post({ command: 'entry', role, text, time, data, ...live });
         if (this.chat && this.sketchPath) {
             try {
                 chatStore.appendMessage(this.sketchPath, this.chat, role, text, time, data);
@@ -679,7 +699,11 @@ class ChatPanel {
                         this.addEntry('agent', event.text);
                     } else if (event.type === 'tool') {
                         const label = t.strings.tools[event.name] ? `tools.${event.name}` : 'tools.default';
-                        this.addEntry('activity', t(label, event.detail || event.name));
+                        this.addEntry('activity', t(label, event.detail || event.name), undefined,
+                            event.id ? { toolId: event.id } : undefined);
+                    } else if (event.type === 'toolOutput') {
+                        // Shown live only: the stored chat stays small and agents do not read old output
+                        this.post({ command: 'toolOutput', toolId: event.id, output: prepareOutput(event.output, t), failed: event.failed });
                     }
                 }
             });

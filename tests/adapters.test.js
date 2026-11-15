@@ -97,6 +97,57 @@ test('antigravity: unknown tool parameters still show a file', () => {
     assert.equal(tool(JSON.stringify({ Path: `${sketch}/Test.ino` })).detail, 'Test.ino');
 });
 
+test('shell output: claudecode, codex and vibe pass it on for shell calls only', () => {
+    const outputs = (id, events) => {
+        const parser = registry.get(id).createParser({ cwd: sketch, sessionId: null });
+        return events.flatMap(e => parser.onEvent(e)).filter(e => e.type === 'tool' || e.type === 'toolOutput');
+    };
+
+    const claude = outputs('claudecode', [
+        { type: 'assistant', message: { content: [
+            { type: 'tool_use', id: 't1', name: 'Bash', input: { command: 'agentuino-serial' } },
+            { type: 'tool_use', id: 't2', name: 'Read', input: { file_path: `${sketch}/Test.ino` } }] } },
+        { type: 'user', message: { content: [
+            { type: 'tool_result', tool_use_id: 't1', content: [{ type: 'text', text: 'Hello' }], is_error: true },
+            { type: 'tool_result', tool_use_id: 't2', content: 'void setup() {}' }] } }
+    ]);
+    assert.equal(claude[0].id, 't1');
+    assert.equal(claude[1].id, undefined);
+    assert.deepEqual(claude[2], { type: 'toolOutput', id: 't1', output: 'Hello', failed: true });
+    assert.equal(claude.length, 3);
+
+    const codex = outputs('codex', [
+        { type: 'item.started', item: { id: 'i1', type: 'command_execution', command: 'ls' } },
+        { type: 'item.completed', item: { id: 'i1', type: 'command_execution', aggregated_output: 'a.ino\n', exit_code: 0 } }
+    ]);
+    assert.equal(codex[0].id, 'i1');
+    assert.deepEqual(codex[1], { type: 'toolOutput', id: 'i1', output: 'a.ino\n', failed: false });
+
+    const vibe = outputs('vibe', [
+        { role: 'assistant', content: '', tool_calls: [{ id: 'c1', function: { name: 'bash', arguments: '{"command":"ls"}' } }] },
+        { role: 'tool', tool_call_id: 'c1', content: 'a.ino' }
+    ]);
+    assert.equal(vibe[0].id, 'c1');
+    assert.deepEqual(vibe[1], { type: 'toolOutput', id: 'c1', output: 'a.ino', failed: false });
+
+    // Real lines of agy 1.5.8, the output header is cut off
+    const step = (index, state, command, output) => ({ event: 'step_update', step_update: {
+        conversation_id: 'c', step_index: index, state, step_type: 'tool', tool_name: 'run_command',
+        tool_info: { name: 'run_command', parameters: { CommandLine: command }, output } } });
+    const header = code => `Created At: 2026-11-15T09:09:16+01:00\nCompleted At: 2026-11-15T09:09:16+01:00\nCommand exited with code ${code}.\n\nCommand output:\n`;
+    const agy = outputs('antigravity', [
+        step(2, 'ACTIVE', 'echo hallo'),
+        step(2, 'DONE', 'echo hallo', `${header(0)}hallo\r\n`),
+        step(4, 'ACTIVE', 'ls /gibtsnicht'),
+        step(4, 'DONE', 'ls /gibtsnicht', `${header(2)}ls: Zugriff auf '/gibtsnicht' nicht möglich\r\n`)
+    ]);
+    assert.equal(agy.length, 4);
+    assert.equal(agy[0].id, 'step-2');
+    assert.deepEqual(agy[1], { type: 'toolOutput', id: 'step-2', output: 'hallo\r\n', failed: false });
+    assert.equal(agy[3].failed, true);
+    assert.equal(agy[3].output, "ls: Zugriff auf '/gibtsnicht' nicht möglich\r\n");
+});
+
 test('claudecode: generates a chat title with a single call', async () => {
     const title = await registry.get('claudecode').generateTitle(env.fake('claude'), 'Title please');
     assert.equal(title, 'Test title');

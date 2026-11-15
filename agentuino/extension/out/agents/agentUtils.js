@@ -162,7 +162,8 @@ function writeFileAtomic(file, content) {
  * @returns {number} Negative if a is older, 0 if equal, positive if a is newer
  */
 function compareVersions(a, b) {
-    const parse = v => String(v || '').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+    // "-" counts as a separator: package revisions like 1.8.8-5 are newer than 1.8.8
+    const parse = v => String(v || '').replace(/^v/, '').split(/[.-]/).map(n => parseInt(n, 10) || 0);
     const pa = parse(a);
     const pb = parse(b);
     for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
@@ -170,6 +171,19 @@ function compareVersions(a, b) {
         if (diff !== 0) return diff;
     }
     return 0;
+}
+
+/**
+ * Get the text of a message content (string or list of parts)
+ * @param {*} content - Message content
+ * @returns {string} Text
+ */
+function contentText(content) {
+    if (typeof content === 'string') return content;
+    if (Array.isArray(content)) {
+        return content.map(part => (typeof part === 'string' ? part : part?.text || '')).join('');
+    }
+    return '';
 }
 
 /**
@@ -197,5 +211,6 @@ module.exports = {
     buildEnv,
     writeFileAtomic,
     compareVersions,
+    contentText,
     parseJson
 };

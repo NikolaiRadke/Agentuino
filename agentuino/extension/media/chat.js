@@ -255,8 +255,10 @@
      * @param {string} role - 'user' | 'agent' | 'activity' | 'info' | 'error'
      * @param {string} text - Entry text
      * @param {number} time - Message timestamp (identifies the reset point)
+     * @param {Object} [data] - Compile result
+     * @param {string} [toolId] - Shell call whose output may follow (live only)
      */
-    function addEntry(role, text, time, data) {
+    function addEntry(role, text, time, data, toolId) {
         const entry = document.createElement('div');
         entry.className = `entry ${role}`;
 
@@ -293,10 +295,33 @@
             entry.appendChild(body);
         } else {
             entry.textContent = role === 'activity' ? `› ${text}` : text;
+            if (toolId) entry.dataset.toolId = toolId;
         }
 
         elements.messages.appendChild(entry);
         elements.messages.scrollTop = elements.messages.scrollHeight;
+    }
+
+    /**
+     * Turn an activity line into a collapsible block with the command's output
+     * @param {string} toolId - Shell call
+     * @param {string} output - Prepared output
+     * @param {boolean} failed - Command failed
+     */
+    function attachToolOutput(toolId, output, failed) {
+        // The latest line wins: some agents count their steps anew in every run
+        const entry = [...elements.messages.querySelectorAll('.entry.activity')].reverse().find(e => e.dataset.toolId === toolId);
+        if (!entry || entry.querySelector('details')) return;
+        const details = document.createElement('details');
+        details.className = 'tool-output';
+        const summary = document.createElement('summary');
+        summary.textContent = entry.textContent.replace(/^› /, '');
+        summary.classList.toggle('failed', !!failed);
+        const pre = document.createElement('pre');
+        pre.textContent = output;
+        details.append(summary, pre);
+        entry.textContent = '';
+        entry.appendChild(details);
     }
 
     /**
@@ -716,8 +741,11 @@
                 break;
             case 'entry':
                 elements.messages.querySelector('.welcome')?.remove();
-                addEntry(msg.role, msg.text, msg.time, msg.data);
+                addEntry(msg.role, msg.text, msg.time, msg.data, msg.toolId);
                 updateRestoreButtons();
+                break;
+            case 'toolOutput':
+                attachToolOutput(msg.toolId, msg.output, msg.failed);
                 break;
             case 'working':
                 elements.workingText.textContent = msg.text;

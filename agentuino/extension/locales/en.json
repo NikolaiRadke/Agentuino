@@ -59,7 +59,9 @@
     "chooseAgent": "Choose the agent for this new chat",
     "noAgent": "no agent",
     "fixErrors": "🔧 Let the agent fix it",
-    "checkLabel": "Check by Agentuino"
+    "checkLabel": "Check by Agentuino",
+    "noOutput": "(no output)",
+    "outputCut": "… {0} characters left out …"
   },
   "tools": {
     "Read": "Reading {0}",

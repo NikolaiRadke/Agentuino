@@ -9,7 +9,7 @@
 
 const path = require('path');
 const { execFile } = require('child_process');
-const { IS_WINDOWS, buildEnv } = require(path.join(__dirname, '..', 'out', 'agents', 'agentUtils'));
+const { IS_WINDOWS, buildEnv, compareVersions } = require(path.join(__dirname, '..', 'out', 'agents', 'agentUtils'));
 
 // ===== CONSTANTS =====
 
@@ -99,4 +99,4 @@ function toDebugFqbn(fqbn) {
     return `${DEBUG_VENDOR}:${SUPPORTED_ARCH}:${board}:${list.join(',')}`;
 }
 
-module.exports = { IS_WINDOWS, DEBUG_VENDOR, SUPPORTED_ARCH, getToolEnv, runCli, stopProcess, cutText, toDebugFqbn };
+module.exports = { IS_WINDOWS, DEBUG_VENDOR, SUPPORTED_ARCH, compareVersions, getToolEnv, runCli, stopProcess, cutText, toDebugFqbn };

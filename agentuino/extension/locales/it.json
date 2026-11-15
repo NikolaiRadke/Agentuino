@@ -59,7 +59,9 @@
     "chooseAgent": "Scegli l'agente per questa nuova chat",
     "noAgent": "nessun agente",
     "fixErrors": "🔧 Fai correggere all'agente",
-    "checkLabel": "Verifica di Agentuino"
+    "checkLabel": "Verifica di Agentuino",
+    "noOutput": "(nessun output)",
+    "outputCut": "… {0} caratteri omessi …"
   },
   "tools": {
     "Read": "Legge {0}",

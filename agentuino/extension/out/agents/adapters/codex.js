@@ -56,11 +56,15 @@ function createParser({ cwd, sessionId }) {
 
                 case 'item.started':
                     if (type === 'command_execution') {
-                        return [{ type: 'tool', name: 'Bash', detail: describeCommand(item.command || '') }];
+                        return [{ type: 'tool', name: 'Bash', detail: describeCommand(item.command || ''), ...(item.id && { id: item.id }) }];
                     }
                     return [];
 
                 case 'item.completed':
+                    if (type === 'command_execution' && item.id) {
+                        const failed = typeof item.exit_code === 'number' ? item.exit_code !== 0 : item.status === 'failed';
+                        return [{ type: 'toolOutput', id: item.id, output: item.aggregated_output || '', failed }];
+                    }
                     if (type === 'agent_message' && item.text?.trim()) {
                         return [{ type: 'text', text: item.text }];
                     }
