@@ -25,12 +25,12 @@ cp "$ROOT"/installer/* "$DIST/$NAME/"
 (cd "$DIST" && zip -qr "$NAME.zip" "$NAME")
 rm -rf "$DIST/$NAME"
 
-# Marketplace / Open VSX build: made with vsce, with ArduDebug as dependency.
-# Not for the Arduino IDE, which cannot resolve extension dependencies.
+# Marketplace / Open VSX build: made with vsce, ArduDebug comes along as pack member
+# (can be removed on its own). Not for the Arduino IDE, which has no Marketplace.
 MARKET="$DIST/market"
 cp -r "$ROOT/agentuino/extension" "$MARKET"
 cp "$ROOT/README.md" "$ROOT/LICENSE" "$MARKET/"
-node -e "const f='$MARKET/package.json';const p=require(f);p.extensionDependencies=['NikolaiRadke.ardudebug'];require('fs').writeFileSync(f,JSON.stringify(p,null,2)+'\\n')"
+node -e "const f='$MARKET/package.json';const p=require(f);p.extensionPack=['NikolaiRadke.ardudebug'];require('fs').writeFileSync(f,JSON.stringify(p,null,2)+'\\n')"
 (cd "$MARKET" && npx --yes @vscode/vsce package --no-dependencies -o "$DIST/$NAME-marketplace.vsix")
 rm -rf "$MARKET"
 
