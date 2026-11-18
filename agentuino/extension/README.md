@@ -1,4 +1,4 @@
-<img src="icons/agentuino-256.png" alt="Agentuino" width="128">
+![Agentuino](https://www.nikolairadke.de/aiduino/agentuino_banner.png)
 
 # Agentuino
 
