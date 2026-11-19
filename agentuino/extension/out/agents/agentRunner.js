@@ -58,6 +58,7 @@ class AgentRunner {
      * @param {string} options.cwd - Sketch folder
      * @param {string|null} options.sessionId - Session to resume
      * @param {string} options.model - Model or ''
+     * @param {string} options.effort - Effort level or ''
      * @param {string} options.permissionMode - 'bypassPermissions' | 'acceptEdits' | 'auto'
      * @param {string} options.instructionsFile - AGENTS.md relative to cwd
      * @param {string[]} options.pathDirs - Folders the agent's commands need in PATH
@@ -65,7 +66,7 @@ class AgentRunner {
      * @param {Function} options.onEvent - Receives {type:'init'|'text'|'tool'|'toolOutput', ...}
      * @returns {Promise<Object>} {sessionId, result, isError, errorType, costUsd, stopped}
      */
-    run({ adapter, toolPath, prompt, cwd, sessionId = null, model = '', permissionMode = '',
+    run({ adapter, toolPath, prompt, cwd, sessionId = null, model = '', effort = '', permissionMode = '',
         instructionsFile = '', pathDirs = [], env = {}, onEvent = () => {} }) {
         if (this.isRunning) {
             return Promise.reject(createError('BUSY', 'Agent is already running'));
@@ -83,7 +84,7 @@ class AgentRunner {
         };
 
         return new Promise((resolve, reject) => {
-            const args = adapter.buildArgs({ sessionId, model, permissionMode, instructionsFile, runDir });
+            const args = adapter.buildArgs({ sessionId, model, effort, permissionMode, instructionsFile, runDir });
             const parser = adapter.createParser({ cwd, sessionId });
 
             let child;

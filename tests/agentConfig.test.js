@@ -49,7 +49,7 @@ test('versions compare by date and counter', () => {
     assert.ok(!agentConfig.isNewer('garbage', '2026-01-01'));
 });
 
-test('command lines are built in the order base, instructions, permissions, model, resume, tail', () => {
+test('command lines are built in the order base, instructions, permissions, model, effort, resume, tail', () => {
     const args = id => options => registry.get(id).buildArgs({ permissionMode: 'bypassPermissions', ...options });
     assert.deepEqual(args('claudecode')({ sessionId: 's1', model: 'opus', instructionsFile: 'agentuino/AGENTS.md' }), [
         '-p', '--output-format', 'stream-json', '--verbose',
@@ -65,6 +65,37 @@ test('command lines are built in the order base, instructions, permissions, mode
     ]);
     // Unknown mode falls back to the default
     assert.ok(args('claudecode')({ permissionMode: 'nonsense' }).includes('bypassPermissions'));
+});
+
+test('effort goes after the model, invalid values never reach the command line', () => {
+    const args = id => options => registry.get(id).buildArgs({ permissionMode: 'bypassPermissions', ...options });
+    assert.deepEqual(args('claudecode')({ model: 'opus', effort: 'high', sessionId: 's1' }).slice(-6),
+        ['--model', 'opus', '--effort', 'high', '--resume', 's1']);
+    assert.deepEqual(args('codex')({ model: 'gpt-fast', effort: 'high', sessionId: 't1' }).slice(-7),
+        ['--model', 'gpt-fast', '-c', 'model_reasoning_effort=high', 'resume', 't1', '-']);
+    assert.deepEqual(args('opencode')({ model: 'ollama/qwen2.5-coder:7b', effort: 'max' }).slice(-4),
+        ['--model', 'ollama/qwen2.5-coder:7b', '--variant', 'max']);
+    // Agents without an effort option ignore it
+    assert.ok(!args('antigravity')({ effort: 'high' }).includes('high'));
+    // A chat file from someone else must not smuggle in options
+    for (const bad of ['--auto', '-x', 'a b', '']) {
+        const line = args('opencode')({ model: bad, effort: bad });
+        assert.ok(!line.includes('--model') && !line.includes('--variant'), bad);
+    }
+});
+
+test('model and effort fields of the configuration are checked', () => {
+    const cases = [
+        [config => { config.agents.claudecode.args.effort = ['--effort']; }, 'claudecode.args.effort'],
+        [config => { config.agents.claudecode.efforts = ['high', '--max']; }, 'claudecode.efforts'],
+        [config => { config.agents.claudecode.models = 'opus'; }, 'claudecode.models'],
+        [config => { config.agents.codex.modelsCommand = { args: ['debug', 'models'], format: 'yaml' }; }, 'codex.modelsCommand']
+    ];
+    for (const [change, expected] of cases) {
+        const config = bundled();
+        change(config);
+        assert.equal(agentConfig.validate(config, IDS), expected);
+    }
 });
 
 test('install locations fill in home and Windows folders', () => {

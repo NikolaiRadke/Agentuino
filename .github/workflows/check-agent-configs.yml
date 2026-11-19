@@ -8,6 +8,7 @@ on:
     paths:
       - agentuino/extension/config/agentConfigs.json
       - agentuino/extension/out/agents/agentConfig.js
+      - agentuino/extension/out/agents/modelCatalog.js
       - .github/scripts/check-agent-configs.js
       - .github/workflows/check-agent-configs.yml
   pull_request:

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": "2026-11-15",
+  "version": "2026-11-19",
   "agents": {
     "claudecode": {
       "name": "Claude Code",
@@ -37,8 +37,11 @@
           "auto": ["--permission-mode", "auto"]
         },
         "model": ["--model", "{model}"],
+        "effort": ["--effort", "{effort}"],
         "resume": ["--resume", "{session}"]
       },
+      "models": ["fable", "opus", "sonnet", "haiku"],
+      "efforts": ["low", "medium", "high", "xhigh", "max"],
       "sessionNotFound": "no conversation found",
       "authError": "/login|not logged in|login expired|oauth|authentication_(error|failed)|invalid api key",
       "titleModel": "haiku"
@@ -76,9 +79,12 @@
           "auto": ["--approve-for-me"]
         },
         "model": ["--model", "{model}"],
+        "effort": ["-c", "model_reasoning_effort={effort}"],
         "resume": ["resume", "{session}"],
         "tail": ["-"]
       },
+      "modelsCommand": { "args": ["debug", "models"], "format": "codex-json" },
+      "efforts": ["low", "medium", "high"],
       "sessionNotFound": "no (conversation|session|thread|rollout) found|not found",
       "authError": "401|unauthori[sz]ed|not logged in|login required|api key|oauth|refresh|expired"
     },
@@ -157,6 +163,7 @@
         "model": ["--model", "{model}"],
         "resume": ["--conversation", "{session}"]
       },
+      "modelsCommand": { "args": ["models"], "format": "lines" },
       "sessionNotFound": "conversation .*not found",
       "authError": "authenticat|log ?in|oauth|credential|401|unauthori[sz]ed"
     },
@@ -196,8 +203,10 @@
           "auto": []
         },
         "model": ["--model", "{model}"],
+        "effort": ["--variant", "{effort}"],
         "resume": ["--session", "{session}"]
       },
+      "modelsCommand": { "args": ["models", "--verbose"], "format": "opencode-verbose" },
       "sessionNotFound": "session not found",
       "authError": "401|unauthori[sz]ed|api key|authenticat|oauth|credential|log ?in|ProviderAuthError"
     }

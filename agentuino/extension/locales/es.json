@@ -64,7 +64,12 @@
     "outputCut": "… {0} caracteres omitidos …",
     "loginButton": "Iniciar sesión en un terminal",
     "loginOpened": "Hay un terminal abierto con {0}. Inicia sesión allí ({1}) y luego vuelve a enviar tu petición.",
-    "loginNoTerminal": "No se encontró ningún terminal. Abre uno e inicia sesión con: {0}"
+    "loginNoTerminal": "No se encontró ningún terminal. Abre uno e inicia sesión con: {0}",
+    "modelDefault": "Modelo predeterminado",
+    "modelTitle": "Modelo para este chat. Vacío: el predeterminado del agente.",
+    "effortTitle": "Esfuerzo para este chat",
+    "effortDefault": "Esfuerzo predeterminado",
+    "modelNextChat": "{0} mantiene el modelo de una conversación en curso. El nuevo modelo se aplica a partir del próximo chat nuevo."
   },
   "tools": {
     "Read": "Lee {0}",

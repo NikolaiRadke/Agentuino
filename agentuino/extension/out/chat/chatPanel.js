@@ -19,6 +19,7 @@ const crypto = require('crypto');
 
 const projectManager = require('../utils/projectManager');
 const toolDetector = require('../agents/toolDetector');
+const modelCatalog = require('../agents/modelCatalog');
 const chatStore = require('./chatStore');
 const backupManager = require('../utils/backupManager');
 const links = require('../utils/links');
@@ -26,6 +27,7 @@ const ruleBlocks = require('../utils/ruleBlocks');
 const registry = require('../agents/registry');
 const { AgentRunner } = require('../agents/agentRunner');
 const { shorten, createError } = require('../agents/agentUtils');
+const { isModel, isEffort } = require('../agents/agentConfig');
 const { CompileChecker } = require('../utils/compileChecker');
 const { openInTerminal } = require('../utils/terminal');
 
@@ -103,6 +105,12 @@ class ChatPanel {
         this.sketchPath = null;
         this.chat = null;
         this.pendingAttachments = [];
+        // Model and effort for the next new chat: {agent, model, effort}
+        this.nextChoice = null;
+        // Models the agent of the shown chat reported: {agent, listed}
+        this.catalog = null;
+        // Agent whose model choice the webview shows
+        this.modelAgent = null;
 
         const mediaDir = path.join(deps.extensionPath, 'media');
         this.panel = vscode.window.createWebviewPanel(
@@ -216,9 +224,12 @@ class ChatPanel {
      */
     async updateAgentName() {
         let name = this.chat ? registry.getName(this.chat.agent) : '';
+        let agentId = this.chat?.agent || null;
         if (!this.chat) {
             try {
-                name = (await this.resolveAgent()).adapter.name;
+                const { adapter } = await this.resolveAgent();
+                name = adapter.name;
+                agentId = adapter.id;
             } catch (err) {
                 name = '';
                 if (err.code === 'NO_AGENT') this.showSetup();
@@ -226,6 +237,122 @@ class ChatPanel {
         }
         this.agentName = name;
         this.post({ command: 'agent', name, selectable: !this.chat });
+        // Suggestions are a convenience, a failing list never disturbs the chat
+        this.postModel(agentId).catch(() => {});
+    }
+
+    // ===== MODEL AND EFFORT =====
+
+    /**
+     * Model and effort of the shown chat, or of the next new chat.
+     * Chats from before this choice existed use the model from the settings.
+     * @param {string} agentId - Agent of the chat
+     * @returns {{model: string, effort: string}} Choice ('' = agent default)
+     */
+    getChoice(agentId) {
+        const settings = this.deps.getSettings();
+        const fallback = String(settings.models[agentId] || '').trim();
+        if (this.chat) {
+            const { model, effort } = this.chat;
+            return { model: typeof model === 'string' ? model : fallback, effort: typeof effort === 'string' ? effort : '' };
+        }
+        if (this.nextChoice?.agent === agentId) {
+            return { model: this.nextChoice.model, effort: this.nextChoice.effort };
+        }
+        return { model: fallback, effort: '' };
+    }
+
+    /**
+     * Models the agent reported (empty until its list command has answered)
+     * @param {string} agentId - Agent
+     * @returns {Array} Listed models
+     */
+    getListed(agentId) {
+        return this.catalog?.agent === agentId ? this.catalog.listed : [];
+    }
+
+    /**
+     * Send model, effort and suggestions to the webview. The fixed lists come
+     * at once, the agent's own list follows when its command has answered.
+     * @param {string|null} agentId - Agent of the chat
+     */
+    async postModel(agentId) {
+        const adapter = agentId ? registry.get(agentId) : null;
+        this.modelAgent = agentId;
+        if (!adapter) {
+            this.post({ command: 'model', available: false });
+            return;
+        }
+        const send = () => {
+            const choice = this.getChoice(agentId);
+            const { models, efforts } = modelCatalog.describe(adapter, this.getListed(agentId), choice.model);
+            this.post({
+                command: 'model',
+                available: true,
+                model: choice.model,
+                // A level the model does not offer is not used, so it is not shown either
+                effort: efforts.includes(choice.effort) ? choice.effort : '',
+                models,
+                efforts
+            });
+        };
+        send();
+        if (!adapter.modelsCommand || this.getListed(agentId).length > 0) return;
+
+        const toolPath = await toolDetector.findAgent(adapter, this.deps.getSettings().paths[agentId]);
+        const listed = await modelCatalog.listModels(adapter, toolPath);
+        if (listed.length === 0) return;
+        this.catalog = { agent: agentId, listed };
+        // The user may have switched to a chat with another agent meanwhile
+        if (this.modelAgent === agentId) send();
+    }
+
+    /**
+     * Store model and effort chosen in the webview, for the shown chat or the next new one
+     * @param {Object} msg - {model, effort}
+     */
+    async setModel(msg) {
+        const t = this.deps.getT();
+        const model = String(msg.model || '').trim();
+        const effort = String(msg.effort || '');
+        const agentId = this.chat?.agent || (await this.resolveAgent()).adapter.id;
+        // Invalid input is not stored, the webview gets the old value back
+        if (this.working || (model && !isModel(model)) || (effort && !isEffort(effort))) {
+            this.postModel(agentId).catch(() => {});
+            return;
+        }
+        const adapter = registry.get(agentId);
+        if (this.chat) {
+            const changed = this.getChoice(agentId).model !== model;
+            this.chat.model = model;
+            this.chat.effort = effort;
+            if (this.sketchPath) chatStore.saveChat(this.sketchPath, this.chat);
+            // Some agents keep the model of a running session
+            if (changed && adapter.modelOnNewSession && this.chat.sessionId) {
+                this.post({ command: 'entry', role: 'info', text: t('chat.modelNextChat', adapter.name), time: Date.now() });
+            }
+        } else {
+            this.nextChoice = { agent: agentId, model, effort };
+        }
+        this.postModel(agentId).catch(() => {});
+    }
+
+    /**
+     * Model and effort for a run. An effort level the model does not offer
+     * (or no longer offers) is left out, the agent then uses its default.
+     * @param {Object} agent - {adapter, toolPath}
+     * @returns {Promise<{model: string, effort: string}>} Values for the command line
+     */
+    async getRunChoice(agent) {
+        const { adapter, toolPath } = agent;
+        const choice = this.getChoice(adapter.id);
+        let listed = this.getListed(adapter.id);
+        if (choice.effort && adapter.modelsCommand && listed.length === 0) {
+            listed = await modelCatalog.listModels(adapter, toolPath);
+            if (listed.length > 0) this.catalog = { agent: adapter.id, listed };
+        }
+        const { efforts } = modelCatalog.describe(adapter, listed, choice.model);
+        return { model: choice.model, effort: efforts.includes(choice.effort) ? choice.effort : '' };
     }
 
     /**
@@ -361,6 +488,7 @@ class ChatPanel {
                 case 'deleteChat': await this.deleteChat(msg.id); break;
                 case 'settings': await this.deps.showSettingsMenu(); break;
                 case 'recheckAgents': await this.recheckAgents(); break;
+                case 'setModel': await this.setModel(msg); break;
                 case 'chooseAgent':
                     // The agent of an existing chat is fixed, its session cannot move
                     if (!this.chat && !this.working) await this.deps.chooseAgent();
@@ -460,6 +588,11 @@ class ChatPanel {
             this.addEntry('error', this.deps.getT()('errors.busy'));
             return;
         }
+        // Like in claude.ai a new chat starts with the model and effort of the last one
+        if (this.chat) {
+            const { model, effort } = this.getChoice(this.chat.agent);
+            this.nextChoice = { agent: this.chat.agent, model, effort };
+        }
         this.chat = null;
         this.pendingAttachments = [];
         if (this.sketchPath && projectManager.isProject(this.sketchPath)) {
@@ -513,7 +646,7 @@ class ChatPanel {
      */
     startChat(sketchPath, firstText, agent) {
         const t = this.deps.getT();
-        this.chat = chatStore.createChat(sketchPath, agent.adapter.id, firstText);
+        this.chat = chatStore.createChat(sketchPath, agent.adapter.id, firstText, this.getChoice(agent.adapter.id));
         projectManager.setLastChatId(sketchPath, this.chat.id);
         projectManager.refreshAutoSection(sketchPath);
         this.postHeader();
@@ -702,6 +835,7 @@ class ChatPanel {
         const chat = this.chat;
         const { adapter, toolPath } = agent;
         const { prompt, hash } = this.addInstructions(sketchPath, adapter, chat, basePrompt);
+        const { model, effort } = await this.getRunChoice(agent);
 
         try {
             const result = await this.runner.run({
@@ -710,7 +844,8 @@ class ChatPanel {
                 prompt,
                 cwd: sketchPath,
                 sessionId: chat.sessionId,
-                model: settings.models[adapter.id],
+                model,
+                effort,
                 permissionMode: settings.permissionMode,
                 instructionsFile: projectManager.AGENTS_FILE_REL,
                 pathDirs: [...this.getCliDirs(sketchPath), path.join(this.deps.extensionPath, TOOLS_DIR)],
@@ -1104,6 +1239,11 @@ class ChatPanel {
         <textarea id="input" rows="3"></textarea>
         <div class="buttons">
             <button id="attach" class="secondary"></button>
+            <span id="modelChoice" class="model-choice" hidden>
+                <input id="model" type="text" list="modelList" spellcheck="false" autocomplete="off">
+                <datalist id="modelList"></datalist>
+                <select id="effort"></select>
+            </span>
             <span class="spacer"></span>
             <button id="stop" class="danger" hidden></button>
             <button id="send"></button>

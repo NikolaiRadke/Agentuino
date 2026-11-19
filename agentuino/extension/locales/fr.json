@@ -64,7 +64,12 @@
     "outputCut": "… {0} caractères omis …",
     "loginButton": "Se connecter dans un terminal",
     "loginOpened": "Un terminal avec {0} est ouvert. Connecte-toi là-bas ({1}), puis renvoie ta demande.",
-    "loginNoTerminal": "Aucun terminal trouvé. Ouvres-en un et connecte-toi avec : {0}"
+    "loginNoTerminal": "Aucun terminal trouvé. Ouvres-en un et connecte-toi avec : {0}",
+    "modelDefault": "Modèle par défaut",
+    "modelTitle": "Modèle pour ce chat. Vide : celui de l'agent par défaut.",
+    "effortTitle": "Effort pour ce chat",
+    "effortDefault": "Effort par défaut",
+    "modelNextChat": "{0} garde le modèle d'une conversation en cours. Le nouveau modèle s'applique à partir du prochain nouveau chat."
   },
   "tools": {
     "Read": "Lit {0}",

@@ -16,6 +16,10 @@ if (args.includes('--version')) {
     console.log('1.5.8');
     process.exit(0);
 }
+if (args[0] === 'models') {
+    console.log('Available models:\n  gemini-pro (default)\n  gemini-flash');
+    process.exit(0);
+}
 
 let input = '';
 process.stdin.on('data', data => { input += data; });

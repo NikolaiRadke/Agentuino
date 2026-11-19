@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+- Chat: model and effort per chat, next to the attach button. The model is a free
+  field with suggestions, a new chat starts with the choice of the last one
+- Suggestions come from the agents where they can list their models (codex debug
+  models, opencode models --verbose, agy models), otherwise from agentConfigs.json
+- Effort levels per model where the agent reports them (Codex, OpenCode), otherwise
+  the fixed list from agentConfigs.json; hidden for agents without an effort option
+  (Mistral Vibe, Antigravity CLI)
+- A level the model does not offer is left out, models and levels that look like
+  options ("-...") never reach the command line
+- Mistral Vibe keeps the model of a running session: the chat says so
+- The model settings are now the default for new chats
+- Check agent configs: effort option, effort levels against the help text where it
+  lists them, model list commands
+
 ## 1.1.0
 
 Adjustments to ArduDebug 1.8.8-5.

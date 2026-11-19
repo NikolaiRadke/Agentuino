@@ -8,7 +8,8 @@
  * Run before publishing a changed agentConfigs.json: every published change
  * reaches all installations. The script validates the file like the extension
  * does, then asks each installed agent for its help text and checks that every
- * option from the templates exists. No login needed.
+ * option from the templates exists. Effort levels are compared with the help
+ * text where it lists them, model list commands must answer. No login needed.
  *
  * Usage: node .github/scripts/check-agent-configs.js [config file] [--<agentId>=<path>] [--all]
  * --all: a missing agent is an error (CI, where all agents are installed)
@@ -22,6 +23,7 @@ const { execFileSync, spawnSync } = require('child_process');
 
 const EXTENSION_DIR = path.join(__dirname, '..', '..', 'agentuino', 'extension');
 const agentConfig = require(path.join(EXTENSION_DIR, 'out', 'agents', 'agentConfig'));
+const modelCatalog = require(path.join(EXTENSION_DIR, 'out', 'agents', 'modelCatalog'));
 const { IS_WINDOWS } = require(path.join(EXTENSION_DIR, 'out', 'agents', 'agentUtils'));
 
 const HELP_TIMEOUT_MS = 20000;
@@ -29,6 +31,9 @@ const MAX_HELP_BUFFER = 4 * 1024 * 1024;
 const OPTION_PATTERN = /^--?[a-zA-Z]/;
 const VERSION_NUMBER = /\d+\.\d+\.\d+/;
 const ALL_FLAG = '--all';
+// How far after the effort option the help text may list the levels
+const EFFORT_HELP_CHARS = 200;
+const MIN_HELP_LEVELS = 2;
 
 /**
  * Parse the command line
@@ -103,9 +108,55 @@ function collectOptions(agent) {
     const { args } = agent;
     const parts = [
         ...args.base, ...(args.instructions || []), ...Object.values(args.permissions).flat(),
-        ...(args.model || []), ...args.resume, ...(args.tail || [])
+        ...(args.model || []), ...(args.effort || []), ...args.resume, ...(args.tail || [])
     ];
     return [...new Set(parts.filter(part => OPTION_PATTERN.test(part)))];
+}
+
+/**
+ * Effort levels the help text lists after the effort option, like
+ * "--effort <level>  Effort level ... (low, medium, high, xhigh, max)"
+ * @param {Object} agent - Agent entry
+ * @param {string} help - Help text
+ * @returns {string[]|null} Levels, null if the help lists none
+ */
+function effortsInHelp(agent, help) {
+    const option = (agent.args.effort || []).find(part => OPTION_PATTERN.test(part));
+    if (!option) return null;
+    const escaped = option.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const match = help.match(new RegExp(`${escaped}\\b[^(]{0,${EFFORT_HELP_CHARS}}\\(([\\w\\s,-]+)\\)`));
+    const levels = match ? match[1].split(',').map(level => level.trim()).filter(Boolean) : [];
+    // A single word in brackets is a remark like "(repeatable)", not a list
+    return levels.length >= MIN_HELP_LEVELS ? levels : null;
+}
+
+/**
+ * Compare the effort levels of the configuration with the help text
+ * @param {Object} agent - Agent entry
+ * @param {string} help - Help text
+ * @returns {string[]} Problems
+ */
+function checkEfforts(agent, help) {
+    const listed = effortsInHelp(agent, help);
+    if (!listed) return [];
+    const configured = agent.efforts || [];
+    return [
+        ...listed.filter(level => !configured.includes(level)).map(level => `effort level not in config: ${level}`),
+        ...configured.filter(level => !listed.includes(level)).map(level => `effort level not in help: ${level}`)
+    ];
+}
+
+/**
+ * Run the model list command and count what the extension would read from it
+ * @param {Object} agent - Agent entry
+ * @param {string} toolPath - Executable
+ * @returns {string[]} Problems
+ */
+function checkModels(agent, toolPath) {
+    if (!agent.modelsCommand) return [];
+    const count = modelCatalog.parse(agent.modelsCommand.format, run(toolPath, agent.modelsCommand.args)).length;
+    console.log(`    ${count} models from '${agent.command} ${agent.modelsCommand.args.join(' ')}'`);
+    return count > 0 ? [] : ['model list command gave no models'];
 }
 
 function main() {
@@ -142,10 +193,13 @@ function main() {
         // A fresh install older than minVersion means the entry is wrong
         const number = version.match(VERSION_NUMBER)?.[0];
         const tooOld = Boolean(agent.minVersion && number && isOlder(number, agent.minVersion));
-        console.log(`${missing.length || tooOld ? '✗' : '✓'} ${agent.name} (${version || '?'}, ${toolPath})`);
+        const problems = [...missing.map(option => `option not in help: ${option}`), ...checkEfforts(agent, help)];
+        console.log(`${problems.length || tooOld ? '✗' : '✓'} ${agent.name} (${version || '?'}, ${toolPath})`);
         if (agent.minVersion) console.log(`    minimum version ${agent.minVersion}${tooOld ? ': installed version is older' : ''}`);
-        missing.forEach(option => console.log(`    option not in help: ${option}`));
-        failed = failed || missing.length > 0 || tooOld;
+        problems.forEach(problem => console.log(`    ${problem}`));
+        // Without login some agents may not list models: a warning, not a failure
+        checkModels(agent, toolPath).forEach(problem => console.log(`    ⚠ ${problem}`));
+        failed = failed || problems.length > 0 || tooOld;
     }
     process.exit(failed ? 1 : 0);
 }

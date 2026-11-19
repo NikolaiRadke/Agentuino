@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Fake Codex CLI (exec --json). Prompt words: AUTH_FAIL. Resuming the
+ * Fake Codex CLI (exec --json, debug models). Prompt words: AUTH_FAIL. Resuming the
  * session "gone" fails like a deleted rollout. Calls go to $FAKE_AGENT_LOG.
  */
 
@@ -13,6 +13,15 @@ const args = process.argv.slice(2);
 const out = event => process.stdout.write(JSON.stringify(event) + '\n');
 if (args.includes('--version')) {
     console.log('codex-cli 0.169.0');
+    process.exit(0);
+}
+if (args[0] === 'debug' && args[1] === 'models') {
+    const levels = names => names.map(effort => ({ effort, description: effort }));
+    console.log(JSON.stringify({ models: [
+        { slug: 'gpt-fast', visibility: 'list', default_reasoning_level: 'low', supported_reasoning_levels: levels(['low', 'medium', 'ultra']) },
+        { slug: 'gpt-old', visibility: 'list', supported_reasoning_levels: levels(['low', 'high']) },
+        { slug: 'gpt-internal', visibility: 'hide', supported_reasoning_levels: levels(['low']) }
+    ] }));
     process.exit(0);
 }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Fake OpenCode (run --format json), lines shaped like opencode 1.18.32.
+ * Fake OpenCode (run --format json, models --verbose), lines shaped like opencode 1.18.32.
  * Prompt words: AUTH_FAIL. Resuming the session "gone" fails like the real one.
  * Calls go to $FAKE_AGENT_LOG.
  */
@@ -14,6 +14,14 @@ const args = process.argv.slice(2);
 const out = event => process.stdout.write(JSON.stringify(event) + '\n');
 if (args.includes('--version')) {
     console.log('1.18.32');
+    process.exit(0);
+}
+if (args[0] === 'models') {
+    const block = (id, variants) => `${id}\n${JSON.stringify({ id: id.split('/')[1], variants }, null, 2)}`;
+    console.log([
+        block('ollama/qwen-coder', {}),
+        block('opencode/thinker', { none: { reasoningEffort: 'none' }, high: { reasoningEffort: 'high' } })
+    ].join('\n'));
     process.exit(0);
 }
 

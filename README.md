@@ -134,7 +134,7 @@ By default the agent runs with full permissions (`agentuino.permissionMode` = `b
 | `agentuino.compileCheck` | Compile after every task that changed code (default on) |
 | `agentuino.permissionMode` | `bypassPermissions` (default), `acceptEdits` or `auto` |
 | `agentuino.claudePath` / `codexPath` / `vibePath` / `antigravityPath` / `opencodePath` | Agent path, empty = auto-detect |
-| `agentuino.claudeModel` / `codexModel` / `vibeModel` / `antigravityModel` / `opencodeModel` | Model, empty = agent default. OpenCode takes `provider/model`, e.g. `ollama/qwen2.5-coder` |
+| `agentuino.claudeModel` / `codexModel` / `vibeModel` / `antigravityModel` / `opencodeModel` | Model for new chats, empty = agent default. Each chat can choose its own model and effort below the input field. OpenCode takes `provider/model`, e.g. `ollama/qwen2.5-coder` |
 | `agentuino.checkForUpdates` | Check for new versions and agent configurations at startup; nothing is stored without asking (default on) |
 | `agentuino.arduinoCliPath` | Path to arduino-cli, empty = the one bundled with the IDE |
 

@@ -75,7 +75,7 @@ folders in the sketches are kept.
 | `agentuino.compileCheck` | Compile after every run that changed code, show flash/RAM or errors (default on) |
 | `agentuino.permissionMode` | `bypassPermissions` (default), `acceptEdits` or `auto` |
 | `agentuino.claudePath` / `codexPath` / `vibePath` | Agent path, empty = auto-detect |
-| `agentuino.claudeModel` / `codexModel` / `vibeModel` | Model, empty = agent default |
+| `agentuino.claudeModel` / `codexModel` / `vibeModel` | Model for new chats, empty = agent default. Each chat can choose its own model and effort below the input field |
 | `agentuino.checkForUpdates` | Check for new versions and agent configurations at startup; nothing is stored without asking (default on) |
 | `agentuino.arduinoCliPath` | Path to arduino-cli, empty = the one bundled with the IDE |
 

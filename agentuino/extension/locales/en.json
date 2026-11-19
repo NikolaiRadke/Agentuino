@@ -64,7 +64,12 @@
     "outputCut": "… {0} characters left out …",
     "loginButton": "Log in in a terminal",
     "loginOpened": "A terminal with {0} is open. Log in there ({1}), then send your request again.",
-    "loginNoTerminal": "No terminal found. Open one and log in with: {0}"
+    "loginNoTerminal": "No terminal found. Open one and log in with: {0}",
+    "modelDefault": "Default model",
+    "modelTitle": "Model for this chat. Empty: the agent's default.",
+    "effortTitle": "Effort for this chat",
+    "effortDefault": "Default effort",
+    "modelNextChat": "{0} keeps the model of a running conversation. The new model applies from the next new chat on."
   },
   "tools": {
     "Read": "Reading {0}",

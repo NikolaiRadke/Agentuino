@@ -64,7 +64,12 @@
     "outputCut": "… {0} caratteri omessi …",
     "loginButton": "Accedi in un terminale",
     "loginOpened": "È aperto un terminale con {0}. Accedi lì ({1}), poi invia di nuovo la tua richiesta.",
-    "loginNoTerminal": "Nessun terminale trovato. Aprine uno e accedi con: {0}"
+    "loginNoTerminal": "Nessun terminale trovato. Aprine uno e accedi con: {0}",
+    "modelDefault": "Modello predefinito",
+    "modelTitle": "Modello per questa chat. Vuoto: quello predefinito dell'agente.",
+    "effortTitle": "Impegno per questa chat",
+    "effortDefault": "Impegno predefinito",
+    "modelNextChat": "{0} mantiene il modello di una conversazione in corso. Il nuovo modello vale dalla prossima nuova chat."
   },
   "tools": {
     "Read": "Legge {0}",

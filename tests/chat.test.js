@@ -20,6 +20,7 @@ test.after(() => ide.stop());
 const compiles = entries => entries.filter(e => e.role === 'compile').map(e => e.data);
 const lastPrompt = () => env.agentCalls().filter(call => !call.args.includes('json')).pop().prompt;
 const callCount = () => env.agentCalls().filter(call => !call.args.includes('json')).length;
+const lastRunArgs = () => env.agentCalls().filter(call => !call.args.includes('json')).pop().args;
 
 /**
  * Open the chat for a new sketch
@@ -189,4 +190,81 @@ test('with "Upload automatically" the repair run may upload', async () => {
     projectManager.writeConfig(sketch, config);
     await ide.send('WRITE_BROKEN');
     assert.match(lastPrompt(), /Upload as soon as it compiles without errors/);
+});
+
+/**
+ * Wait for the next model state the chat sends to the webview
+ * @param {Function} check - Condition on the message
+ * @returns {Promise<Object>} Message
+ */
+async function modelState(check = () => true) {
+    const WAIT_MS = 20;
+    const MAX_TRIES = 250;
+    for (let i = 0; i < MAX_TRIES; i++) {
+        const found = ide.posted.filter(m => m.command === 'model' && check(m)).pop();
+        if (found) return found;
+        await new Promise(resolve => setTimeout(resolve, WAIT_MS));
+    }
+    throw new Error('No model state');
+}
+
+test('model and effort are chosen per chat and reach the command line', async () => {
+    const sketch = await newSketch('ModelChoice');
+    const initial = await modelState();
+    assert.ok(initial.models.includes('opus'));
+    assert.ok(initial.efforts.includes('max'));
+
+    // Chosen before the first message: belongs to the new chat
+    await ide.message({ command: 'setModel', model: 'opus', effort: 'high' });
+    await ide.send('Hello');
+    let args = lastRunArgs();
+    assert.deepEqual(args.slice(args.indexOf('--model'), args.indexOf('--model') + 4), ['--model', 'opus', '--effort', 'high']);
+    const chatId = projectManager.getLastChatId(sketch);
+    assert.equal(chatStore.loadChat(sketch, chatId).model, 'opus');
+
+    // An option instead of a model is refused, the old choice stays
+    ide.posted.length = 0;
+    await ide.message({ command: 'setModel', model: '--dangerously-skip-permissions', effort: '' });
+    assert.equal((await modelState()).model, 'opus');
+    assert.equal(chatStore.loadChat(sketch, chatId).effort, 'high');
+
+    // A new chat starts with the choice of the last one
+    await ide.message({ command: 'newChat' });
+    await ide.send('Second chat');
+    args = lastRunArgs();
+    assert.ok(args.includes('opus') && args.includes('high'));
+});
+
+test('Vibe keeps the model of a running session, the chat says so', async () => {
+    ide.settings.agent = 'vibe';
+    try {
+        await newSketch('VibeModel');
+        await ide.send('Hello');
+        const entries = await ide.message({ command: 'setModel', model: 'devstral', effort: '' });
+        assert.ok(entries.some(e => e.role === 'info' && /next new chat/.test(e.text)), JSON.stringify(entries));
+        // Vibe has no effort option
+        assert.deepEqual((await modelState(m => m.model === 'devstral')).efforts, []);
+    } finally {
+        ide.settings.agent = 'claudecode';
+    }
+});
+
+test('an effort level the model does not offer is left out', async () => {
+    ide.settings.agent = 'codex';
+    try {
+        await newSketch('CodexEffort');
+        await modelState(m => m.models.includes('gpt-fast'));
+        await ide.message({ command: 'setModel', model: 'gpt-old', effort: 'ultra' });
+        await ide.send('Hello');
+        let args = lastRunArgs();
+        assert.ok(args.includes('gpt-old'));
+        assert.ok(!args.some(arg => arg.startsWith('model_reasoning_effort')));
+
+        await ide.message({ command: 'setModel', model: 'gpt-fast', effort: 'ultra' });
+        await ide.send('Again');
+        args = lastRunArgs();
+        assert.ok(args.includes('model_reasoning_effort=ultra'));
+    } finally {
+        ide.settings.agent = 'claudecode';
+    }
 });

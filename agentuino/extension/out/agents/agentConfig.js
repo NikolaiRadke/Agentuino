@@ -5,7 +5,8 @@
  * Licensed under the Apache License, Version 2.0
  *
  * Everything about the agents that can change without new code: command line
- * options, install commands, minimum versions, install locations, error patterns.
+ * options, install commands, minimum versions, install locations, error patterns,
+ * model suggestions and effort levels.
  * Shipped in config/agentConfigs.json; a newer copy from GitHub is stored in
  * ~/.agentuino/ only after the user agreed. Pure data (JSON), never executed.
  * Pure Node, no VS Code API.
@@ -35,6 +36,15 @@ const JSON_INDENT = 2;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
 // A plain program name: looked up in PATH, never a path to some other program
 const COMMAND_PATTERN = /^[a-z][\w-]*$/;
+// Model and effort values end up on the command line. Chats are files in the
+// sketch folder and may come from someone else, so a value must never start
+// with "-" and become an option of its own (e.g. a model "--auto").
+const MODEL_PATTERN = /^\w[\w.:/@+-]*$/;
+const MAX_MODEL_CHARS = 200;
+const EFFORT_PATTERN = /^\w[\w.-]*$/;
+const MAX_EFFORT_CHARS = 40;
+// Output formats of the model list commands, parsed by modelCatalog.js
+const MODELS_FORMATS = ['lines', 'codex-json', 'opencode-verbose'];
 
 // ===== STATE =====
 
@@ -45,6 +55,33 @@ let current = null;
 const isString = value => typeof value === 'string' && value.length > 0;
 const isStringArray = value => Array.isArray(value) && value.every(isString);
 const isOptional = (value, check) => value === undefined || check(value);
+
+/**
+ * Check a model name before it goes on the command line
+ * @param {*} value - Model
+ * @returns {boolean} Usable
+ */
+function isModel(value) {
+    return typeof value === 'string' && value.length <= MAX_MODEL_CHARS && MODEL_PATTERN.test(value);
+}
+
+/**
+ * Check an effort level before it goes on the command line
+ * @param {*} value - Effort level
+ * @returns {boolean} Usable
+ */
+function isEffort(value) {
+    return typeof value === 'string' && value.length <= MAX_EFFORT_CHARS && EFFORT_PATTERN.test(value);
+}
+
+/**
+ * Model list command: arguments for the agent and the output format
+ * @param {Object} value - {args, format}
+ * @returns {boolean} Valid
+ */
+function isModelsCommand(value) {
+    return Boolean(value) && isStringArray(value.args) && MODELS_FORMATS.includes(value.format);
+}
 
 /**
  * Install locations must point to the agent's own command, not to any program
@@ -96,6 +133,7 @@ function checkAgent(agent) {
         'args.permissions': PERMISSION_MODES.every(mode => isStringArray(args.permissions?.[mode])),
         'args.model': isOptional(args.model, v => isStringArray(v) && v.includes('{model}')),
         'args.modelOnNewSession': isOptional(args.modelOnNewSession, v => typeof v === 'boolean'),
+        'args.effort': isOptional(args.effort, v => isStringArray(v) && v.some(part => part.includes('{effort}'))),
         'args.resume': isStringArray(args.resume) && args.resume.includes('{session}'),
         'args.tail': isOptional(args.tail, isStringArray),
         sessionNotFound: isRegex(agent.sessionNotFound),
@@ -103,7 +141,10 @@ function checkAgent(agent) {
         minVersion: isOptional(agent.minVersion, v => SEMVER_PATTERN.test(v)),
         updateHint: isOptional(agent.updateHint, isString),
         experimental: isOptional(agent.experimental, v => typeof v === 'boolean'),
-        titleModel: isOptional(agent.titleModel, isString)
+        titleModel: isOptional(agent.titleModel, isString),
+        models: isOptional(agent.models, v => Array.isArray(v) && v.every(isModel)),
+        efforts: isOptional(agent.efforts, v => Array.isArray(v) && v.every(isEffort)),
+        modelsCommand: isOptional(agent.modelsCommand, isModelsCommand)
     };
     return Object.keys(checks).find(key => !checks[key]) || null;
 }
@@ -231,20 +272,23 @@ function expandCandidates(agent, windows) {
 
 /**
  * Build the command line from the templates of an agent.
- * Order: base, instructions, permissions, model, resume, tail.
+ * Order: base, instructions, permissions, model, effort, resume, tail.
+ * A model or effort that does not look like one is left out, the agent
+ * then uses its own default.
  * @param {Object} agent - Agent entry
- * @param {Object} options - {sessionId, model, permissionMode, instructionsFile, runDir}
+ * @param {Object} options - {sessionId, model, effort, permissionMode, instructionsFile, runDir}
  * @returns {string[]} Arguments
  */
-function buildArgs(agent, { sessionId, model, permissionMode, instructionsFile, runDir }) {
-    const values = { session: sessionId, model, file: instructionsFile, runDir };
+function buildArgs(agent, { sessionId, model, effort, permissionMode, instructionsFile, runDir }) {
+    const values = { session: sessionId, model, effort, file: instructionsFile, runDir };
     const fill = template => template.map(part => part.replace(/\{(\w+)\}/g, (match, key) => values[key] ?? match));
     const { args } = agent;
 
     const result = fill(args.base);
     if (args.instructions && instructionsFile) result.push(...fill(args.instructions));
     result.push(...fill(args.permissions[permissionMode] || args.permissions[DEFAULT_PERMISSION]));
-    if (args.model && model && !(args.modelOnNewSession && sessionId)) result.push(...fill(args.model));
+    if (args.model && isModel(model) && !(args.modelOnNewSession && sessionId)) result.push(...fill(args.model));
+    if (args.effort && isEffort(effort)) result.push(...fill(args.effort));
     if (sessionId) result.push(...fill(args.resume));
     if (args.tail) result.push(...fill(args.tail));
     return result;
@@ -274,6 +318,11 @@ function defineAdapter(id, code) {
         get minVersion() { return this.config.minVersion || null; },
         get updateHint() { return this.config.updateHint || ''; },
         get titleModel() { return this.config.titleModel || null; },
+        get models() { return this.config.models || []; },
+        get efforts() { return this.config.args.effort ? this.config.efforts || [] : []; },
+        get supportsEffort() { return Boolean(this.config.args.effort); },
+        get modelOnNewSession() { return Boolean(this.config.args.modelOnNewSession); },
+        get modelsCommand() { return this.config.modelsCommand || null; },
         get supportsInstructionsFile() { return Boolean(this.config.args.instructions); },
         get sessionNotFound() { return toRegex(this.config.sessionNotFound); },
         get authError() { return toRegex(this.config.authError); },
@@ -313,6 +362,8 @@ module.exports = {
     getInfo,
     validate,
     isNewer,
+    isModel,
+    isEffort,
     expandCandidates,
     buildArgs,
     defineAdapter,

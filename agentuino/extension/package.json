@@ -166,7 +166,7 @@
         "agentuino.claudeModel": {
           "type": "string",
           "default": "",
-          "description": "Claude model (e.g. 'sonnet', 'opus'). Leave empty to use the Claude Code default."
+          "description": "Claude model for new chats (e.g. 'sonnet', 'opus'). Each chat can choose its own. Leave empty to use the Claude Code default."
         },
         "agentuino.codexPath": {
           "type": "string",
@@ -176,7 +176,7 @@
         "agentuino.codexModel": {
           "type": "string",
           "default": "",
-          "description": "Codex model (e.g. 'gpt-5.5'). Leave empty to use the Codex default."
+          "description": "Codex model for new chats (e.g. 'gpt-5.5'). Each chat can choose its own. Leave empty to use the Codex default."
         },
         "agentuino.vibePath": {
           "type": "string",
@@ -186,7 +186,7 @@
         "agentuino.vibeModel": {
           "type": "string",
           "default": "",
-          "description": "Mistral Vibe model alias. Leave empty to use Vibe's active model."
+          "description": "Mistral Vibe model alias for new chats. Each chat can choose its own. Leave empty to use Vibe's active model."
         },
         "agentuino.antigravityPath": {
           "type": "string",
@@ -196,7 +196,7 @@
         "agentuino.antigravityModel": {
           "type": "string",
           "default": "",
-          "description": "Antigravity CLI model (see 'agy models'). Leave empty to use the agy default."
+          "description": "Antigravity CLI model for new chats (see 'agy models'). Each chat can choose its own. Leave empty to use the agy default."
         },
         "agentuino.opencodePath": {
           "type": "string",
@@ -206,7 +206,7 @@
         "agentuino.opencodeModel": {
           "type": "string",
           "default": "",
-          "description": "OpenCode model as provider/model (e.g. 'ollama/qwen2.5-coder', see 'opencode models'). Leave empty to use the OpenCode default."
+          "description": "OpenCode model for new chats as provider/model (e.g. 'ollama/qwen2.5-coder', see 'opencode models'). Each chat can choose its own. Leave empty to use the OpenCode default."
         },
         "agentuino.arduinoCliPath": {
           "type": "string",

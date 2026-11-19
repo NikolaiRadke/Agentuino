@@ -334,6 +334,40 @@ textarea:focus {
     flex: 1;
 }
 
+/* ===== Model and effort ===== */
+
+.model-choice {
+    display: flex;
+    gap: var(--gap);
+    min-width: 0;
+}
+
+.model-choice input,
+.model-choice select {
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--vscode-input-foreground);
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border, transparent);
+    border-radius: var(--radius);
+    padding: 2px 6px;
+}
+
+.model-choice input {
+    width: 14em;
+    min-width: 6em;
+}
+
+.model-choice input:focus,
+.model-choice select:focus {
+    outline: 1px solid var(--vscode-focusBorder);
+}
+
+.model-choice[hidden],
+.model-choice select[hidden] {
+    display: none;
+}
+
 button {
     font-family: inherit;
     font-size: inherit;

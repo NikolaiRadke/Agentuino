@@ -35,7 +35,11 @@
         cost: $('cost'),
         working: $('working'),
         workingText: $('workingText'),
-        attachments: $('attachments')
+        attachments: $('attachments'),
+        modelChoice: $('modelChoice'),
+        model: $('model'),
+        modelList: $('modelList'),
+        effort: $('effort')
     };
 
     let texts = {};
@@ -46,6 +50,8 @@
     let snapshotTime = null;
     let sketchName = null;
     let lastAgentName = '';
+    // Last state from the extension: {available, model, effort, models, efforts}
+    let modelState = { available: false };
 
     // ===== CLIPBOARD =====
 
@@ -529,6 +535,8 @@
         elements.attach.disabled = busy;
         elements.newChat.disabled = busy;
         elements.chatTitle.disabled = busy;
+        elements.model.disabled = busy;
+        elements.effort.disabled = busy;
         if (busy) hideChatList();
         updateRestoreButtons();
         showSubline(lastAgentName);
@@ -565,7 +573,61 @@
         elements.settings.title = texts.settings;
         elements.input.placeholder = texts.placeholder;
         elements.workingText.textContent = texts.working;
+        elements.model.placeholder = texts.modelDefault;
+        elements.model.title = texts.modelTitle;
+        elements.effort.title = texts.effortTitle;
     }
+
+    // ===== MODEL AND EFFORT =====
+
+    /**
+     * Show model, suggestions and effort levels of the chat
+     * @param {Object} state - {available, model, effort, models, efforts}
+     */
+    function showModel(state) {
+        modelState = state;
+        elements.modelChoice.hidden = !state.available;
+        if (!state.available) return;
+        // Do not overwrite what the user is typing
+        if (document.activeElement !== elements.model) elements.model.value = state.model;
+
+        elements.modelList.innerHTML = '';
+        for (const name of state.models) {
+            const option = document.createElement('option');
+            option.value = name;
+            elements.modelList.appendChild(option);
+        }
+
+        elements.effort.innerHTML = '';
+        for (const level of ['', ...state.efforts]) {
+            const option = document.createElement('option');
+            option.value = level;
+            option.textContent = level || texts.effortDefault;
+            elements.effort.appendChild(option);
+        }
+        elements.effort.value = state.effort;
+        elements.effort.hidden = state.efforts.length === 0;
+    }
+
+    /**
+     * Send the chosen model and effort to the extension (only if changed)
+     */
+    function sendModel() {
+        const model = elements.model.value.trim();
+        const effort = elements.effort.hidden ? '' : elements.effort.value;
+        if (model === modelState.model && effort === modelState.effort) return;
+        vscode.postMessage({ command: 'setModel', model, effort });
+    }
+
+    elements.model.addEventListener('change', sendModel);
+    elements.model.addEventListener('keydown', (event) => {
+        // Enter fires 'change' by itself
+        if (event.key === 'Escape') {
+            elements.model.value = modelState.model;
+            elements.input.focus();
+        }
+    });
+    elements.effort.addEventListener('change', sendModel);
 
     let agentSelectable = false;
 
@@ -798,6 +860,9 @@
                 break;
             case 'paste':
                 insertIntoInput(msg.text);
+                break;
+            case 'model':
+                showModel(msg);
                 break;
             default:
                 break;

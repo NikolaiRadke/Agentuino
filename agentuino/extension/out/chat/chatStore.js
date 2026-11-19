@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0
  *
  * Every chat of a sketch is stored in agentuino/chats/ as two files:
- *   <id>.json  data for the UI: agent, session, cost, messages
+ *   <id>.json  data for the UI: agent, model, effort, session, cost, messages
  *   <id>.md    readable protocol; agents search it with Grep to look up
  *              earlier conversations (like past-chat search in Claude)
  * Pure Node.js (no vscode dependency).
@@ -130,9 +130,10 @@ function saveChat(sketchPath, chat) {
  * @param {string} sketchPath - Sketch folder
  * @param {string} agentId - Agent identifier (e.g. 'claudecode')
  * @param {string} firstText - First user message (for the provisional title)
+ * @param {Object} [choice] - {model, effort} chosen for this chat ('' = agent default)
  * @returns {Object} Chat object
  */
-function createChat(sketchPath, agentId, firstText) {
+function createChat(sketchPath, agentId, firstText, { model = '', effort = '' } = {}) {
     const now = new Date();
     const chat = {
         id: createChatId(now),
@@ -141,6 +142,8 @@ function createChat(sketchPath, agentId, firstText) {
         created: now.getTime(),
         updated: now.getTime(),
         agent: agentId,
+        model,
+        effort,
         sessionId: null,
         costUsd: null,
         messages: []
