@@ -56,5 +56,5 @@ test('a failing list command leaves the fixed lists and is tried again later', a
     const agy = registry.get('antigravity');
     assert.deepEqual(await modelCatalog.listModels(agy, env.fake('missing-agy')), []);
     const listed = await modelCatalog.listModels(agy, env.fake('agy'));
-    assert.deepEqual(listed.map(model => model.id), ['gemini-pro', 'gemini-flash']);
+    assert.deepEqual(listed.map(model => model.id), ['gemini-pro-high', 'gemini-flash-low']);
 });
