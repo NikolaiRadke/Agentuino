@@ -342,8 +342,16 @@ textarea:focus {
     min-width: 0;
 }
 
+/* Native popups (datalist, select) appear shifted in Theia webviews,
+   so both lists are own dropdowns like the chat list */
+.choice {
+    position: relative;
+    display: flex;
+    min-width: 0;
+}
+
 .model-choice input,
-.model-choice select {
+.choice-btn {
     font-family: inherit;
     font-size: inherit;
     color: var(--vscode-input-foreground);
@@ -359,13 +367,34 @@ textarea:focus {
 }
 
 .model-choice input:focus,
-.model-choice select:focus {
+.choice-btn:focus {
     outline: 1px solid var(--vscode-focusBorder);
 }
 
 .model-choice[hidden],
-.model-choice select[hidden] {
+.choice-btn[hidden] {
     display: none;
+}
+
+/* The footer sits at the bottom: these lists open upwards */
+.dropdown.up {
+    top: auto;
+    bottom: 100%;
+    right: auto;
+    min-width: 100%;
+    max-height: 40vh;
+    white-space: nowrap;
+}
+
+.choice-item {
+    padding: 2px 12px;
+    cursor: pointer;
+}
+
+.choice-item:hover,
+.choice-item.active {
+    background: var(--vscode-menu-selectionBackground, var(--vscode-list-hoverBackground));
+    color: var(--vscode-menu-selectionForeground, inherit);
 }
 
 button {

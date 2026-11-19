@@ -1240,9 +1240,14 @@ class ChatPanel {
         <div class="buttons">
             <button id="attach" class="secondary"></button>
             <span id="modelChoice" class="model-choice" hidden>
-                <input id="model" type="text" list="modelList" spellcheck="false" autocomplete="off">
-                <datalist id="modelList"></datalist>
-                <select id="effort"></select>
+                <span class="choice">
+                    <input id="model" type="text" spellcheck="false" autocomplete="off">
+                    <div id="modelList" class="dropdown up" hidden></div>
+                </span>
+                <span class="choice">
+                    <button id="effort" class="choice-btn"></button>
+                    <div id="effortList" class="dropdown up" hidden></div>
+                </span>
             </span>
             <span class="spacer"></span>
             <button id="stop" class="danger" hidden></button>

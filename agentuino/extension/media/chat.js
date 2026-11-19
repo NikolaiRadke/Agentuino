@@ -19,6 +19,8 @@
     const PERCENT_MAX = 100;
     // Same limit as the IDE's low memory warning
     const BAR_WARNING_PERCENT = 75;
+    // More suggestions than this are cut, typing narrows them down
+    const MAX_SUGGESTIONS = 100;
 
     const elements = {
         messages: $('messages'),
@@ -39,7 +41,8 @@
         modelChoice: $('modelChoice'),
         model: $('model'),
         modelList: $('modelList'),
-        effort: $('effort')
+        effort: $('effort'),
+        effortList: $('effortList')
     };
 
     let texts = {};
@@ -146,6 +149,7 @@
     document.addEventListener('click', (event) => {
         if (!menu.contains(event.target)) hideMenu();
         if (!elements.chatList.contains(event.target) && event.target !== elements.chatTitle) hideChatList();
+        if (!elements.effortList.contains(event.target)) elements.effortList.hidden = true;
     });
     window.addEventListener('blur', hideMenu);
     elements.messages.addEventListener('scroll', hideMenu);
@@ -155,6 +159,7 @@
         if (event.key === 'Escape') {
             hideMenu();
             hideChatList();
+            hideChoiceLists();
             return;
         }
         if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
@@ -537,7 +542,10 @@
         elements.chatTitle.disabled = busy;
         elements.model.disabled = busy;
         elements.effort.disabled = busy;
-        if (busy) hideChatList();
+        if (busy) {
+            hideChatList();
+            hideChoiceLists();
+        }
         updateRestoreButtons();
         showSubline(lastAgentName);
         if (!busy) elements.input.focus();
@@ -580,6 +588,18 @@
 
     // ===== MODEL AND EFFORT =====
 
+    let modelActive = -1;
+    // Only typing filters the suggestions, on focus all of them are shown
+    let modelFiltering = false;
+
+    /**
+     * Hide both lists of the model choice
+     */
+    function hideChoiceLists() {
+        elements.modelList.hidden = true;
+        elements.effortList.hidden = true;
+    }
+
     /**
      * Show model, suggestions and effort levels of the chat
      * @param {Object} state - {available, model, effort, models, efforts}
@@ -590,44 +610,142 @@
         if (!state.available) return;
         // Do not overwrite what the user is typing
         if (document.activeElement !== elements.model) elements.model.value = state.model;
-
-        elements.modelList.innerHTML = '';
-        for (const name of state.models) {
-            const option = document.createElement('option');
-            option.value = name;
-            elements.modelList.appendChild(option);
-        }
-
-        elements.effort.innerHTML = '';
-        for (const level of ['', ...state.efforts]) {
-            const option = document.createElement('option');
-            option.value = level;
-            option.textContent = level || texts.effortDefault;
-            elements.effort.appendChild(option);
-        }
-        elements.effort.value = state.effort;
+        elements.effort.textContent = (state.effort || texts.effortDefault) + ' ▾';
         elements.effort.hidden = state.efforts.length === 0;
+        if (!elements.modelList.hidden) renderModelList();
+        if (!elements.effortList.hidden) renderEffortList();
     }
 
     /**
      * Send the chosen model and effort to the extension (only if changed)
+     * @param {string} [effort] - New effort level, otherwise the current one
      */
-    function sendModel() {
+    function sendModel(effort = modelState.effort) {
         const model = elements.model.value.trim();
-        const effort = elements.effort.hidden ? '' : elements.effort.value;
         if (model === modelState.model && effort === modelState.effort) return;
+        // Taken over at once, so blur after a click does not send it twice
+        modelState = { ...modelState, model, effort };
+        elements.effort.textContent = (effort || texts.effortDefault) + ' ▾';
         vscode.postMessage({ command: 'setModel', model, effort });
     }
 
-    elements.model.addEventListener('change', sendModel);
+    /**
+     * Create one entry of a choice list
+     * @param {string} label - Text
+     * @param {Function} pick - Called on click
+     * @returns {HTMLElement} Entry
+     */
+    function createChoiceItem(label, pick) {
+        const item = document.createElement('div');
+        item.className = 'choice-item';
+        item.textContent = label;
+        // Keep the focus in the field until the click is done
+        item.addEventListener('mousedown', (event) => event.preventDefault());
+        item.addEventListener('click', pick);
+        return item;
+    }
+
+    /**
+     * Suggestions that contain the typed text
+     * @returns {string[]} Models
+     */
+    function matchingModels() {
+        const typed = modelFiltering ? elements.model.value.trim().toLowerCase() : '';
+        return (modelState.models || [])
+            .filter(name => !typed || name.toLowerCase().includes(typed))
+            .slice(0, MAX_SUGGESTIONS);
+    }
+
+    /**
+     * Render the model suggestions, hidden if none match
+     */
+    function renderModelList() {
+        const names = matchingModels();
+        elements.modelList.innerHTML = '';
+        modelActive = Math.min(modelActive, names.length - 1);
+        names.forEach((name, index) => {
+            const item = createChoiceItem(name, () => pickModel(name));
+            if (index === modelActive) item.classList.add('active');
+            elements.modelList.appendChild(item);
+        });
+        elements.modelList.hidden = names.length === 0;
+        elements.modelList.querySelector('.active')?.scrollIntoView({ block: 'nearest' });
+    }
+
+    /**
+     * Take a suggestion
+     * @param {string} name - Model
+     */
+    function pickModel(name) {
+        elements.model.value = name;
+        elements.modelList.hidden = true;
+        sendModel();
+    }
+
+    /**
+     * Render the effort levels, the current one marked
+     */
+    function renderEffortList() {
+        elements.effortList.innerHTML = '';
+        for (const level of ['', ...modelState.efforts]) {
+            const item = createChoiceItem(level || texts.effortDefault, () => {
+                elements.effortList.hidden = true;
+                sendModel(level);
+            });
+            if (level === modelState.effort) item.classList.add('active');
+            elements.effortList.appendChild(item);
+        }
+    }
+
+    elements.model.addEventListener('focus', () => {
+        elements.effortList.hidden = true;
+        modelActive = -1;
+        modelFiltering = false;
+        renderModelList();
+    });
+    elements.model.addEventListener('input', () => {
+        modelActive = -1;
+        modelFiltering = true;
+        renderModelList();
+    });
+    elements.model.addEventListener('blur', () => {
+        elements.modelList.hidden = true;
+        sendModel();
+    });
     elements.model.addEventListener('keydown', (event) => {
-        // Enter fires 'change' by itself
-        if (event.key === 'Escape') {
+        const count = elements.modelList.hidden ? 0 : elements.modelList.children.length;
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            if (elements.modelList.hidden) {
+                renderModelList();
+                return;
+            }
+            const step = event.key === 'ArrowDown' ? 1 : -1;
+            modelActive = count ? (modelActive + step + count) % count : -1;
+            renderModelList();
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            const names = matchingModels();
+            if (!elements.modelList.hidden && modelActive >= 0 && names[modelActive]) {
+                pickModel(names[modelActive]);
+            } else {
+                elements.modelList.hidden = true;
+                sendModel();
+            }
+        } else if (event.key === 'Escape') {
             elements.model.value = modelState.model;
+            elements.modelList.hidden = true;
             elements.input.focus();
         }
     });
-    elements.effort.addEventListener('change', sendModel);
+
+    elements.effort.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (busy) return;
+        elements.modelList.hidden = true;
+        if (elements.effortList.hidden) renderEffortList();
+        elements.effortList.hidden = !elements.effortList.hidden;
+    });
 
     let agentSelectable = false;
 
