@@ -1242,6 +1242,7 @@ class ChatPanel {
             <span id="modelChoice" class="model-choice" hidden>
                 <span class="choice">
                     <input id="model" type="text" spellcheck="false" autocomplete="off">
+                    <span id="modelArrow" class="choice-arrow">▾</span>
                     <div id="modelList" class="dropdown up" hidden></div>
                 </span>
                 <span class="choice">

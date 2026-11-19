@@ -41,6 +41,7 @@
         modelChoice: $('modelChoice'),
         model: $('model'),
         modelList: $('modelList'),
+        modelArrow: $('modelArrow'),
         effort: $('effort'),
         effortList: $('effortList')
     };
@@ -736,6 +737,20 @@
             elements.model.value = modelState.model;
             elements.modelList.hidden = true;
             elements.input.focus();
+        }
+    });
+
+    // The arrow opens and closes the suggestions without leaving the field
+    elements.modelArrow.addEventListener('mousedown', (event) => {
+        event.preventDefault();
+        if (busy) return;
+        if (document.activeElement !== elements.model) {
+            elements.model.focus();
+        } else if (elements.modelList.hidden) {
+            modelFiltering = false;
+            renderModelList();
+        } else {
+            elements.modelList.hidden = true;
         }
     });
 

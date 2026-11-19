@@ -364,6 +364,22 @@ textarea:focus {
 .model-choice input {
     width: 14em;
     min-width: 6em;
+    padding-right: 1.6em;
+}
+
+/* Arrow inside the model field: it looks and works like a dropdown */
+.choice-arrow {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--vscode-input-foreground);
+    cursor: pointer;
+    user-select: none;
 }
 
 .model-choice input:focus,
