@@ -12,7 +12,7 @@ Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Co
 > Agentuino is tested on Linux and Windows. macOS and Codex CLI are untested so far: please tell how it went in the [issues](https://github.com/NikolaiRadke/Agentuino/issues), it works or not.
 
 🆕 What's new?
-* **19.11.2026** **V1.2.0**: model and effort per chat, right below the input field. The suggestions come from the agents themselves where they can list their models.  
+* **19.11.2026** **V1.2.0**: model and effort per chat, right below the input field. The suggestions come from the agents themselves where they can list their models.    
     -- More news? Check the [newsblog](NEWS.md).
 
 ## Features
