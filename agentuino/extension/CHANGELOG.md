@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.2.0
+
+Model and effort per chat.
 
 - Chat: model and effort per chat, next to the attach button. The model is a free
   field with suggestions, a new chat starts with the choice of the last one
