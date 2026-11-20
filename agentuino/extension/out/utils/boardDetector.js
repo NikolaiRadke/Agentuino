@@ -4,9 +4,10 @@
  *
  * Licensed under the Apache License, Version 2.0
  *
- * The Arduino IDE offers no API for the selected board, so the board is read
- * from the IDE log files (same approach as AI.duino) and from sketch.yaml
- * (default_fqbn / default_port), if present. Pure Node.js.
+ * The Arduino IDE 2.x reports board and port of its window through the built-in
+ * vscode-arduino-api extension (ArduinoContext). Without it (e.g. VS Code) the
+ * board is read from the IDE log files (same approach as AI.duino). sketch.yaml
+ * (default_fqbn / default_port) fills in what the IDE does not report. Pure Node.js.
  */
 
 "use strict";
@@ -130,8 +131,13 @@ function readSketchYaml(sketchPath) {
 // ===== DETECTOR =====
 
 class BoardDetector extends EventEmitter {
-    constructor() {
+    /**
+     * @param {Object} [options] - {arduinoContext}: API of the Arduino IDE, null to use the logs
+     */
+    constructor(options = {}) {
         super();
+        this.api = options.arduinoContext || null;
+        this.apiListener = null;
         this.logDir = getLogDirectory();
         this.fileSizes = new Map();
         this.entries = LOG_PATTERNS.map(() => null);
@@ -140,9 +146,16 @@ class BoardDetector extends EventEmitter {
     }
 
     /**
-     * Start polling the IDE logs. Emits 'change' with {fqbn, boardName}.
+     * Start watching the board: IDE API if available, else the IDE logs.
+     * Emits 'change' with {fqbn, boardName}.
      */
     start() {
+        if (this.api) {
+            this.apiListener = this.api.onDidChange('fqbn')(fqbn => {
+                if (isFqbn(fqbn)) this.emit('change', { fqbn, boardName: getBoardName(fqbn) });
+            });
+            return;
+        }
         this.poll();
         this.timer = setInterval(() => this.poll(), POLL_INTERVAL_MS);
     }
@@ -153,21 +166,37 @@ class BoardDetector extends EventEmitter {
     dispose() {
         clearInterval(this.timer);
         this.timer = null;
+        this.apiListener?.dispose();
+        this.apiListener = null;
         this.removeAllListeners();
     }
 
     /**
-     * Get board info for a sketch: sketch.yaml wins over the IDE log
+     * IDE state, if it belongs to this sketch (one sketch per IDE window)
+     * @param {string} sketchPath - Sketch folder
+     * @returns {Object|null} ArduinoContext or null
+     */
+    apiFor(sketchPath) {
+        const api = this.api;
+        if (!api) return null;
+        if (api.sketchPath && sketchPath && path.resolve(api.sketchPath) !== path.resolve(sketchPath)) return null;
+        return api;
+    }
+
+    /**
+     * Get board info for a sketch: IDE selection first, then sketch.yaml, then the IDE log
      * @param {string} sketchPath - Sketch folder
      * @returns {{fqbn: string|null, boardName: string|null, port: string|null}} Board info
      */
     getBoardInfo(sketchPath) {
+        const api = this.apiFor(sketchPath);
         const yaml = sketchPath ? readSketchYaml(sketchPath) : { fqbn: null, port: null };
-        const fqbn = yaml.fqbn || this.fqbn;
+        const apiFqbn = isFqbn(api?.fqbn) ? api.fqbn : null;
+        const fqbn = apiFqbn || yaml.fqbn || this.fqbn;
         return {
             fqbn,
             boardName: fqbn ? getBoardName(fqbn) : null,
-            port: yaml.port
+            port: api?.port?.address || yaml.port
         };
     }
 

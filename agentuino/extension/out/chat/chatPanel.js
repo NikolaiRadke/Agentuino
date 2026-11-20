@@ -909,7 +909,7 @@ class ChatPanel {
         const t = this.deps.getT();
         for (let attempt = 1; ; attempt++) {
             if (!result || result.stopped || result.isError) return;
-            const check = await this.checkCompile(sketchPath, attempt > 1 || this.lastCheckFailed());
+            const check = await this.checkCompile(sketchPath, attempt > 1 || this.shouldRecheck(sketchPath));
             // Installing a library needs the user's ok, a repair round would not help
             if (!check || check.ok || check.missingLibraries || attempt >= MAX_COMPILE_ATTEMPTS) return;
 
@@ -925,16 +925,21 @@ class ChatPanel {
     }
 
     /**
-     * Whether the last compile check in this chat failed. Then the next run is
-     * checked even without code changes (e.g. after installing a missing library).
-     * @returns {boolean} Last check failed
+     * Whether a failed last check is worth repeating without code changes in this run:
+     * code edited outside the agent, board changed, or a missing library may be installed now
+     * @param {string} sketchPath - Sketch folder
+     * @returns {boolean} Check again
      */
-    lastCheckFailed() {
-        const messages = this.chat?.messages || [];
-        for (let i = messages.length - 1; i >= 0; i--) {
-            if (messages[i].role === 'compile') return !messages[i].data?.ok;
+    shouldRecheck(sketchPath) {
+        const last = [...(this.chat?.messages || [])].reverse().find(m => m.role === 'compile');
+        if (!last || last.data?.ok) return false;
+        if (last.data?.missingLibraries) return true;
+        try {
+            return projectManager.readConfig(sketchPath).context.fqbn !== last.data?.fqbn
+                || backupManager.getCodeFingerprint(sketchPath) !== last.data?.fingerprint;
+        } catch {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -984,6 +989,9 @@ class ChatPanel {
         }
         this.writeOutput(sketchPath, board, context.fqbn, result.output);
         const data = this.describeCompile(result, board);
+        // Remember what was checked, so an unchanged failed state is not compiled again
+        data.fqbn = context.fqbn;
+        data.fingerprint = backupManager.getCodeFingerprint(sketchPath);
         this.addEntry('compile', data.compact ? data.line : [data.title, ...data.sizes.map(s => `${s.label}: ${s.text}`),
             data.warning, ...data.errors, data.more, data.hint].filter(Boolean).join('\n'), data);
 

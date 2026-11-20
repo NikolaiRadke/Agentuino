@@ -75,6 +75,20 @@ test('the loop ends after three runs, the user can still ask for a fix', async (
     assert.equal(checks[2].fixable, true);
 });
 
+test('a failed check is not repeated for a question, only after the code changed', async () => {
+    const sketch = await newSketch('Unchanged');
+    await ide.send('WRITE_STUBBORN');
+    const before = callCount();
+    const question = await ide.send('Why did that fail?');
+    assert.deepEqual(compiles(question), []);
+    assert.equal(callCount() - before, 1);
+
+    // Code edited by the user outside the agent: checked again
+    fs.appendFileSync(path.join(sketch, 'Unchanged.ino'), '\n// edited by hand\n');
+    const edited = compiles(await ide.send('Another question'));
+    assert.equal(edited.length > 0, true);
+});
+
 test('a missing library stops the loop and is checked again after installing', async () => {
     await newSketch('Library');
     const before = callCount();

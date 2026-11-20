@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2.1
+
+Board per IDE window, no repeated compile checks.
+
+- Board and port come from the Arduino IDE itself (built-in vscode-arduino-api):
+  every IDE window has its own board, a board change arrives at once. Before, the
+  newest board in the shared IDE log won, even if another window had selected it
+- The IDE log is only read without that API (e.g. VS Code), sketch.yaml fills in
+  what the IDE does not report
+- A failed compile check is not repeated after every message: only when the code,
+  the board or an installed library may have changed. Before, a question after a
+  failed check started a new check and a repair run
+
 ## 1.2.0
 
 Model and effort per chat.

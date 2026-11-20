@@ -543,6 +543,18 @@ function applyLanguageChange() {
 
 // ===== ACTIVATION =====
 
+// Built into the Arduino IDE 2.x, reports board, port and sketch of this window
+const ARDUINO_API_EXTENSION = 'dankeboy36.vscode-arduino-api';
+
+/**
+ * Get the Arduino IDE API (the IDE activates it before all other extensions)
+ * @returns {Object|null} ArduinoContext or null (e.g. in VS Code)
+ */
+function getArduinoContext() {
+    const api = vscode.extensions.getExtension(ARDUINO_API_EXTENSION)?.exports;
+    return api && typeof api.onDidChange === 'function' ? api : null;
+}
+
 /**
  * Extension entry point
  * @param {vscode.ExtensionContext} context - Extension context
@@ -552,7 +564,7 @@ function activate(context) {
     loadLocale();
     makeToolsExecutable();
 
-    boardDetector = new BoardDetector();
+    boardDetector = new BoardDetector({ arduinoContext: getArduinoContext() });
     boardDetector.on('change', handleBoardChange);
     boardDetector.start();
 
