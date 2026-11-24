@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
   <Metadata>
-    <Identity Language="en-US" Id="agentuino" Version="1.2.2" Publisher="NikolaiRadke"/>
+    <Identity Language="en-US" Id="agentuino" Version="1.2.1" Publisher="NikolaiRadke"/>
     <DisplayName>Agentuino</DisplayName>
     <Description xml:space="preserve">Agentic coding for Arduino beginners</Description>
   </Metadata>
