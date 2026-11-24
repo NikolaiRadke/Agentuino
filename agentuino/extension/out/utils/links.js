@@ -31,6 +31,7 @@ module.exports = {
     KOFI_URL: 'https://ko-fi.com/nikolairadke',
     SPONSORS_URL: `https://github.com/sponsors/${REPO_OWNER}`,
     RAW_HOST: 'raw.githubusercontent.com',
-    RAW_PACKAGE_PATH: `/${REPO_OWNER}/${REPO_NAME}/refs/heads/${REPO_BRANCH}/agentuino/extension/package.json`,
+    // Written by .github/scripts/package.sh, so only a release announces a new version
+    RAW_RELEASE_PATH: `/${REPO_OWNER}/${REPO_NAME}/refs/heads/${REPO_BRANCH}/installer/version.json`,
     RAW_AGENT_CONFIG_PATH: `/${REPO_OWNER}/${REPO_NAME}/refs/heads/${REPO_BRANCH}/agentuino/extension/config/agentConfigs.json`
 };

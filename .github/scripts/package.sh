@@ -22,6 +22,8 @@ mkdir -p "$DIST/$NAME"
 rm -f "$ROOT"/installer/agentuino-*.vsix
 cp "$DIST/$NAME.vsix" "$ROOT/installer/"
 cp "$ROOT"/installer/* "$DIST/$NAME/"
+# version.json is only for the update check, not part of the release zip
+rm -f "$DIST/$NAME/version.json"
 (cd "$DIST" && zip -qr "$NAME.zip" "$NAME")
 rm -rf "$DIST/$NAME"
 
@@ -33,5 +35,8 @@ cp "$ROOT/README.md" "$ROOT/LICENSE" "$MARKET/"
 node -e "const f='$MARKET/package.json';const p=require(f);p.extensionPack=['NikolaiRadke.ardudebug'];require('fs').writeFileSync(f,JSON.stringify(p,null,2)+'\\n')"
 (cd "$MARKET" && npx --yes @vscode/vsce package --no-dependencies -o "$DIST/$NAME-marketplace.vsix")
 rm -rf "$MARKET"
+
+# The update check reads this file, so only a release announces a new version
+printf '{\n  "version": "%s"\n}\n' "$VERSION" > "$ROOT/installer/version.json"
 
 echo "Built $DIST/$NAME.vsix, $DIST/$NAME-marketplace.vsix and $DIST/$NAME.zip"
