@@ -14,7 +14,45 @@
     "openMemory": "🧠 Voir la mémoire du projet",
     "about": "ℹ️ À propos d'Agentuino",
     "chooseAgent": "🤖 Agent pour les nouveaux chats",
-    "uninstall": "🗑 Désinstaller Agentuino"
+    "uninstall": "🗑 Désinstaller Agentuino",
+    "preferences": "⚙️ Paramètres"
+  },
+  "prefs": {
+    "title": "Paramètres",
+    "on": "activé",
+    "off": "désactivé",
+    "language": "🌐 Langue",
+    "compileCheck": "🔧 Vérifier la compilation après chaque tâche",
+    "permissionMode": "🔐 Droits de l'agent",
+    "permissionSelect": "Que peut faire l'agent sans demander ?",
+    "permission": {
+      "bypassPermissions": {
+        "label": "Tout autoriser",
+        "description": "Modifier les fichiers et compiler (recommandé, nécessaire pour compiler)"
+      },
+      "acceptEdits": {
+        "label": "Modifier les fichiers seulement",
+        "description": "L'agent ne peut alors pas compiler lui-même"
+      },
+      "auto": {
+        "label": "L'agent décide",
+        "description": "Le contrôle de sécurité de l'agent décide"
+      }
+    },
+    "gitignoreAll": "🙈 Git : ignorer le dossier Agentuino",
+    "checkForUpdates": "🔄 Rechercher des mises à jour au démarrage",
+    "paths": "📁 Chemins des programmes …",
+    "pathsSelect": "Choisis le programme dont tu veux modifier le chemin",
+    "pathAuto": "automatique : {0}",
+    "pathNone": "automatique, introuvable",
+    "pathMissing": "défini manuellement, absent : {0}",
+    "pathBrowse": "📂 Choisir un fichier …",
+    "pathAutoDetect": "🔍 Détecter automatiquement",
+    "pathDialog": "Choisir le fichier programme de {0}",
+    "pathOpen": "Choisir",
+    "pathNoVersion": "{1} n'indique aucun numéro de version. Est-ce vraiment {0} ?",
+    "pathTooOld": "{0} {1} est trop ancien, Agentuino a besoin au moins de la version {2}.",
+    "pathUseAnyway": "Utiliser quand même"
   },
   "status": {
     "text": "Agentuino",
@@ -126,7 +164,7 @@
     "busy": "L'agent travaille encore. Attends ou appuie sur Arrêter.",
     "unknown": "Erreur inattendue : {0}",
     "notLoggedIn": "{0} n'est pas connecté. Ouvre un terminal et connecte-toi : {1}",
-    "agentNotFound": "{0} est introuvable. Installe-le ({1}) ou indique le chemin dans les paramètres sous « {2} ».",
+    "agentNotFound": "{0} est introuvable. Installe-le ({1}) ou indique son chemin dans le menu engrenage, sous « Paramètres → Chemins des programmes ».",
     "agentUnknown": "Agent inconnu : {0}",
     "noAgent": "Aucun agent trouvé. Installe Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI ou OpenCode et redémarre l'IDE.",
     "anAgent": "L'agent",

@@ -14,7 +14,45 @@
     "openMemory": "🧠 Mostra la memoria del progetto",
     "about": "ℹ️ Informazioni su Agentuino",
     "chooseAgent": "🤖 Agente per le nuove chat",
-    "uninstall": "🗑 Disinstalla Agentuino"
+    "uninstall": "🗑 Disinstalla Agentuino",
+    "preferences": "⚙️ Impostazioni"
+  },
+  "prefs": {
+    "title": "Impostazioni",
+    "on": "attivo",
+    "off": "disattivo",
+    "language": "🌐 Lingua",
+    "compileCheck": "🔧 Verifica della compilazione dopo ogni attività",
+    "permissionMode": "🔐 Permessi dell'agente",
+    "permissionSelect": "Cosa può fare l'agente senza chiedere?",
+    "permission": {
+      "bypassPermissions": {
+        "label": "Consenti tutto",
+        "description": "Modificare file e compilare (consigliato, necessario per compilare)"
+      },
+      "acceptEdits": {
+        "label": "Solo modificare file",
+        "description": "L'agente non potrà compilare da solo"
+      },
+      "auto": {
+        "label": "Decide l'agente",
+        "description": "Decide il controllo di sicurezza dell'agente"
+      }
+    },
+    "gitignoreAll": "🙈 Git: ignora la cartella di Agentuino",
+    "checkForUpdates": "🔄 Cerca aggiornamenti all'avvio",
+    "paths": "📁 Percorsi dei programmi …",
+    "pathsSelect": "Scegli il programma di cui vuoi cambiare il percorso",
+    "pathAuto": "automatico: {0}",
+    "pathNone": "automatico, non trovato",
+    "pathMissing": "impostato a mano, mancante: {0}",
+    "pathBrowse": "📂 Scegli file …",
+    "pathAutoDetect": "🔍 Rileva automaticamente",
+    "pathDialog": "Scegli il file del programma per {0}",
+    "pathOpen": "Scegli",
+    "pathNoVersion": "{1} non indica un numero di versione. È davvero {0}?",
+    "pathTooOld": "{0} {1} è troppo vecchio, Agentuino richiede almeno la versione {2}.",
+    "pathUseAnyway": "Usa comunque"
   },
   "status": {
     "text": "Agentuino",
@@ -126,7 +164,7 @@
     "busy": "L'agente sta ancora lavorando. Attendi o premi Ferma.",
     "unknown": "Errore imprevisto: {0}",
     "notLoggedIn": "{0} non ha effettuato l'accesso. Apri un terminale ed effettua l'accesso: {1}",
-    "agentNotFound": "{0} non trovato. Installalo ({1}) o imposta il percorso nelle impostazioni alla voce «{2}».",
+    "agentNotFound": "{0} non trovato. Installalo ({1}) o imposta il percorso nel menu a ingranaggio, alla voce «Impostazioni → Percorsi dei programmi».",
     "agentUnknown": "Agente sconosciuto: {0}",
     "noAgent": "Nessun agente trovato. Installa Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI o OpenCode e riavvia l'IDE.",
     "anAgent": "L'agente",

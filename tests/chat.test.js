@@ -282,3 +282,40 @@ test('an effort level the model does not offer is left out', async () => {
         ide.settings.agent = 'claudecode';
     }
 });
+
+test('settings submenu: toggles, Git folder and program paths with a check', async () => {
+    const sketch = await newSketch('Prefs');
+    await ide.send('A question');
+    const gitignore = projectManager.getProjectPaths(sketch).gitignore;
+    assert.equal(fs.readFileSync(gitignore, 'utf8'), '*\n');
+
+    // Answer the menus one after the other by label, undefined = Escape
+    const picks = ['⚙️', 'Git:', 'Compile check', 'Program paths', 'arduino-cli', 'Choose file', 'arduino-cli', 'Choose file'];
+    ide.answerQuickPick = items => {
+        const want = picks.shift();
+        return want === undefined ? undefined : items.find(item => item.label.includes(want));
+    };
+    // First a file without version (the user cancels the warning), then the real one
+    const files = [path.join(sketch, 'Prefs.ino'), env.fake('arduino-cli')];
+    ide.vscode.window.showOpenDialog = async () => [ide.vscode.Uri.file(files.shift())];
+    const warnings = [];
+    ide.answerWarning = message => { warnings.push(message); return undefined; };
+    ide.settings.arduinoCliPath = '';
+    try {
+        await ide.runCommand('agentuino.settings');
+        assert.equal(ide.settings.gitignoreAll, false);
+        assert.equal(fs.readFileSync(gitignore, 'utf8'), 'backups/\nattachments/\n');
+        assert.equal(ide.settings.compileCheck, false);
+        assert.equal(warnings.length, 1);
+        assert.match(warnings[0], /Prefs\.ino/);
+        assert.equal(ide.settings.arduinoCliPath, env.fake('arduino-cli'));
+        assert.deepEqual(picks, []);
+    } finally {
+        ide.answerQuickPick = items => items[0];
+        ide.answerWarning = (message, options, ...buttons) => buttons[0];
+        ide.vscode.window.showOpenDialog = async () => undefined;
+        ide.settings.gitignoreAll = true;
+        ide.settings.compileCheck = true;
+        ide.settings.arduinoCliPath = env.fake('arduino-cli');
+    }
+});

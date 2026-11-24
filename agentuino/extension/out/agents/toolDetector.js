@@ -306,6 +306,7 @@ async function checkAgentVersion(adapter, toolPath) {
 
 module.exports = {
     getToolVersion,
+    isVersionAtLeast,
     checkAgentVersion,
     findAgent,
     findArduinoCli,

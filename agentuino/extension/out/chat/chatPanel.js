@@ -570,7 +570,8 @@ class ChatPanel {
         const context = await this.deps.collectContext(sketchPath);
         const { created } = projectManager.ensureProject(sketchPath, {
             language: this.deps.getLocale(),
-            context
+            context,
+            gitignoreAll: this.deps.getSettings().gitignoreAll
         });
         if (created) {
             this.post({ command: 'entry', role: 'info', text: this.deps.getT()('chat.projectCreated') });
@@ -1181,7 +1182,7 @@ class ChatPanel {
             case 'AGENT_NOT_FOUND': {
                 const adapter = err.adapter;
                 return adapter
-                    ? t('errors.agentNotFound', adapter.name, adapter.installUrl, `agentuino.${adapter.pathSetting}`)
+                    ? t('errors.agentNotFound', adapter.name, adapter.installUrl)
                     : t('errors.agentUnknown', err.agentId || '?');
             }
             case 'NO_AGENT': return t('errors.noAgent');

@@ -14,7 +14,45 @@
     "openMemory": "🧠 Projektgedächtnis ansehen",
     "about": "ℹ️ Über Agentuino",
     "chooseAgent": "🤖 Agent für neue Chats",
-    "uninstall": "🗑 Agentuino deinstallieren"
+    "uninstall": "🗑 Agentuino deinstallieren",
+    "preferences": "⚙️ Einstellungen"
+  },
+  "prefs": {
+    "title": "Einstellungen",
+    "on": "an",
+    "off": "aus",
+    "language": "🌐 Sprache",
+    "compileCheck": "🔧 Kompilierprüfung nach jedem Auftrag",
+    "permissionMode": "🔐 Rechte des Agenten",
+    "permissionSelect": "Was darf der Agent ohne Rückfrage?",
+    "permission": {
+      "bypassPermissions": {
+        "label": "Alles erlauben",
+        "description": "Dateien ändern und kompilieren (empfohlen, zum Kompilieren nötig)"
+      },
+      "acceptEdits": {
+        "label": "Nur Dateien ändern",
+        "description": "Der Agent kann dann nicht selbst kompilieren"
+      },
+      "auto": {
+        "label": "Agent entscheidet",
+        "description": "Die Sicherheitsprüfung des Agenten entscheidet"
+      }
+    },
+    "gitignoreAll": "🙈 Git: Agentuino-Ordner ignorieren",
+    "checkForUpdates": "🔄 Beim Start nach Updates suchen",
+    "paths": "📁 Programmpfade …",
+    "pathsSelect": "Programm wählen, dessen Pfad du ändern willst",
+    "pathAuto": "automatisch: {0}",
+    "pathNone": "automatisch, nicht gefunden",
+    "pathMissing": "fest eingestellt, fehlt: {0}",
+    "pathBrowse": "📂 Datei auswählen …",
+    "pathAutoDetect": "🔍 Automatisch erkennen",
+    "pathDialog": "Programmdatei für {0} auswählen",
+    "pathOpen": "Auswählen",
+    "pathNoVersion": "{1} meldet keine Versionsnummer. Ist das wirklich {0}?",
+    "pathTooOld": "{0} {1} ist zu alt, Agentuino braucht mindestens Version {2}.",
+    "pathUseAnyway": "Trotzdem verwenden"
   },
   "status": {
     "text": "Agentuino",
@@ -126,7 +164,7 @@
     "busy": "Der Agent arbeitet noch. Warte oder drücke Stopp.",
     "unknown": "Unerwarteter Fehler: {0}",
     "notLoggedIn": "{0} ist nicht angemeldet. Öffne ein Terminal und melde dich an: {1}",
-    "agentNotFound": "{0} wurde nicht gefunden. Installiere ihn ({1}) oder trage den Pfad in den Einstellungen unter „{2}“ ein.",
+    "agentNotFound": "{0} wurde nicht gefunden. Installiere ihn ({1}) oder trage den Pfad im Zahnrad-Menü unter „Einstellungen → Programmpfade“ ein.",
     "agentUnknown": "Unbekannter Agent: {0}",
     "noAgent": "Kein Agent gefunden. Installiere Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI oder OpenCode und starte die IDE neu.",
     "anAgent": "Der Agent",

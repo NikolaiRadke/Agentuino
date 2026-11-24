@@ -74,7 +74,10 @@ const DEFAULT_CONFIG = {
     }
 };
 
-const GITIGNORE_CONTENT = [
+// Ignore the whole project folder, including this file
+const GITIGNORE_ALL = ['*', ''].join('\n');
+// Ignore only local data; chats and settings stay in the repo
+const GITIGNORE_LOCAL = [
     `${SUBDIRS.backups}/`,
     `${SUBDIRS.attachments}/`,
     ''
@@ -520,9 +523,27 @@ function refreshAutoSection(sketchPath) {
 // ===== PROJECT SETUP =====
 
 /**
+ * Write the .gitignore of the project folder unless the user has edited it
+ * @param {string} sketchPath - Absolute path of the sketch folder
+ * @param {boolean} ignoreAll - Keep the whole project folder out of Git
+ * @returns {boolean} True if the file was written
+ */
+function updateGitignore(sketchPath, ignoreAll) {
+    const file = getProjectPaths(sketchPath).gitignore;
+    const wanted = ignoreAll ? GITIGNORE_ALL : GITIGNORE_LOCAL;
+    if (fs.existsSync(file)) {
+        const current = fs.readFileSync(file, 'utf8');
+        // Only replace our own defaults, never a file the user changed
+        if (current === wanted || ![GITIGNORE_ALL, GITIGNORE_LOCAL].includes(current)) return false;
+    }
+    writeFileAtomic(file, wanted);
+    return true;
+}
+
+/**
  * Create the project structure if missing. Existing files are preserved.
  * @param {string} sketchPath - Absolute path of the sketch folder
- * @param {Object} options - {language, context}
+ * @param {Object} options - {language, context, gitignoreAll}
  * @returns {{created: boolean, paths: Object}} Whether a new project was created
  * @throws {Error} NOT_A_SKETCH, CONFIG_INVALID
  */
@@ -545,7 +566,7 @@ function ensureProject(sketchPath, options = {}) {
 
     const t = i18n.createTranslator(readConfig(sketchPath).language || i18n.FALLBACK_LOCALE);
     if (!fs.existsSync(paths.memory)) writeFileAtomic(paths.memory, t('project.memoryTemplate').join('\n'));
-    if (!fs.existsSync(paths.gitignore)) writeFileAtomic(paths.gitignore, GITIGNORE_CONTENT);
+    updateGitignore(sketchPath, options.gitignoreAll !== false);
 
     updateAutoSection(sketchPath, options.context || {});
 
@@ -561,6 +582,7 @@ module.exports = {
     findSketchFolder,
     isProject,
     ensureProject,
+    updateGitignore,
     readConfig,
     writeConfig,
     getLastChatId,

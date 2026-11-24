@@ -68,8 +68,21 @@ function getSettings() {
         models,
         permissionMode: config.get('permissionMode', 'bypassPermissions'),
         compileCheck: config.get('compileCheck', true),
+        gitignoreAll: config.get('gitignoreAll', true),
+        checkForUpdates: config.get('checkForUpdates', true),
         arduinoCliPath: config.get('arduinoCliPath', '')
     };
+}
+
+/**
+ * Store a setting for all windows
+ * @param {string} key - Setting without the 'agentuino.' prefix
+ * @param {*} value - New value ('' or undefined resets it)
+ * @returns {Thenable<void>} Done
+ */
+function updateSetting(key, value) {
+    // Global target is the reliable persistence mechanism in the Arduino IDE
+    return vscode.workspace.getConfiguration(CONFIG_SECTION).update(key, value, vscode.ConfigurationTarget.Global);
 }
 
 /**
@@ -164,7 +177,7 @@ async function ensureCurrentProject() {
 async function ensureProjectFor(sketchPath) {
     try {
         const context = await collectContext(sketchPath);
-        projectManager.ensureProject(sketchPath, { language: currentLocale, context });
+        projectManager.ensureProject(sketchPath, { language: currentLocale, context, gitignoreAll: getSettings().gitignoreAll });
     } catch (err) {
         const message = err.code === 'CONFIG_INVALID'
             ? t('errors.configInvalid', err.message)
@@ -500,7 +513,7 @@ async function showSettingsMenu() {
         { label: t('menu.rules'), action: showRules },
         { label: t('menu.addKnowledge'), action: addKnowledge },
         { label: t('menu.openMemory'), action: openMemory },
-        { label: t('menu.switchLanguage'), action: switchLanguage },
+        { label: t('menu.preferences'), action: showPreferencesMenu },
         { label: t('menu.about'), action: showAbout },
         { label: t('menu.uninstall'), action: uninstall }
     ];
@@ -525,10 +538,186 @@ async function switchLanguage() {
     }
     const selected = await vscode.window.showQuickPick(items, { placeHolder: t('language.select') });
     if (!selected) return;
+    await updateSetting('language', selected.value);
+}
 
-    // Global target is the reliable persistence mechanism in the Arduino IDE
-    await vscode.workspace.getConfiguration(CONFIG_SECTION)
-        .update('language', selected.value, vscode.ConfigurationTarget.Global);
+// ===== PREFERENCES =====
+
+// Permission modes in the order shown in the menu
+const PERMISSION_MODES = ['bypassPermissions', 'acceptEdits', 'auto'];
+
+/**
+ * Name of the language setting for the menu
+ * @param {string} value - 'auto' or a locale code
+ * @returns {string} e.g. "Deutsch"
+ */
+function describeLanguage(value) {
+    return value === i18n.AUTO ? t('language.auto') : i18n.createTranslator(value)('language.name');
+}
+
+/**
+ * Short name of a permission mode for the menu
+ * @param {string} mode - Setting value
+ * @returns {string} Label, or the raw value if unknown
+ */
+function describePermissionMode(mode) {
+    return PERMISSION_MODES.includes(mode) ? t(`prefs.permission.${mode}.label`) : mode;
+}
+
+/**
+ * Settings that people rarely change, in a submenu of the gear menu.
+ * Each entry shows its current value; the menu reopens after a change.
+ */
+async function showPreferencesMenu() {
+    for (;;) {
+        // The language may just have changed
+        loadLocale();
+        const settings = getSettings();
+        const onOff = value => t(value ? 'prefs.on' : 'prefs.off');
+        const items = [
+            { label: t('prefs.language'), description: describeLanguage(settings.language), action: switchLanguage },
+            {
+                label: t('prefs.compileCheck'),
+                description: onOff(settings.compileCheck),
+                action: () => updateSetting('compileCheck', !settings.compileCheck)
+            },
+            { label: t('prefs.permissionMode'), description: describePermissionMode(settings.permissionMode), action: choosePermissionMode },
+            { label: t('prefs.gitignoreAll'), description: onOff(settings.gitignoreAll), action: toggleGitignore },
+            {
+                label: t('prefs.checkForUpdates'),
+                description: onOff(settings.checkForUpdates),
+                action: () => updateSetting('checkForUpdates', !settings.checkForUpdates)
+            },
+            { label: t('prefs.paths'), action: showPathsMenu }
+        ];
+        const selected = await vscode.window.showQuickPick(items, { placeHolder: t('prefs.title') });
+        if (!selected) return;
+        await selected.action();
+    }
+}
+
+/**
+ * Choose what the agent may do without asking
+ */
+async function choosePermissionMode() {
+    const current = getSettings().permissionMode;
+    const items = PERMISSION_MODES.map(mode => ({
+        label: (mode === current ? '✓ ' : '    ') + describePermissionMode(mode),
+        description: t(`prefs.permission.${mode}.description`),
+        value: mode
+    }));
+    const selected = await vscode.window.showQuickPick(items, { placeHolder: t('prefs.permissionSelect') });
+    if (selected && selected.value !== current) await updateSetting('permissionMode', selected.value);
+}
+
+/**
+ * Toggle whether the whole project folder is kept out of Git
+ */
+async function toggleGitignore() {
+    const ignoreAll = !getSettings().gitignoreAll;
+    await updateSetting('gitignoreAll', ignoreAll);
+    // Rewrite the .gitignore of the open sketch right away, the others follow on their next use
+    const sketchPath = findSketch();
+    if (sketchPath && projectManager.isProject(sketchPath)) {
+        try {
+            projectManager.updateGitignore(sketchPath, ignoreAll);
+        } catch (err) {
+            vscode.window.showErrorMessage(t('errors.unknown', err.message));
+        }
+    }
+}
+
+/**
+ * All programs Agentuino calls, with how to find and check them
+ * @returns {Object[]} {name, setting, configured, find(configured), versionArgs, minVersion}
+ */
+function getPrograms() {
+    const settings = getSettings();
+    return [
+        ...registry.getAll().map(adapter => ({
+            name: adapter.name,
+            setting: adapter.pathSetting,
+            configured: settings.paths[adapter.id],
+            find: configured => toolDetector.findAgent(adapter, configured),
+            versionArgs: adapter.versionArgs,
+            minVersion: adapter.minVersion
+        })),
+        {
+            name: 'arduino-cli',
+            setting: 'arduinoCliPath',
+            configured: settings.arduinoCliPath,
+            find: configured => toolDetector.findArduinoCli(configured, vscode.env.appRoot),
+            versionArgs: ['version'],
+            minVersion: null
+        }
+    ];
+}
+
+/**
+ * Describe where a program was found
+ * @param {string} configured - Path from the settings ('' = automatic)
+ * @param {string|null} found - Path actually used
+ * @returns {string} Menu description
+ */
+function describeProgramPath(configured, found) {
+    if (configured) return found ? found : t('prefs.pathMissing', configured);
+    return found ? t('prefs.pathAuto', found) : t('prefs.pathNone');
+}
+
+/**
+ * Program paths: agents and arduino-cli, each with the path actually found
+ */
+async function showPathsMenu() {
+    for (;;) {
+        const items = await Promise.all(getPrograms().map(async program => ({
+            label: program.name,
+            description: describeProgramPath(program.configured, await program.find(program.configured)),
+            program
+        })));
+        const selected = await vscode.window.showQuickPick(items, { placeHolder: t('prefs.pathsSelect') });
+        if (!selected) return;
+        await chooseProgramPath(selected.program);
+    }
+}
+
+/**
+ * Pick a program file or go back to automatic detection
+ * @param {Object} program - Entry from getPrograms()
+ */
+async function chooseProgramPath(program) {
+    const browse = { label: t('prefs.pathBrowse') };
+    const auto = { label: t('prefs.pathAutoDetect') };
+    const choice = await vscode.window.showQuickPick([browse, auto], { placeHolder: program.name });
+    if (!choice) return;
+    if (choice === auto) {
+        await updateSetting(program.setting, '');
+        return;
+    }
+
+    const uris = await vscode.window.showOpenDialog({
+        canSelectFiles: true,
+        canSelectFolders: false,
+        canSelectMany: false,
+        title: t('prefs.pathDialog', program.name),
+        openLabel: t('prefs.pathOpen')
+    });
+    const file = uris?.[0]?.fsPath;
+    if (!file) return;
+
+    // Check right away, so a wrong file shows up now and not in the next chat
+    const version = await toolDetector.getToolVersion(file, program.versionArgs);
+    let problem = null;
+    if (!version) {
+        problem = t('prefs.pathNoVersion', program.name, path.basename(file));
+    } else if (program.minVersion && !toolDetector.isVersionAtLeast(version, program.minVersion)) {
+        problem = t('prefs.pathTooOld', program.name, version, program.minVersion);
+    }
+    if (problem) {
+        const useAnyway = t('prefs.pathUseAnyway');
+        const answer = await vscode.window.showWarningMessage(problem, { modal: true }, useAnyway);
+        if (answer !== useAnyway) return;
+    }
+    await updateSetting(program.setting, file);
 }
 
 /**

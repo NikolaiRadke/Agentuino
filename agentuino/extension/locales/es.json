@@ -14,7 +14,45 @@
     "openMemory": "🧠 Ver la memoria del proyecto",
     "about": "ℹ️ Acerca de Agentuino",
     "chooseAgent": "🤖 Agente para chats nuevos",
-    "uninstall": "🗑 Desinstalar Agentuino"
+    "uninstall": "🗑 Desinstalar Agentuino",
+    "preferences": "⚙️ Ajustes"
+  },
+  "prefs": {
+    "title": "Ajustes",
+    "on": "activado",
+    "off": "desactivado",
+    "language": "🌐 Idioma",
+    "compileCheck": "🔧 Comprobar la compilación tras cada tarea",
+    "permissionMode": "🔐 Permisos del agente",
+    "permissionSelect": "¿Qué puede hacer el agente sin preguntar?",
+    "permission": {
+      "bypassPermissions": {
+        "label": "Permitir todo",
+        "description": "Modificar archivos y compilar (recomendado, necesario para compilar)"
+      },
+      "acceptEdits": {
+        "label": "Solo modificar archivos",
+        "description": "El agente no podrá compilar por sí mismo"
+      },
+      "auto": {
+        "label": "Decide el agente",
+        "description": "Decide la comprobación de seguridad del propio agente"
+      }
+    },
+    "gitignoreAll": "🙈 Git: ignorar la carpeta de Agentuino",
+    "checkForUpdates": "🔄 Buscar actualizaciones al iniciar",
+    "paths": "📁 Rutas de programas …",
+    "pathsSelect": "Elige el programa cuya ruta quieres cambiar",
+    "pathAuto": "automático: {0}",
+    "pathNone": "automático, no encontrado",
+    "pathMissing": "fijado a mano, no existe: {0}",
+    "pathBrowse": "📂 Elegir archivo …",
+    "pathAutoDetect": "🔍 Detectar automáticamente",
+    "pathDialog": "Elegir el archivo de programa de {0}",
+    "pathOpen": "Elegir",
+    "pathNoVersion": "{1} no indica ningún número de versión. ¿Seguro que es {0}?",
+    "pathTooOld": "{0} {1} es demasiado antiguo, Agentuino necesita como mínimo la versión {2}.",
+    "pathUseAnyway": "Usar de todos modos"
   },
   "status": {
     "text": "Agentuino",
@@ -126,7 +164,7 @@
     "busy": "El agente sigue trabajando. Espera o pulsa Detener.",
     "unknown": "Error inesperado: {0}",
     "notLoggedIn": "{0} no ha iniciado sesión. Abre un terminal e inicia sesión: {1}",
-    "agentNotFound": "No se encontró {0}. Instálalo ({1}) o indica la ruta en los ajustes, en «{2}».",
+    "agentNotFound": "No se encontró {0}. Instálalo ({1}) o indica su ruta en el menú del engranaje, en «Ajustes → Rutas de programas».",
     "agentUnknown": "Agente desconocido: {0}",
     "noAgent": "No se encontró ningún agente. Instala Claude Code, Codex CLI, Mistral Vibe, Antigravity CLI u OpenCode y reinicia el IDE.",
     "anAgent": "El agente",

@@ -54,6 +54,18 @@ test('anchors: defaults, own anchors, per sketch', () => {
     assert.deepEqual(ruleBlocks.getActiveKeys(config), ['nonBlocking']);
 });
 
+test('.gitignore: whole folder by default, local data only on request, own edits stay', () => {
+    const sketch = env.makeSketch('GitIgnore');
+    const file = projectManager.getProjectPaths(sketch).gitignore;
+    projectManager.ensureProject(sketch, { language: 'en', context: UNO });
+    assert.equal(fs.readFileSync(file, 'utf8'), '*\n');
+    projectManager.ensureProject(sketch, { language: 'en', context: UNO, gitignoreAll: false });
+    assert.equal(fs.readFileSync(file, 'utf8'), 'backups/\nattachments/\n');
+    fs.writeFileSync(file, 'chats/\n');
+    assert.equal(projectManager.updateGitignore(sketch, true), false);
+    assert.equal(fs.readFileSync(file, 'utf8'), 'chats/\n');
+});
+
 // ===== COMPILE EVALUATION =====
 
 test('compile result: sizes truncated like the IDE, RAM warning above 75 %', () => {

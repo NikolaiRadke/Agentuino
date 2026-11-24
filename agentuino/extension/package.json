@@ -2,7 +2,7 @@
   "name": "agentuino",
   "displayName": "Agentuino",
   "description": "Agentic coding for Arduino beginners: chat with Claude Code, Codex CLI or Mistral Vibe directly in the Arduino IDE.",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "license": "Apache-2.0",
   "publisher": "NikolaiRadke",
   "icon": "icons/agentuino.png",
@@ -157,6 +157,11 @@
             "auto"
           ],
           "description": "What the agent may do without asking. 'bypassPermissions' lets it edit files and compile freely (recommended, compiling needs it). 'acceptEdits' only allows file edits, 'auto' lets the agent's own safety check decide."
+        },
+        "agentuino.gitignoreAll": {
+          "type": "boolean",
+          "default": true,
+          "description": "Keep the whole agentuino folder of a sketch out of Git (chats, memory, instructions). When off, only backups and attachments are ignored. A .gitignore you edited yourself is never changed."
         },
         "agentuino.claudePath": {
           "type": "string",

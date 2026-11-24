@@ -1,6 +1,6 @@
 {
   "name": "Agentuino",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "directories": [
     "~/.agentuino",
     "{tmp}/agentuino-debug"
@@ -15,6 +15,7 @@
     "agentuino.agent",
     "agentuino.compileCheck",
     "agentuino.permissionMode",
+    "agentuino.gitignoreAll",
     "agentuino.claudePath",
     "agentuino.claudeModel",
     "agentuino.codexPath",
