@@ -271,10 +271,10 @@ code {
 }
 
 .scroll-down {
-    align-self: center;
-    /* Overlaps the end of the chat instead of taking a line of its own */
-    margin-top: -32px;
-    position: relative;
+    /* Floats over the end of the chat, top is set by the script */
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 1;
     border-radius: 12px;
     padding: 2px 12px;

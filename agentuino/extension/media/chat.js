@@ -23,6 +23,8 @@
     const MAX_SUGGESTIONS = 100;
     // Closer to the end than this counts as "at the end", so new entries scroll along
     const SCROLL_SLACK_PX = 40;
+    // Distance of the jump button from the bottom edge of the chat
+    const SCROLL_BUTTON_OFFSET_PX = 36;
     const SECOND_MS = 1000;
     const SECONDS_PER_MINUTE = 60;
 
@@ -55,8 +57,6 @@
     let texts = {};
     let locale = 'en';
     let busy = false;
-    // Follow new entries only while the user is at the end of the chat
-    let followEnd = true;
     let busyTimer = null;
     let chats = [];
     let currentChatId = null;
@@ -281,20 +281,22 @@
      * @param {string} [loginAgent] - Agent to log in to, adds a button (live only)
      */
     function addEntry(role, text, time, data, toolId, loginAgent) {
+        // Measured before the entry exists, so only the real position counts
+        const atEnd = isAtEnd();
         const entry = document.createElement('div');
         entry.className = `entry ${role}`;
 
         if (role === 'compile' && data) {
             renderCompile(entry, data, time);
             elements.messages.appendChild(entry);
-            keepScroll();
+            keepScroll(atEnd);
             return;
         }
 
         if (role === 'changes' && data) {
             renderChanges(entry, data);
             elements.messages.appendChild(entry);
-            keepScroll();
+            keepScroll(atEnd);
             return;
         }
 
@@ -333,7 +335,7 @@
         } else {
             elements.messages.appendChild(entry);
         }
-        keepScroll();
+        keepScroll(atEnd);
     }
 
     /**
@@ -367,31 +369,47 @@
     }
 
     /**
-     * After new content: stay at the end if the user was there, otherwise offer the jump button
+     * Check whether the end of the chat is in sight
+     * @returns {boolean} True at the end
      */
-    function keepScroll() {
-        if (followEnd) {
+    function isAtEnd() {
+        const m = elements.messages;
+        return m.scrollHeight - m.scrollTop - m.clientHeight < SCROLL_SLACK_PX;
+    }
+
+    /**
+     * Show or hide the jump button; it floats over the chat and never moves the layout
+     * @param {boolean} show - Show it
+     */
+    function showScrollButton(show) {
+        if (show) {
+            elements.scrollDown.style.top = `${elements.messages.getBoundingClientRect().bottom - SCROLL_BUTTON_OFFSET_PX}px`;
+        }
+        elements.scrollDown.hidden = !show;
+    }
+
+    /**
+     * After new content: stay at the end if the user was there, otherwise offer the jump button
+     * @param {boolean} wasAtEnd - Position before the content was added
+     */
+    function keepScroll(wasAtEnd) {
+        if (wasAtEnd) {
             elements.messages.scrollTop = elements.messages.scrollHeight;
         } else {
-            elements.scrollDown.hidden = false;
+            showScrollButton(true);
         }
     }
 
     /**
-     * Jump to the end and follow new entries again
+     * Jump to the end
      */
     function scrollToEnd() {
-        followEnd = true;
-        elements.scrollDown.hidden = true;
         elements.messages.scrollTop = elements.messages.scrollHeight;
+        showScrollButton(false);
     }
 
-    elements.messages.addEventListener('scroll', () => {
-        const m = elements.messages;
-        followEnd = m.scrollHeight - m.scrollTop - m.clientHeight < SCROLL_SLACK_PX;
-        // Like other chats: the button is there whenever the end is out of sight
-        elements.scrollDown.hidden = followEnd;
-    });
+    // Like other chats: the button is there whenever the end is out of sight
+    elements.messages.addEventListener('scroll', () => showScrollButton(!isAtEnd()));
     elements.scrollDown.addEventListener('click', scrollToEnd);
 
     /**
@@ -625,8 +643,9 @@
         buttons.appendChild(recheck);
         card.append(after, buttons);
 
+        const atEnd = isAtEnd();
         elements.messages.appendChild(card);
-        keepScroll();
+        keepScroll(atEnd);
     }
 
     /**
@@ -1103,8 +1122,7 @@
                 lastAgentName = msg.agent;
                 showSubline(msg.agent);
                 elements.messages.innerHTML = '';
-                followEnd = true;
-                elements.scrollDown.hidden = true;
+                showScrollButton(false);
                 if (msg.messages.length === 0) showWelcome();
                 msg.messages.forEach(m => addEntry(m.role, m.text, m.time, m.data));
                 renderAttachments(msg.attachments || []);
