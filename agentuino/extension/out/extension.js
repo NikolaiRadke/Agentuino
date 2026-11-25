@@ -22,6 +22,7 @@ const toolDetector = require('./agents/toolDetector');
 const registry = require('./agents/registry');
 const links = require('./utils/links');
 const updateChecker = require('./utils/updateChecker');
+const libraryUsage = require('./utils/libraryUsage');
 const uninstaller = require('./utils/uninstaller');
 const { BoardDetector } = require('./utils/boardDetector');
 const { ChatPanel } = require('./chat/chatPanel');
@@ -152,7 +153,12 @@ async function collectContext(sketchPath) {
         ardudebug = await toolDetector.hasArdudebug(cliPath, configFile, true);
     }
 
-    const context = { cliPath, configFile, port, ardudebug };
+    // Installed libraries the sketch includes, AGENTS.md points to their docs
+    const libraries = cliPath
+        ? libraryUsage.findUsedLibraries(sketchPath, await toolDetector.listLibraries(cliPath, configFile))
+        : [];
+
+    const context = { cliPath, configFile, port, ardudebug, libraries };
     if (board.fqbn) Object.assign(context, { fqbn: board.fqbn, boardName: board.boardName });
     return context;
 }

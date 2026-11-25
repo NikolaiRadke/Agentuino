@@ -228,7 +228,7 @@
       "chatsIntro": "Les conversations précédentes sur ce projet sont enregistrées sous forme de protocoles dans `{0}`. Si l'utilisateur fait référence à une conversation antérieure ou s'il te manque du contexte, cherches-y des mots-clés de façon ciblée avec Grep et ne lis que les passages pertinents. Ne lis jamais tous les protocoles en entier.",
       "chatsRecent": "Chats récents :",
       "ruleLibraries": "- N'installe des bibliothèques ou des paquets de cartes (lib install, core install) qu'après avoir demandé à l'utilisateur. Ils valent pour tous les sketches.",
-      "libList": "Les bibliothèques installées sont listées par `{0}`.",
+      "libList": "Les bibliothèques installées et leurs dossiers sont listés par `{0}`. Si tu ne connais pas bien une bibliothèque, lis ses en-têtes, son README et ses exemples (examples/) avant de l'utiliser. N'invente pas de fonctions.",
       "serialTitle": "## Lire la sortie série",
       "serialIntro": "Voici comment lire la sortie série de la carte pendant quelques secondes (débit comme dans `Serial.begin()`, 60 secondes au maximum). Le port est choisi automatiquement ; avec plusieurs cartes, indique-le avec `--port` :",
       "serialRules": [
@@ -252,7 +252,10 @@
         "- Si le sketch a besoin d'une saisie avant d'atteindre l'endroit que tu veux examiner, transmets-la avec `agentuino-debug --send \"texte\"` (ajoute `--no-newline` pour des caractères isolés). Ne lance pas `agentuino-serial` en parallèle pour cela.",
         "- Quand le débogage a rempli son rôle : corrige l'erreur dans le sketch et retire tout ce que tu as ajouté uniquement pour le débogage. La version de débogage peut rester sur la carte. Ne téléverse la version normale avec `agentuino-debug --restore` que si l'utilisateur le demande.",
         "- N'appelle jamais `ardudebug-bridge` ni `avr-gdb` directement, uniquement via `agentuino-debug`."
-      ]
+      ],
+      "librariesTitle": "## Bibliothèques utilisées",
+      "librariesIntro": "Le sketch inclut ces bibliothèques installées. Les en-têtes, le README et examples/ de chaque dossier montrent comment les utiliser correctement :",
+      "library": "- {0} {1}: `{2}`"
     }
   },
   "about": {

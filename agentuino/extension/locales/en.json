@@ -228,7 +228,7 @@
       "chatsIntro": "Earlier conversations about this project are stored as protocols in `{0}`. If the user refers to an earlier conversation or you lack background, search them specifically with Grep for keywords and read only the matching parts. Never read all protocols completely.",
       "chatsRecent": "Recent chats:",
       "ruleLibraries": "- Install libraries or board packages (lib install, core install) only after asking the user. They apply to all sketches.",
-      "libList": "Installed libraries are listed by `{0}`.",
+      "libList": "Installed libraries and their folders are listed by `{0}`. If you do not know a library well, read its headers, README and examples (examples/) before using it. Do not guess functions.",
       "serialTitle": "## Reading the serial output",
       "serialIntro": "This reads the serial output of the board for a few seconds (baud rate as in `Serial.begin()`, at most 60 seconds). The port is chosen automatically; with several boards, pass it with `--port`:",
       "serialRules": [
@@ -252,7 +252,10 @@
         "- If the sketch needs input before it reaches the place you want to inspect, pass it with `agentuino-debug --send \"text\"` (add `--no-newline` for single characters). Do not run `agentuino-serial` in parallel for this.",
         "- When debugging has done its job: fix the bug in the sketch and remove everything you added only for debugging. The debug build may stay on the board. Upload the normal build with `agentuino-debug --restore` only if the user asks for it.",
         "- Never call `ardudebug-bridge` or `avr-gdb` directly, only through `agentuino-debug`."
-      ]
+      ],
+      "librariesTitle": "## Libraries used",
+      "librariesIntro": "The sketch includes these installed libraries. The headers, README and examples/ in each folder show how to use them correctly:",
+      "library": "- {0} {1}: `{2}`"
     }
   },
   "about": {

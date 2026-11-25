@@ -228,7 +228,7 @@
       "chatsIntro": "Frühere Gespräche zu diesem Projekt liegen als Protokolle in `{0}`. Bezieht sich der Nutzer auf ein früheres Gespräch oder fehlt dir Vorwissen, durchsuche sie gezielt mit Grep nach Stichworten und lies nur die passenden Stellen. Lies nie alle Protokolle vollständig.",
       "chatsRecent": "Letzte Chats:",
       "ruleLibraries": "- Installiere Bibliotheken oder Board-Pakete (lib install, core install) nur nach Rückfrage beim Nutzer. Sie gelten für alle Sketches.",
-      "libList": "Installierte Bibliotheken zeigt `{0}`.",
+      "libList": "Installierte Bibliotheken samt Ordner zeigt `{0}`. Kennst du eine Bibliothek nicht genau, lies ihre Header, README und Beispiele (examples/), bevor du sie verwendest. Rate keine Funktionen.",
       "serialTitle": "## Serielle Ausgabe lesen",
       "serialIntro": "So liest du die serielle Ausgabe des Boards für einige Sekunden (Baudrate wie in `Serial.begin()`, höchstens 60 Sekunden). Der Port wird automatisch gewählt, bei mehreren Boards gibst du ihn mit `--port` an:",
       "serialRules": [
@@ -252,7 +252,10 @@
         "- Braucht der Sketch eine Eingabe, bevor er die Stelle erreicht, die du untersuchen willst, gib sie mit `agentuino-debug --send \"Text\"` mit (bei einzelnen Zeichen zusätzlich `--no-newline`). Starte dafür nicht parallel `agentuino-serial`.",
         "- Hat das Debuggen seinen Zweck erfüllt: Behebe den Fehler im Sketch und entferne alles, was du nur zum Debuggen eingebaut hast. Der Debug-Build darf auf dem Board bleiben. Lade den normalen Build mit `agentuino-debug --restore` nur hoch, wenn der Nutzer das möchte.",
         "- Rufe `ardudebug-bridge` und `avr-gdb` nie direkt auf, nur über `agentuino-debug`."
-      ]
+      ],
+      "librariesTitle": "## Verwendete Bibliotheken",
+      "librariesIntro": "Der Sketch bindet diese installierten Bibliotheken ein. Header, README und examples/ im jeweiligen Ordner zeigen, wie sie richtig benutzt werden:",
+      "library": "- {0} {1}: `{2}`"
     }
   },
   "about": {

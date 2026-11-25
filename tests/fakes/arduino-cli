@@ -111,6 +111,17 @@ switch (`${args[0]} ${args[1] || ''}`.trim()) {
             { port: { address: '/dev/ttyACM0', protocol: 'serial', properties: { vid: '0x2341', pid: '0x0043' } } }
         ] }));
         break;
+    case 'lib list':
+        // Installed libraries plus one of the board package, which Agentuino leaves out
+        console.log(JSON.stringify({ installed_libraries: [
+            ...readState().libraries.map(name => ({ library: {
+                name, version: '1.0.0', location: 'user',
+                install_dir: path.join(path.dirname(stateFile), 'libraries', name),
+                provides_includes: [`${name}.h`]
+            } })),
+            { library: { name: 'Wire', version: '1.0', location: 'platform', install_dir: '/core/Wire', provides_includes: ['Wire.h'] } }
+        ] }));
+        break;
     case 'core list':
         console.log(JSON.stringify({ platforms: [{ id: 'arduino:avr' }] }));
         break;

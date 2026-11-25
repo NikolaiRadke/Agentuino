@@ -228,7 +228,7 @@
       "chatsIntro": "Las conversaciones anteriores sobre este proyecto están guardadas como protocolos en `{0}`. Si el usuario se refiere a una conversación anterior o te falta contexto, busca en ellas palabras clave de forma específica con Grep y lee solo las partes que encajen. Nunca leas todos los protocolos completos.",
       "chatsRecent": "Chats recientes:",
       "ruleLibraries": "- Instala bibliotecas o paquetes de placas (lib install, core install) solo después de preguntar al usuario. Valen para todos los sketches.",
-      "libList": "Las bibliotecas instaladas se muestran con `{0}`.",
+      "libList": "Las bibliotecas instaladas y sus carpetas se muestran con `{0}`. Si no conoces bien una biblioteca, lee sus cabeceras, el README y los ejemplos (examples/) antes de usarla. No inventes funciones.",
       "serialTitle": "## Leer la salida serie",
       "serialIntro": "Así lees la salida serie de la placa durante unos segundos (velocidad como en `Serial.begin()`, 60 segundos como máximo). El puerto se elige automáticamente; con varias placas, indícalo con `--port`:",
       "serialRules": [
@@ -252,7 +252,10 @@
         "- Si el sketch necesita una entrada antes de llegar al punto que quieres examinar, pásala con `agentuino-debug --send \"texto\"` (añade `--no-newline` para caracteres sueltos). No ejecutes `agentuino-serial` en paralelo para ello.",
         "- Cuando la depuración haya cumplido su función: corrige el error en el sketch y quita todo lo que añadiste solo para depurar. La versión de depuración puede quedarse en la placa. Sube la versión normal con `agentuino-debug --restore` solo si el usuario lo pide.",
         "- No llames nunca directamente a `ardudebug-bridge` ni a `avr-gdb`, solo a través de `agentuino-debug`."
-      ]
+      ],
+      "librariesTitle": "## Bibliotecas usadas",
+      "librariesIntro": "El sketch incluye estas bibliotecas instaladas. Las cabeceras, el README y examples/ de cada carpeta muestran cómo usarlas correctamente:",
+      "library": "- {0} {1}: `{2}`"
     }
   },
   "about": {

@@ -280,6 +280,7 @@ module.exports = {
     planRestore,
     listChanges,
     getSnapshotFile,
+    collectCodeFiles,
     getCodeFingerprint,
     restoreSnapshot,
     deleteSnapshot

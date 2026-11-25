@@ -228,7 +228,7 @@
       "chatsIntro": "Le conversazioni precedenti su questo progetto sono salvate come protocolli in `{0}`. Se l'utente fa riferimento a una conversazione precedente o ti manca il contesto, cerca in modo mirato parole chiave con Grep e leggi solo le parti pertinenti. Non leggere mai tutti i protocolli per intero.",
       "chatsRecent": "Chat recenti:",
       "ruleLibraries": "- Installa librerie o pacchetti di schede (lib install, core install) solo dopo averlo chiesto all'utente. Valgono per tutti gli sketch.",
-      "libList": "Le librerie installate sono elencate da `{0}`.",
+      "libList": "Le librerie installate e le loro cartelle sono elencate da `{0}`. Se non conosci bene una libreria, leggi header, README ed esempi (examples/) prima di usarla. Non inventare funzioni.",
       "serialTitle": "## Leggere l'output seriale",
       "serialIntro": "Così leggi l'output seriale della scheda per alcuni secondi (velocità come in `Serial.begin()`, al massimo 60 secondi). La porta viene scelta automaticamente; con più schede, indicala con `--port`:",
       "serialRules": [
@@ -252,7 +252,10 @@
         "- Se lo sketch ha bisogno di un input prima di raggiungere il punto che vuoi esaminare, passalo con `agentuino-debug --send \"testo\"` (aggiungi `--no-newline` per singoli caratteri). Non avviare `agentuino-serial` in parallelo per questo.",
         "- Quando il debug ha raggiunto il suo scopo: correggi l'errore nello sketch e rimuovi tutto ciò che hai aggiunto solo per il debug. La versione di debug può restare sulla scheda. Carica la versione normale con `agentuino-debug --restore` solo se l'utente lo chiede.",
         "- Non chiamare mai direttamente `ardudebug-bridge` o `avr-gdb`, solo tramite `agentuino-debug`."
-      ]
+      ],
+      "librariesTitle": "## Librerie usate",
+      "librariesIntro": "Lo sketch include queste librerie installate. Header, README ed examples/ in ogni cartella mostrano come usarle correttamente:",
+      "library": "- {0} {1}: `{2}`"
     }
   },
   "about": {

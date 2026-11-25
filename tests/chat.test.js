@@ -90,7 +90,7 @@ test('a failed check is not repeated for a question, only after the code changed
 });
 
 test('a missing library stops the loop and is checked again after installing', async () => {
-    await newSketch('Library');
+    const sketch = await newSketch('Library');
     const before = callCount();
     const first = compiles(await ide.send('WRITE_LIB'));
     assert.equal(callCount() - before, 1);
@@ -103,6 +103,13 @@ test('a missing library stops the loop and is checked again after installing', a
     const second = await ide.send('INSTALL_LIB');
     assert.ok(second.some(e => e.role === 'activity' && e.text.includes('arduino-cli lib install TM1637Display')));
     assert.deepEqual(compiles(second).map(c => c.ok), [true]);
+
+    // The next task points the agent to the installed library it uses
+    await ide.send('A question');
+    const agents = fs.readFileSync(projectManager.getProjectPaths(sketch).agents, 'utf8');
+    assert.match(agents, /## Libraries used/);
+    assert.match(agents, /- TM1637Display 1\.0\.0: `.*TM1637Display`/);
+    assert.match(agents, /lib list --format json/);
 });
 
 test('high RAM use shows a card with warning instead of the short line', async () => {

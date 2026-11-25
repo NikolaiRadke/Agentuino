@@ -83,6 +83,20 @@ test('listChanges tells changed, new and deleted code files apart', () => {
     assert.equal(backupManager.getSnapshotFile(sketch, 'src/new.h'), null);
 });
 
+test('used libraries: only installed ones the sketch includes, in root and src/', () => {
+    const libraryUsage = env.ext('out/utils/libraryUsage.js');
+    const sketch = env.makeSketch('Libs');
+    fs.writeFileSync(path.join(sketch, 'Libs.ino'), '#include <TinyRTOS.h>\n#include "local.h"\nvoid setup() {}\nvoid loop() {}\n');
+    fs.mkdirSync(path.join(sketch, 'src'));
+    fs.writeFileSync(path.join(sketch, 'src', 'led.cpp'), '  #  include <Adafruit_NeoPixel.h>\n');
+    const installed = [
+        { name: 'TinyRTOS', version: '1.0', dir: '/l/TinyRTOS', includes: ['TinyRTOS.h'] },
+        { name: 'Adafruit NeoPixel', version: '1.12', dir: '/l/NeoPixel', includes: ['Adafruit_NeoPixel.h'] },
+        { name: 'Servo', version: '1.2', dir: '/l/Servo', includes: ['Servo.h'] }
+    ];
+    assert.deepEqual(libraryUsage.findUsedLibraries(sketch, installed).map(lib => lib.name), ['Adafruit NeoPixel', 'TinyRTOS']);
+});
+
 // ===== COMPILE EVALUATION =====
 
 test('compile result: sizes truncated like the IDE, RAM warning above 75 %', () => {

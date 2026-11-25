@@ -25,6 +25,8 @@ const PORT_LIST_TIMEOUT_MS = 8000;
 const PORT_CACHE_MS = 30000;
 // Installed board packages change rarely
 const CORE_CACHE_MS = 5 * 60 * 1000;
+// Many installed libraries make a long JSON list
+const LIB_LIST_MAX_BUFFER = 16 * 1024 * 1024;
 const ARDUDEBUG_CORE = 'ardudebug:avr';
 
 // ===== HELPERS =====
@@ -243,6 +245,44 @@ function hasArdudebug(cliPath, configFile, force = false) {
     });
 }
 
+/**
+ * List the installed libraries ('arduino-cli lib list'), without those bundled with a board package
+ * @param {string} cliPath - arduino-cli executable
+ * @param {string|null} configFile - arduino-cli config file
+ * @returns {Promise<Array<{name: string, version: string, dir: string, includes: string[]}>>} Libraries, [] on error
+ */
+function listLibraries(cliPath, configFile) {
+    const args = ['lib', 'list', '--format', 'json'];
+    if (configFile) args.push('--config-file', configFile);
+
+    return new Promise(resolve => {
+        execFile(cliPath, args, { timeout: PORT_LIST_TIMEOUT_MS, windowsHide: true, maxBuffer: LIB_LIST_MAX_BUFFER },
+            (error, stdout) => {
+                if (error || !stdout) {
+                    resolve([]);
+                    return;
+                }
+                try {
+                    const data = JSON.parse(stdout);
+                    // arduino-cli 1.x: {installed_libraries: [...]}, older versions: [...]
+                    const entries = Array.isArray(data) ? data : (data.installed_libraries || []);
+                    resolve(entries
+                        .map(entry => entry.library || entry)
+                        // Wire, SPI & co. come with the board package, the agent knows them
+                        .filter(lib => lib?.name && lib.install_dir && lib.location !== 'platform')
+                        .map(lib => ({
+                            name: lib.name,
+                            version: lib.version || '',
+                            dir: lib.install_dir,
+                            includes: Array.isArray(lib.provides_includes) ? lib.provides_includes : []
+                        })));
+                } catch {
+                    resolve([]);
+                }
+            });
+    });
+}
+
 // ===== VERSIONS =====
 
 /**
@@ -312,5 +352,6 @@ module.exports = {
     findArduinoCli,
     findArduinoCliConfig,
     detectSerialPort,
-    hasArdudebug
+    hasArdudebug,
+    listLibraries
 };

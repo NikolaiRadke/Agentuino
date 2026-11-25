@@ -415,7 +415,12 @@ function buildAutoSection(sketchPath, config) {
         if (!port) {
             lines.push('', t('project.auto.portHint', `${cli} board list`));
         }
-        lines.push('', t('project.auto.libList', `${cli} lib list`));
+        lines.push('', t('project.auto.libList', `${cli} lib list --format json`));
+        const libraries = config.context.libraries || [];
+        if (libraries.length > 0) {
+            lines.push('', t('project.auto.librariesTitle'), '', t('project.auto.librariesIntro'), '');
+            libraries.forEach(lib => lines.push(t('project.auto.library', lib.name, lib.version, lib.dir)));
+        }
         lines.push(
             '',
             t('project.auto.serialTitle'),
