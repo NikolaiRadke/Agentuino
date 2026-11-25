@@ -107,7 +107,14 @@
     "modelTitle": "Model for this chat. Empty: the agent's default.",
     "effortTitle": "Effort for this chat",
     "effortDefault": "Default effort",
-    "modelNextChat": "{0} keeps the model of a running conversation. The new model applies from the next new chat on."
+    "modelNextChat": "{0} keeps the model of a running conversation. The new model applies from the next new chat on.",
+    "changesLine": "✏️ {0} file(s) changed",
+    "changesChanged": "Changed:",
+    "changesAdded": "New:",
+    "changesDeleted": "Deleted:",
+    "changesOpen": "Open comparison: before the task ↔ now",
+    "changesTitle": "{0} (before the task ↔ now)",
+    "changesGone": "{0} is back to how it was before the task."
   },
   "tools": {
     "Read": "Reading {0}",

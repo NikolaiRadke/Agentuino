@@ -171,7 +171,7 @@ function loadChat(sketchPath, id) {
  * Append a message and save
  * @param {string} sketchPath - Sketch folder
  * @param {Object} chat - Chat object (modified)
- * @param {string} role - 'user' | 'agent' | 'activity' | 'info' | 'error' | 'compile'
+ * @param {string} role - 'user' | 'agent' | 'activity' | 'info' | 'error' | 'compile' | 'changes'
  * @param {string} text - Message text
  * @param {number} time - Timestamp (also identifies the message in the UI)
  * @param {Object} [data] - Extra data (compile result)

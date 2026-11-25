@@ -107,7 +107,14 @@
     "modelTitle": "Modèle pour ce chat. Vide : celui de l'agent par défaut.",
     "effortTitle": "Effort pour ce chat",
     "effortDefault": "Effort par défaut",
-    "modelNextChat": "{0} garde le modèle d'une conversation en cours. Le nouveau modèle s'applique à partir du prochain nouveau chat."
+    "modelNextChat": "{0} garde le modèle d'une conversation en cours. Le nouveau modèle s'applique à partir du prochain nouveau chat.",
+    "changesLine": "✏️ {0} fichier(s) modifié(s)",
+    "changesChanged": "Modifié :",
+    "changesAdded": "Nouveau :",
+    "changesDeleted": "Supprimé :",
+    "changesOpen": "Ouvrir la comparaison : avant la tâche ↔ maintenant",
+    "changesTitle": "{0} (avant la tâche ↔ maintenant)",
+    "changesGone": "{0} est revenu à son état d'avant la tâche."
   },
   "tools": {
     "Read": "Lit {0}",

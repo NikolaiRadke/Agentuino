@@ -210,6 +210,35 @@ function planRestore(sketchPath) {
 }
 
 /**
+ * List what changed since the snapshot, for the changes line in the chat
+ * @param {string} sketchPath - Sketch folder
+ * @returns {Array<{rel: string, kind: string}>|null} kind: 'changed' | 'added' | 'deleted'; null without snapshot
+ */
+function listChanges(sketchPath) {
+    const plan = planRestore(sketchPath);
+    if (!plan) return null;
+    return [
+        ...plan.restore.map(rel => ({
+            rel,
+            kind: fs.existsSync(resolveRel(sketchPath, rel)) ? 'changed' : 'deleted'
+        })),
+        ...plan.remove.map(rel => ({ rel, kind: 'added' }))
+    ];
+}
+
+/**
+ * Path of a file as it was in the snapshot
+ * @param {string} sketchPath - Sketch folder
+ * @param {string} rel - Path relative to the sketch folder (forward slashes)
+ * @returns {string|null} Absolute path, null if the file was not in the snapshot
+ */
+function getSnapshotFile(sketchPath, rel) {
+    const meta = getSnapshot(sketchPath);
+    if (!meta || !meta.files.includes(rel)) return null;
+    return resolveRel(getSnapshotPaths(sketchPath).files, rel);
+}
+
+/**
  * Restore the snapshot and delete it afterwards
  * @param {string} sketchPath - Sketch folder
  * @returns {{restore: string[], remove: string[]}|null} What was done
@@ -249,6 +278,8 @@ module.exports = {
     settleSnapshot,
     getSnapshot,
     planRestore,
+    listChanges,
+    getSnapshotFile,
     getCodeFingerprint,
     restoreSnapshot,
     deleteSnapshot

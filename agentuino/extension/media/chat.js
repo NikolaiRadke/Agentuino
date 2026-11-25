@@ -282,6 +282,13 @@
             return;
         }
 
+        if (role === 'changes' && data) {
+            renderChanges(entry, data);
+            elements.messages.appendChild(entry);
+            elements.messages.scrollTop = elements.messages.scrollHeight;
+            return;
+        }
+
         if (role === 'user' || role === 'agent') {
             const header = document.createElement('div');
             header.className = 'label';
@@ -426,6 +433,38 @@
     }
 
     /**
+     * Line with the files a task changed, each one opens the diff editor
+     * @param {HTMLElement} entry - Entry element
+     * @param {Object} data - {task, files: [{rel, kind}]}
+     */
+    function renderChanges(entry, data) {
+        entry.dataset.task = String(data.task);
+        entry.append('✏️ ');
+        const groups = [
+            ['changed', texts.changesChanged],
+            ['added', texts.changesAdded],
+            ['deleted', texts.changesDeleted]
+        ];
+        let first = true;
+        groups.forEach(([kind, label]) => {
+            const files = (data.files || []).filter(file => file.kind === kind);
+            if (files.length === 0) return;
+            if (!first) entry.append(' · ');
+            first = false;
+            entry.append(`${label} `);
+            files.forEach((file, index) => {
+                if (index > 0) entry.append(', ');
+                const link = document.createElement('button');
+                link.className = 'link-btn change-link';
+                link.textContent = file.rel;
+                link.disabled = true;
+                link.addEventListener('click', () => vscode.postMessage({ command: 'showChange', rel: file.rel }));
+                entry.appendChild(link);
+            });
+        });
+    }
+
+    /**
      * Offer "fix errors" only at a failed check that is the last compile
      * result and was not followed by a new message
      */
@@ -443,6 +482,14 @@
     function updateRestoreButtons() {
         elements.messages.querySelectorAll('.restore-btn').forEach(button => {
             button.hidden = busy || Number(button.dataset.time) !== snapshotTime;
+        });
+        // The diff needs the snapshot, so only the changes of the last run are clickable
+        elements.messages.querySelectorAll('.entry.changes').forEach(entry => {
+            const active = !busy && Number(entry.dataset.task) === snapshotTime;
+            entry.querySelectorAll('.change-link').forEach(link => {
+                link.disabled = !active;
+                link.title = active ? texts.changesOpen : '';
+            });
         });
         updateFixButtons();
     }

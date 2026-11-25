@@ -107,7 +107,14 @@
     "modelTitle": "Modelo para este chat. Vacío: el predeterminado del agente.",
     "effortTitle": "Esfuerzo para este chat",
     "effortDefault": "Esfuerzo predeterminado",
-    "modelNextChat": "{0} mantiene el modelo de una conversación en curso. El nuevo modelo se aplica a partir del próximo chat nuevo."
+    "modelNextChat": "{0} mantiene el modelo de una conversación en curso. El nuevo modelo se aplica a partir del próximo chat nuevo.",
+    "changesLine": "✏️ {0} archivo(s) modificado(s)",
+    "changesChanged": "Modificado:",
+    "changesAdded": "Nuevo:",
+    "changesDeleted": "Eliminado:",
+    "changesOpen": "Abrir comparación: antes de la tarea ↔ ahora",
+    "changesTitle": "{0} (antes de la tarea ↔ ahora)",
+    "changesGone": "{0} vuelve a estar como antes de la tarea."
   },
   "tools": {
     "Read": "Lee {0}",

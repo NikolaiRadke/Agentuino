@@ -36,7 +36,7 @@ async function newSketch(name) {
 test('a task that changes code is compiled, the agent learns the result', async () => {
     await newSketch('Task');
     const entries = (await ide.send('WRITE_OK')).filter(e => e.role !== 'info');
-    assert.deepEqual(entries.map(e => e.role), ['user', 'activity', 'agent', 'compile']);
+    assert.deepEqual(entries.map(e => e.role), ['user', 'activity', 'agent', 'compile', 'changes']);
     assert.match(entries[1].text, /Task\.ino$/);
     const [check] = compiles(entries);
     assert.equal(check.ok, true);
@@ -318,4 +318,30 @@ test('settings submenu: toggles, Git folder and program paths with a check', asy
         ide.settings.compileCheck = true;
         ide.settings.arduinoCliPath = env.fake('arduino-cli');
     }
+});
+
+test('changes line lists the files of the task, a click opens the diff of before and now', async () => {
+    const sketch = await newSketch('Diff');
+    const ino = path.join(sketch, 'Diff.ino');
+    const original = fs.readFileSync(ino, 'utf8');
+    const [changes] = (await ide.send('WRITE_OK')).filter(e => e.role === 'changes');
+    assert.deepEqual(changes.data.files, [{ rel: 'Diff.ino', kind: 'changed' }]);
+
+    ide.executed.length = 0;
+    await ide.message({ command: 'showChange', rel: 'Diff.ino' });
+    const [name, before, after, title] = ide.executed.find(args => args[0] === 'vscode.diff');
+    assert.equal(name, 'vscode.diff');
+    assert.equal(after.fsPath, ino);
+    assert.match(title, /Diff\.ino/);
+    // The old side is read-only content from the snapshot
+    assert.equal(ide.providers[before.scheme].provideTextDocumentContent(before), original);
+
+    // A question changes no code: no new line, the diff still works
+    const question = await ide.send('A question');
+    assert.ok(!question.some(e => e.role === 'changes'));
+
+    // Paths that did not change are refused
+    ide.executed.length = 0;
+    await ide.message({ command: 'showChange', rel: '../../etc/passwd' });
+    assert.ok(!ide.executed.some(args => args[0] === 'vscode.diff'));
 });

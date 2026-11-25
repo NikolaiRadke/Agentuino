@@ -42,6 +42,10 @@ function startIde(overrides = {}) {
         handler: null,
         // URLs given to openExternal
         opened: [],
+        // Commands run by the extension: [name, ...args]
+        executed: [],
+        // Content providers by scheme
+        providers: {},
         // Answer of modal questions: (message, ...buttons) => button
         answerWarning: (message, options, ...buttons) => buttons[0],
         answerQuickPick: items => items[0],
@@ -51,7 +55,11 @@ function startIde(overrides = {}) {
             ViewColumn: { One: 1, Two: 2 },
             StatusBarAlignment: { Left: 1, Right: 2 },
             ConfigurationTarget: { Global: 1 },
-            Uri: { file: p => ({ fsPath: p, scheme: 'file' }), parse: url => ({ url }) },
+            Uri: {
+                file: p => ({ fsPath: p, scheme: 'file' }),
+                parse: url => ({ url }),
+                from: parts => ({ ...parts })
+            },
             env: {
                 language: 'en',
                 appName: 'Arduino IDE',
@@ -93,13 +101,17 @@ function startIde(overrides = {}) {
                     get: (key, fallback) => (key in settings ? settings[key] : fallback),
                     update: async (key, value) => { settings[key] = value; }
                 }),
-                onDidChangeConfiguration: () => ({ dispose() {} })
+                onDidChangeConfiguration: () => ({ dispose() {} }),
+                registerTextDocumentContentProvider: (scheme, provider) => {
+                    ide.providers[scheme] = provider;
+                    return { dispose() {} };
+                }
             },
             // No other extensions, like in the Arduino IDE
             extensions: { getExtension: () => undefined },
             commands: {
                 registerCommand: (name, callback) => { commands[name] = callback; return { dispose() {} }; },
-                executeCommand: async () => undefined
+                executeCommand: async (...args) => { ide.executed.push(args); return undefined; }
             }
         },
 

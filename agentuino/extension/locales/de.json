@@ -107,7 +107,14 @@
     "modelTitle": "Modell für diesen Chat. Leer: Standard des Agenten.",
     "effortTitle": "Aufwand für diesen Chat",
     "effortDefault": "Standardaufwand",
-    "modelNextChat": "{0} behält in einem laufenden Gespräch sein Modell. Das neue Modell gilt ab dem nächsten neuen Chat."
+    "modelNextChat": "{0} behält in einem laufenden Gespräch sein Modell. Das neue Modell gilt ab dem nächsten neuen Chat.",
+    "changesLine": "✏️ {0} Datei(en) geändert",
+    "changesChanged": "Geändert:",
+    "changesAdded": "Neu:",
+    "changesDeleted": "Gelöscht:",
+    "changesOpen": "Vergleich öffnen: vor dem Auftrag ↔ jetzt",
+    "changesTitle": "{0} (vor dem Auftrag ↔ jetzt)",
+    "changesGone": "{0} ist wieder wie vor dem Auftrag."
   },
   "tools": {
     "Read": "Liest {0}",

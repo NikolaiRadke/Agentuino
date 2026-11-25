@@ -107,7 +107,14 @@
     "modelTitle": "Modello per questa chat. Vuoto: quello predefinito dell'agente.",
     "effortTitle": "Impegno per questa chat",
     "effortDefault": "Impegno predefinito",
-    "modelNextChat": "{0} mantiene il modello di una conversazione in corso. Il nuovo modello vale dalla prossima nuova chat."
+    "modelNextChat": "{0} mantiene il modello di una conversazione in corso. Il nuovo modello vale dalla prossima nuova chat.",
+    "changesLine": "✏️ {0} file modificati",
+    "changesChanged": "Modificato:",
+    "changesAdded": "Nuovo:",
+    "changesDeleted": "Eliminato:",
+    "changesOpen": "Apri il confronto: prima dell'attività ↔ ora",
+    "changesTitle": "{0} (prima dell'attività ↔ ora)",
+    "changesGone": "{0} è tornato com'era prima dell'attività."
   },
   "tools": {
     "Read": "Legge {0}",

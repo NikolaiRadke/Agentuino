@@ -66,6 +66,23 @@ test('.gitignore: whole folder by default, local data only on request, own edits
     assert.equal(fs.readFileSync(file, 'utf8'), 'chats/\n');
 });
 
+test('listChanges tells changed, new and deleted code files apart', () => {
+    const sketch = env.makeSketch('Changes');
+    fs.mkdirSync(path.join(sketch, 'src'));
+    fs.writeFileSync(path.join(sketch, 'src', 'old.h'), '// old\n');
+    backupManager.createSnapshot(sketch, { chatId: 'c1', messageTime: 1 });
+    fs.appendFileSync(path.join(sketch, 'Changes.ino'), '// changed\n');
+    fs.unlinkSync(path.join(sketch, 'src', 'old.h'));
+    fs.writeFileSync(path.join(sketch, 'src', 'new.h'), '// new\n');
+    assert.deepEqual(backupManager.listChanges(sketch), [
+        { rel: 'Changes.ino', kind: 'changed' },
+        { rel: 'src/old.h', kind: 'deleted' },
+        { rel: 'src/new.h', kind: 'added' }
+    ]);
+    assert.equal(fs.readFileSync(backupManager.getSnapshotFile(sketch, 'src/old.h'), 'utf8'), '// old\n');
+    assert.equal(backupManager.getSnapshotFile(sketch, 'src/new.h'), null);
+});
+
 // ===== COMPILE EVALUATION =====
 
 test('compile result: sizes truncated like the IDE, RAM warning above 75 %', () => {

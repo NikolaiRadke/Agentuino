@@ -25,6 +25,7 @@ const updateChecker = require('./utils/updateChecker');
 const uninstaller = require('./utils/uninstaller');
 const { BoardDetector } = require('./utils/boardDetector');
 const { ChatPanel } = require('./chat/chatPanel');
+const changesView = require('./chat/changesView');
 const { AboutPanel } = require('./ui/aboutPanel');
 const { RulesPanel } = require('./ui/rulesPanel');
 
@@ -770,6 +771,7 @@ function activate(context) {
     context.subscriptions.push(
         statusBarItem,
         { dispose: () => boardDetector.dispose() },
+        changesView.register(),
         vscode.commands.registerCommand('agentuino.openChat', () => openChat()),
         vscode.commands.registerCommand('agentuino.newChat', () => openChat().newChat()),
         vscode.commands.registerCommand('agentuino.addKnowledge', addKnowledge),

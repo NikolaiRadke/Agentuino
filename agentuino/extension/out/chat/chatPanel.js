@@ -22,6 +22,7 @@ const toolDetector = require('../agents/toolDetector');
 const modelCatalog = require('../agents/modelCatalog');
 const chatStore = require('./chatStore');
 const backupManager = require('../utils/backupManager');
+const changesView = require('./changesView');
 const links = require('../utils/links');
 const ruleBlocks = require('../utils/ruleBlocks');
 const registry = require('../agents/registry');
@@ -146,7 +147,7 @@ class ChatPanel {
 
     /**
      * Add a chat entry: show it and store it in the current chat
-     * @param {string} role - 'user' | 'agent' | 'activity' | 'info' | 'error' | 'compile'
+     * @param {string} role - 'user' | 'agent' | 'activity' | 'info' | 'error' | 'compile' | 'changes'
      * @param {string} text - Text
      * @param {Object} [data] - Extra data for the webview (compile result)
      * @param {Object} [live] - Extra fields for the webview only, not stored (toolId)
@@ -495,6 +496,7 @@ class ChatPanel {
                     break;
                 case 'attach': await this.attachFiles(); break;
                 case 'restore': await this.restore(); break;
+                case 'showChange': await this.showChange(msg.rel); break;
                 case 'openUrl':
                     if (links.isWebUrl(msg.url)) await vscode.env.openExternal(vscode.Uri.parse(msg.url));
                     break;
@@ -754,12 +756,14 @@ class ChatPanel {
         } finally {
             focusGuard.dispose();
             // A run without code changes keeps the reset of the last real change
+            let changed = false;
             try {
-                backupManager.settleSnapshot(sketchPath);
+                changed = backupManager.settleSnapshot(sketchPath);
             } catch {
                 // Reset is a convenience, never block the chat
             }
             this.postSnapshot();
+            if (changed) this.addChanges(sketchPath);
             this.setBusy(false);
             this.panel.reveal(undefined, false);
         }
@@ -1086,6 +1090,39 @@ class ChatPanel {
         const entry = this.chat?.messages.find(m => m.time === time && m.role === 'compile');
         if (!entry || !entry.data || entry.data.ok) return;
         await this.send(t('compile.fixRequest'), this.fixPrompt(this.sketchPath, entry.data.errorText || entry.data.errors.join('\n')));
+    }
+
+    /**
+     * After a run that changed code: list the files; the webview makes them
+     * clickable as long as this run is the one the snapshot belongs to
+     * @param {string} sketchPath - Sketch folder
+     */
+    addChanges(sketchPath) {
+        try {
+            const changes = backupManager.listChanges(sketchPath);
+            const snapshot = backupManager.getSnapshot(sketchPath);
+            if (!changes || changes.length === 0 || !snapshot) return;
+            this.addEntry('changes', this.deps.getT()('chat.changesLine', changes.length),
+                { task: snapshot.messageTime, files: changes });
+        } catch {
+            // The list is a convenience, never block the chat
+        }
+    }
+
+    /**
+     * Open the diff editor for a file of the changes line
+     * @param {string} rel - File relative to the sketch folder (from the webview)
+     */
+    async showChange(rel) {
+        const t = this.deps.getT();
+        if (!this.sketchPath || typeof rel !== 'string') return;
+        // Only files that really differ from the snapshot, never a path from outside
+        const change = (backupManager.listChanges(this.sketchPath) || []).find(c => c.rel === rel);
+        if (!change) {
+            vscode.window.showInformationMessage(t('chat.changesGone', rel));
+            return;
+        }
+        await changesView.showChange(this.sketchPath, change, t('chat.changesTitle', path.basename(rel)));
     }
 
     /**
