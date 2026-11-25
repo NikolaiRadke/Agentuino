@@ -26,6 +26,15 @@ After every task that changed code, Agentuino compiles the sketch itself and sho
 ### Undo with one click
 Before every task Agentuino saves the code. ↶ next to your message brings back the state before that task, including files the agent created or deleted. The agent is told about the reset.
 
+### See what changed
+After every task that changed code, a line lists the changed, new and deleted files. Click a file name and the IDE's diff editor shows it before the task and now, side by side.
+
+### Libraries the agent does not know
+New or rare libraries are unknown to every agent. Agentuino lists the installed libraries your sketch includes, with their folders, so the agent reads their headers and examples instead of guessing functions.
+
+### All your projects at hand
+📁 lists all Agentuino projects in your sketchbook, last used first. A click opens one in a new IDE window, **@** mentions it in your message: *"Do it like in project Schimpfolino."* The agent may read other sketches when you refer to them, but changes files only in the current one.
+
 ### Serial output for the agent
 The agent can read what your board prints with `Serial.println()` for a few seconds and check whether the sketch really does what it should.
 
@@ -41,6 +50,9 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 ### More
 - Attach files to a message, e.g. a photo of your breadboard or a datasheet
 - Input history with ↑ / ↓
+- Rename chats in the chat list
+- The chat follows new entries only while you are at the end; ↓ brings you back. The agent's steps fold into one line, the running time shows that it is still at work
+- Everything else in ⚙ → *Settings*, including the paths of the agents and arduino-cli
 - German, English, French, Spanish and Italian, following the IDE language
 - Agent options are kept up to date with a configuration file from this repository. Agentuino asks before it downloads a new one.
 
@@ -102,7 +114,8 @@ In VS Code, Agentuino needs [arduino-cli](https://arduino.github.io/arduino-cli/
 - Click **Agentuino** in the status bar or press `Ctrl+Alt+A`. The chat opens next to your code.
 - Describe what your Arduino should do, e.g. *"Let the LED blink faster when I press the button on pin 2."*
 - The chat title opens the list of all chats of this sketch, **+ New** starts a new one.
-- **⚙** opens the project instructions, semantic anchors, knowledge files, project memory, agent selection, language and the about page.
+- **📁** lists your Agentuino projects: click to open, **@** to mention one in your message.
+- **⚙** opens the project instructions, semantic anchors, knowledge files, project memory, agent selection, settings and the about page.
 
 ### The project folder
 
@@ -116,16 +129,19 @@ MySketch/
     ├── chats/       # one .json and one readable .md per chat
     ├── attachments/ # files attached to messages
     ├── backups/     # the saved code for ↶
-    └── config.json  # project settings
+    ├── config.json  # project settings
+    └── .gitignore   # keeps the folder out of Git
 ```
 
-The folder is created with the first chat message. Your sketch works without it.
+The folder is created with the first chat message. Your sketch works without it. If your sketches live in a Git repository, the folder stays out of it; switch this off in ⚙ → *Settings* → *Git* to share chats and instructions.
 
 ## Security
 
-By default the agent runs with full permissions (`agentuino.permissionMode` = `bypassPermissions`): it can edit files and run commands in your user account without asking, which compiling needs. The rules in `AGENTS.md` keep it inside the sketch folder, but they are instructions, not a sandbox. See [SECURITY.md](SECURITY.md).
+By default the agent runs with full permissions (`agentuino.permissionMode` = `bypassPermissions`): it can edit files and run commands in your user account without asking, which compiling needs. The rules in `AGENTS.md` let it change files only in the sketch folder and read only libraries and the sketches you refer to, but they are instructions, not a sandbox. See [SECURITY.md](SECURITY.md).
 
 ## Settings
+
+All settings except the models can be changed in ⚙ → *Settings*.
 
 | Setting | Description |
 |---|---|
@@ -133,6 +149,7 @@ By default the agent runs with full permissions (`agentuino.permissionMode` = `b
 | `agentuino.agent` | Agent for new chats: `auto`, `claudecode`, `codex`, `vibe`, `antigravity`, `opencode` |
 | `agentuino.compileCheck` | Compile after every task that changed code (default on) |
 | `agentuino.permissionMode` | `bypassPermissions` (default), `acceptEdits` or `auto` |
+| `agentuino.gitignoreAll` | Keep the `agentuino/` folder of a sketch out of Git (default on); off = only backups and attachments are ignored |
 | `agentuino.claudePath` / `codexPath` / `vibePath` / `antigravityPath` / `opencodePath` | Agent path, empty = auto-detect |
 | `agentuino.claudeModel` / `codexModel` / `vibeModel` / `antigravityModel` / `opencodeModel` | Model for new chats, empty = agent default. Each chat can choose its own model and effort below the input field. OpenCode takes `provider/model`, e.g. `ollama/qwen2.5-coder` |
 | `agentuino.checkForUpdates` | Check for new versions and agent configurations at startup; nothing is stored without asking (default on) |
@@ -160,7 +177,7 @@ node --test tests/*.test.js
 
 The workflow *Tests* runs them on every push.
 
-`.github/scripts/package.sh` builds the VSIX and the release zip into `dist/` and puts the VSIX into `installer/`.
+`.github/scripts/package.sh` builds the VSIX and the release zip into `dist/`, puts the VSIX into `installer/` and writes `installer/version.json`. The update check reads only that file, so `main` may carry a newer version in `package.json` without announcing it.
 
 ## Content
 
