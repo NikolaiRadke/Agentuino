@@ -38,6 +38,8 @@
         settings: $('settings'),
         chatTitle: $('chatTitle'),
         chatList: $('chatList'),
+        projects: $('projects'),
+        projectList: $('projectList'),
         sketch: $('sketch'),
         agentBtn: $('agentBtn'),
         cost: $('cost'),
@@ -159,6 +161,9 @@
     document.addEventListener('click', (event) => {
         if (!menu.contains(event.target)) hideMenu();
         if (!elements.chatList.contains(event.target) && event.target !== elements.chatTitle) hideChatList();
+        if (!elements.projectList.contains(event.target) && event.target !== elements.projects) {
+            elements.projectList.hidden = true;
+        }
         if (!elements.effortList.contains(event.target)) elements.effortList.hidden = true;
     });
     window.addEventListener('blur', hideMenu);
@@ -751,6 +756,7 @@
         elements.model.title = texts.modelTitle;
         elements.effort.title = texts.effortTitle;
         elements.scrollDown.title = texts.scrollDown;
+        elements.projects.title = texts.projects;
     }
 
     // ===== MODEL AND EFFORT =====
@@ -1028,6 +1034,80 @@
         });
     }
 
+    // ===== PROJECT LIST =====
+
+    /**
+     * Show the projects of the sketchbook: a click opens one, @ mentions it in the input
+     * @param {Object} msg - {found, list: [{name, path, rel, chats, updated, current}]}
+     */
+    function renderProjectList(msg) {
+        const list = elements.projectList;
+        list.innerHTML = '';
+        const heading = document.createElement('div');
+        heading.className = 'dropdown-heading';
+        heading.textContent = texts.projectsHeading;
+        list.appendChild(heading);
+
+        if (!msg.found || msg.list.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'dropdown-empty';
+            empty.textContent = msg.found ? texts.noProjects : texts.noSketchbook;
+            list.appendChild(empty);
+            return;
+        }
+
+        msg.list.forEach(project => {
+            const item = document.createElement('div');
+            item.className = 'chat-item' + (project.current ? ' current' : '');
+            item.title = project.path;
+
+            const info = document.createElement('div');
+            info.className = 'chat-info';
+            const name = document.createElement('div');
+            name.className = 'chat-name';
+            name.textContent = project.name;
+            const details = document.createElement('div');
+            details.className = 'chat-date';
+            const parts = [texts.projectChats.replace('{0}', project.chats)];
+            if (project.updated) parts.push(formatTime(project.updated));
+            if (project.rel !== project.name) parts.unshift(project.rel);
+            details.textContent = parts.join(' · ');
+            info.append(name, details);
+
+            const mention = document.createElement('button');
+            mention.className = 'copy-btn';
+            mention.textContent = '@';
+            mention.title = texts.projectMentionTitle;
+            mention.addEventListener('click', (event) => {
+                event.stopPropagation();
+                list.hidden = true;
+                insertIntoInput(texts.projectMention.replace('{0}', project.name).replace('{1}', project.path));
+            });
+
+            item.append(info, mention);
+            item.addEventListener('click', () => {
+                list.hidden = true;
+                if (!project.current) vscode.postMessage({ command: 'openProject', path: project.path });
+            });
+            list.appendChild(item);
+        });
+    }
+
+    elements.projects.addEventListener('click', () => {
+        if (!elements.projectList.hidden) {
+            elements.projectList.hidden = true;
+            return;
+        }
+        hideChatList();
+        elements.projectList.innerHTML = '';
+        const loading = document.createElement('div');
+        loading.className = 'dropdown-empty';
+        loading.textContent = texts.projectsLoading;
+        elements.projectList.appendChild(loading);
+        elements.projectList.hidden = false;
+        vscode.postMessage({ command: 'listProjects' });
+    });
+
     elements.chatTitle.addEventListener('click', () => {
         if (busy) return;
         renderChatList();
@@ -1172,6 +1252,9 @@
                 break;
             case 'paste':
                 insertIntoInput(msg.text);
+                break;
+            case 'projects':
+                if (!elements.projectList.hidden) renderProjectList(msg);
                 break;
             case 'model':
                 showModel(msg);

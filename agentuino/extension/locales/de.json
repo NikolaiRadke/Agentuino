@@ -118,7 +118,16 @@
     "steps": "{0} Schritte",
     "rename": "Umbenennen",
     "renamePrompt": "Neuer Titel für diesen Chat",
-    "scrollDown": "Zu den neuen Einträgen"
+    "scrollDown": "Zu den neuen Einträgen",
+    "projects": "Projekte im Sketchbook",
+    "projectsHeading": "Agentuino-Projekte im Sketchbook",
+    "projectsLoading": "Suche Projekte …",
+    "noProjects": "Noch keine Agentuino-Projekte im Sketchbook.",
+    "noSketchbook": "Sketchbook nicht gefunden (arduino-cli fehlt?).",
+    "projectChats": "{0} Chats",
+    "projectMentionTitle": "Im Chat erwähnen",
+    "projectMention": "Projekt {0} (`{1}`)",
+    "projectOpenFailed": "{0} ließ sich nicht öffnen. Öffne den Sketch über Datei → Öffnen."
   },
   "tools": {
     "Read": "Liest {0}",
@@ -205,7 +214,7 @@
       "notice": "<!-- Dieser Bereich wird von Agentuino automatisch erzeugt. Änderungen hier werden überschrieben. -->",
       "rulesTitle": "## Arbeitsregeln (Agentuino)",
       "ruleSketch": "- Dies ist ein Arduino-Sketch. Ordner und Hauptdatei `{0}` dürfen nicht umbenannt werden.",
-      "ruleScope": "- Arbeite nur innerhalb dieses Sketch-Ordners.",
+      "ruleScope": "- Ändere nur Dateien in diesem Sketch-Ordner.",
       "ruleSrc": "- Zusätzliche Code-Dateien (.h, .cpp) gehören in den Sketch-Ordner oder nach `src/`, sonst werden sie nicht kompiliert.",
       "ruleProjectDir": "- Ändere im Ordner `{0}/` nur die Datei `{1}`.",
       "ruleMemory": "- Lies zu Beginn `{0}`. Halte dort nur fest, was über dieses Gespräch hinaus gilt: Bauteile, Verdrahtung, Entscheidungen, gelöste Probleme. Keine Gesprächsverläufe, die stehen in den Chat-Protokollen.",
@@ -255,7 +264,9 @@
       ],
       "librariesTitle": "## Verwendete Bibliotheken",
       "librariesIntro": "Der Sketch bindet diese installierten Bibliotheken ein. Header, README und examples/ im jeweiligen Ordner zeigen, wie sie richtig benutzt werden:",
-      "library": "- {0} {1}: `{2}`"
+      "library": "- {0} {1}: `{2}`",
+      "ruleRead": "- Lesen darfst du auch im Sketchbook `{0}`: Bibliotheken jederzeit, andere Sketche nur, wenn der Nutzer darauf verweist.",
+      "ruleReadNoPath": "- Lesen darfst du auch Bibliotheken und andere Sketche, diese aber nur, wenn der Nutzer darauf verweist."
     }
   },
   "about": {

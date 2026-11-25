@@ -122,6 +122,9 @@ switch (`${args[0]} ${args[1] || ''}`.trim()) {
             { library: { name: 'Wire', version: '1.0', location: 'platform', install_dir: '/core/Wire', provides_includes: ['Wire.h'] } }
         ] }));
         break;
+    case 'config dump':
+        console.log(JSON.stringify({ config: { directories: { user: process.env.FAKE_SKETCHBOOK || path.dirname(stateFile) } } }));
+        break;
     case 'core list':
         console.log(JSON.stringify({ platforms: [{ id: 'arduino:avr' }] }));
         break;

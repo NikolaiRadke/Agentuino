@@ -158,9 +158,20 @@ async function collectContext(sketchPath) {
         ? libraryUsage.findUsedLibraries(sketchPath, await toolDetector.listLibraries(cliPath, configFile))
         : [];
 
-    const context = { cliPath, configFile, port, ardudebug, libraries };
+    const sketchbook = cliPath ? await toolDetector.findSketchbook(cliPath, configFile) : null;
+
+    const context = { cliPath, configFile, port, ardudebug, libraries, sketchbook };
     if (board.fqbn) Object.assign(context, { fqbn: board.fqbn, boardName: board.boardName });
     return context;
+}
+
+/**
+ * Find the sketchbook folder via arduino-cli
+ * @returns {Promise<string|null>} Folder or null
+ */
+async function findSketchbook() {
+    const cliPath = await toolDetector.findArduinoCli(getSettings().arduinoCliPath, vscode.env.appRoot);
+    return cliPath ? toolDetector.findSketchbook(cliPath, toolDetector.findArduinoCliConfig()) : null;
 }
 
 /**
@@ -238,6 +249,7 @@ function openChat() {
         getLocale: () => currentLocale,
         findSketch,
         collectContext,
+        findSketchbook,
         getSettings,
         onBusyChange: updateStatusBar,
         showSettingsMenu,

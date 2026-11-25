@@ -118,7 +118,16 @@
     "steps": "{0} passaggi",
     "rename": "Rinomina",
     "renamePrompt": "Nuovo titolo per questa chat",
-    "scrollDown": "Vai alle nuove voci"
+    "scrollDown": "Vai alle nuove voci",
+    "projects": "Progetti nello sketchbook",
+    "projectsHeading": "Progetti Agentuino nello sketchbook",
+    "projectsLoading": "Ricerca dei progetti …",
+    "noProjects": "Ancora nessun progetto Agentuino nello sketchbook.",
+    "noSketchbook": "Sketchbook non trovato (manca arduino-cli?).",
+    "projectChats": "{0} chat",
+    "projectMentionTitle": "Menziona nella chat",
+    "projectMention": "progetto {0} (`{1}`)",
+    "projectOpenFailed": "Impossibile aprire {0}. Apri lo sketch da File → Apri."
   },
   "tools": {
     "Read": "Legge {0}",
@@ -205,7 +214,7 @@
       "notice": "<!-- Questa sezione è generata da Agentuino. Le modifiche qui verranno sovrascritte. -->",
       "rulesTitle": "## Regole di lavoro (Agentuino)",
       "ruleSketch": "- Questo è uno sketch Arduino. Non rinominare la cartella né il file principale `{0}`.",
-      "ruleScope": "- Lavora solo all'interno di questa cartella dello sketch.",
+      "ruleScope": "- Modifica solo file in questa cartella dello sketch.",
       "ruleSrc": "- I file di codice aggiuntivi (.h, .cpp) vanno nella cartella dello sketch o in `src/`, altrimenti non vengono compilati.",
       "ruleProjectDir": "- All'interno di `{0}/`, modifica solo il file `{1}`.",
       "ruleMemory": "- Leggi prima `{0}`. Annota lì solo ciò che vale oltre questa conversazione: componenti, cablaggio, decisioni, problemi risolti. Niente resoconti delle conversazioni, quelli sono nei protocolli delle chat.",
@@ -255,7 +264,9 @@
       ],
       "librariesTitle": "## Librerie usate",
       "librariesIntro": "Lo sketch include queste librerie installate. Header, README ed examples/ in ogni cartella mostrano come usarle correttamente:",
-      "library": "- {0} {1}: `{2}`"
+      "library": "- {0} {1}: `{2}`",
+      "ruleRead": "- Puoi anche leggere nello sketchbook `{0}`: le librerie sempre, altri sketch solo se l'utente vi fa riferimento.",
+      "ruleReadNoPath": "- Puoi anche leggere librerie e altri sketch, questi ultimi solo se l'utente vi fa riferimento."
     }
   },
   "about": {

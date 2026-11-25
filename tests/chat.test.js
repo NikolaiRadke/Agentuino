@@ -369,3 +369,28 @@ test('a chat keeps the title the user gives it', async () => {
     const header = ide.posted.filter(m => m.command === 'header').pop();
     assert.equal(header.title, 'My title');
 });
+
+test('project list: Agentuino projects of the sketchbook, open only listed ones, read rule in AGENTS.md', async () => {
+    const sketch = await newSketch('Projects');
+    await ide.send('A question');
+    const other = env.makeSketch('Other');
+    projectManager.ensureProject(other, { language: 'en', context: {} });
+
+    await ide.message({ command: 'listProjects' });
+    const list = ide.posted.filter(m => m.command === 'projects').pop();
+    const names = list.list.map(p => p.name);
+    assert.ok(names.includes('Projects') && names.includes('Other'));
+    assert.equal(list.list.find(p => p.name === 'Projects').current, true);
+
+    ide.executed.length = 0;
+    await ide.message({ command: 'openProject', path: other });
+    const open = ide.executed.find(args => args[0] === 'vscode.openFolder');
+    assert.equal(open[1].fsPath, other);
+    ide.executed.length = 0;
+    await ide.message({ command: 'openProject', path: '/somewhere/else' });
+    assert.ok(!ide.executed.some(args => args[0] === 'vscode.openFolder'));
+
+    const agents = fs.readFileSync(projectManager.getProjectPaths(sketch).agents, 'utf8');
+    assert.match(agents, /Change files only inside this sketch folder/);
+    assert.match(agents, /read in the sketchbook `/);
+});

@@ -283,6 +283,40 @@ function listLibraries(cliPath, configFile) {
     });
 }
 
+let sketchbookCache = { key: null, dir: null };
+
+/**
+ * Find the sketchbook folder ('directories.user' of arduino-cli)
+ * @param {string} cliPath - arduino-cli executable
+ * @param {string|null} configFile - arduino-cli config file
+ * @returns {Promise<string|null>} Folder or null
+ */
+function findSketchbook(cliPath, configFile) {
+    const key = `${cliPath}|${configFile}`;
+    // Changes only when the user edits the IDE settings, a restart is fine then
+    if (key === sketchbookCache.key && sketchbookCache.dir) return Promise.resolve(sketchbookCache.dir);
+    const args = ['config', 'dump', '--format', 'json'];
+    if (configFile) args.push('--config-file', configFile);
+
+    return new Promise(resolve => {
+        execFile(cliPath, args, { timeout: PORT_LIST_TIMEOUT_MS, windowsHide: true }, (error, stdout) => {
+            let dir = null;
+            if (!error && stdout) {
+                try {
+                    const data = JSON.parse(stdout);
+                    // arduino-cli 1.x: {config: {directories: ...}}, older versions: {directories: ...}
+                    dir = (data.config || data).directories?.user || null;
+                } catch {
+                    // Unexpected output, no sketchbook
+                }
+            }
+            if (dir && !fs.existsSync(dir)) dir = null;
+            sketchbookCache = { key, dir };
+            resolve(dir);
+        });
+    });
+}
+
 // ===== VERSIONS =====
 
 /**
@@ -353,5 +387,6 @@ module.exports = {
     findArduinoCliConfig,
     detectSerialPort,
     hasArdudebug,
-    listLibraries
+    listLibraries,
+    findSketchbook
 };

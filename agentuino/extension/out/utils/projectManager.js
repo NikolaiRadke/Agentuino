@@ -353,7 +353,7 @@ function addAttachment(sketchPath, sourcePath) {
  */
 function buildAutoSection(sketchPath, config) {
     const t = i18n.createTranslator(config.language || i18n.FALLBACK_LOCALE);
-    const { boardName, fqbn, port, cliPath, configFile } = config.context;
+    const { boardName, fqbn, port, cliPath, configFile, sketchbook } = config.context;
     const sketchFile = path.basename(sketchPath) + '.ino';
     const memoryRel = `${PROJECT_DIR_NAME}/${FILES.memory}`;
     const knowledgeRel = `${PROJECT_DIR_NAME}/${SUBDIRS.knowledge}`;
@@ -367,6 +367,7 @@ function buildAutoSection(sketchPath, config) {
         '',
         t('project.auto.ruleSketch', sketchFile),
         t('project.auto.ruleScope'),
+        sketchbook ? t('project.auto.ruleRead', sketchbook) : t('project.auto.ruleReadNoPath'),
         t('project.auto.ruleSrc'),
         t('project.auto.ruleProjectDir', PROJECT_DIR_NAME, memoryRel),
         t('project.auto.ruleMemory', memoryRel),
@@ -582,6 +583,7 @@ function ensureProject(sketchPath, options = {}) {
 
 module.exports = {
     AGENTS_FILE_REL: `${PROJECT_DIR_NAME}/${FILES.agents}`,
+    PROJECT_DIR_NAME,
     getProjectPaths,
     isSketchFolder,
     findSketchFolder,

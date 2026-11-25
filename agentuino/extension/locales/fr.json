@@ -118,7 +118,16 @@
     "steps": "{0} étapes",
     "rename": "Renommer",
     "renamePrompt": "Nouveau titre de ce chat",
-    "scrollDown": "Aller aux nouvelles entrées"
+    "scrollDown": "Aller aux nouvelles entrées",
+    "projects": "Projets du sketchbook",
+    "projectsHeading": "Projets Agentuino du sketchbook",
+    "projectsLoading": "Recherche des projets …",
+    "noProjects": "Pas encore de projets Agentuino dans le sketchbook.",
+    "noSketchbook": "Sketchbook introuvable (arduino-cli manquant ?).",
+    "projectChats": "{0} chats",
+    "projectMentionTitle": "Mentionner dans le chat",
+    "projectMention": "projet {0} (`{1}`)",
+    "projectOpenFailed": "Impossible d'ouvrir {0}. Ouvre le sketch via Fichier → Ouvrir."
   },
   "tools": {
     "Read": "Lit {0}",
@@ -205,7 +214,7 @@
       "notice": "<!-- Cette section est générée par Agentuino. Les modifications ici seront écrasées. -->",
       "rulesTitle": "## Règles de travail (Agentuino)",
       "ruleSketch": "- Ceci est un sketch Arduino. Ne renomme ni le dossier ni le fichier principal `{0}`.",
-      "ruleScope": "- Travaille uniquement dans ce dossier de sketch.",
+      "ruleScope": "- Ne modifie que des fichiers de ce dossier de sketch.",
       "ruleSrc": "- Les fichiers de code supplémentaires (.h, .cpp) vont dans le dossier du sketch ou dans `src/`, sinon ils ne sont pas compilés.",
       "ruleProjectDir": "- Dans `{0}/`, modifie uniquement le fichier `{1}`.",
       "ruleMemory": "- Lis d'abord `{0}`. N'y note que ce qui vaut au-delà de cette conversation : composants, câblage, décisions, problèmes résolus. Pas de comptes rendus de conversation, ils sont dans les protocoles de chat.",
@@ -255,7 +264,9 @@
       ],
       "librariesTitle": "## Bibliothèques utilisées",
       "librariesIntro": "Le sketch inclut ces bibliothèques installées. Les en-têtes, le README et examples/ de chaque dossier montrent comment les utiliser correctement :",
-      "library": "- {0} {1}: `{2}`"
+      "library": "- {0} {1}: `{2}`",
+      "ruleRead": "- Tu peux aussi lire dans le sketchbook `{0}` : les bibliothèques à tout moment, les autres sketches seulement si l'utilisateur y fait référence.",
+      "ruleReadNoPath": "- Tu peux aussi lire les bibliothèques et les autres sketches, ces derniers seulement si l'utilisateur y fait référence."
     }
   },
   "about": {

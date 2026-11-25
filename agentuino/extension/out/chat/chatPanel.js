@@ -23,6 +23,7 @@ const modelCatalog = require('../agents/modelCatalog');
 const chatStore = require('./chatStore');
 const backupManager = require('../utils/backupManager');
 const changesView = require('./changesView');
+const projectList = require('../utils/projectList');
 const links = require('../utils/links');
 const ruleBlocks = require('../utils/ruleBlocks');
 const registry = require('../agents/registry');
@@ -488,6 +489,8 @@ class ChatPanel {
                 case 'selectChat': this.selectChat(msg.id); break;
                 case 'deleteChat': await this.deleteChat(msg.id); break;
                 case 'renameChat': await this.renameChat(msg.id); break;
+                case 'listProjects': await this.postProjects(); break;
+                case 'openProject': await this.openProject(msg.path); break;
                 case 'settings': await this.deps.showSettingsMenu(); break;
                 case 'recheckAgents': await this.recheckAgents(); break;
                 case 'setModel': await this.setModel(msg); break;
@@ -639,6 +642,35 @@ class ChatPanel {
             this.newChat();
         } else {
             this.postHeader();
+        }
+    }
+
+    /**
+     * Send the Agentuino projects of the sketchbook to the project list
+     */
+    async postProjects() {
+        const sketchbook = await this.deps.findSketchbook();
+        this.projects = sketchbook ? projectList.listProjects(sketchbook) : [];
+        this.post({
+            command: 'projects',
+            found: !!sketchbook,
+            list: this.projects.map(p => ({ ...p, current: p.path === this.sketchPath }))
+        });
+    }
+
+    /**
+     * Open another project of the list in the IDE (a new window)
+     * @param {string} projectPath - Sketch folder from the list
+     */
+    async openProject(projectPath) {
+        const t = this.deps.getT();
+        // Only folders of the list just shown, never a path from outside
+        const project = (this.projects || []).find(p => p.path === projectPath);
+        if (!project || project.path === this.sketchPath) return;
+        try {
+            await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(project.path), { forceNewWindow: true });
+        } catch {
+            vscode.window.showErrorMessage(t('chat.projectOpenFailed', project.name));
         }
     }
 
@@ -1294,7 +1326,9 @@ class ChatPanel {
             <div class="chat-select">
                 <button id="chatTitle" class="title-btn"></button>
                 <div id="chatList" class="dropdown" hidden></div>
+                <div id="projectList" class="dropdown" hidden></div>
             </div>
+            <button id="projects" class="icon-btn">📁</button>
             <button id="newChat" class="secondary"></button>
             <button id="settings" class="icon-btn">⚙</button>
         </div>
