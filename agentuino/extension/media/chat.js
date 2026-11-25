@@ -348,6 +348,11 @@
         if (!group && last?.classList.contains('activity')) {
             group = document.createElement('details');
             group.className = 'activity-group';
+            // Open while the agent works, folded when the run ends
+            if (busy) {
+                group.open = true;
+                group.dataset.live = '1';
+            }
             group.appendChild(document.createElement('summary'));
             last.replaceWith(group);
             group.appendChild(last);
@@ -384,7 +389,8 @@
     elements.messages.addEventListener('scroll', () => {
         const m = elements.messages;
         followEnd = m.scrollHeight - m.scrollTop - m.clientHeight < SCROLL_SLACK_PX;
-        if (followEnd) elements.scrollDown.hidden = true;
+        // Like other chats: the button is there whenever the end is out of sight
+        elements.scrollDown.hidden = followEnd;
     });
     elements.scrollDown.addEventListener('click', scrollToEnd);
 
@@ -672,6 +678,12 @@
         elements.working.hidden = !busy;
         if (busy) elements.workingText.textContent = texts.working;
         updateBusyTimer();
+        if (!busy) {
+            elements.messages.querySelectorAll('.activity-group[data-live]').forEach(group => {
+                group.open = false;
+                delete group.dataset.live;
+            });
+        }
         elements.attach.disabled = busy;
         elements.newChat.disabled = busy;
         elements.chatTitle.disabled = busy;
