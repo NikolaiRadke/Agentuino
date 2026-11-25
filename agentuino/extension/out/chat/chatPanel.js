@@ -487,6 +487,7 @@ class ChatPanel {
                 case 'newChat': this.newChat(); break;
                 case 'selectChat': this.selectChat(msg.id); break;
                 case 'deleteChat': await this.deleteChat(msg.id); break;
+                case 'renameChat': await this.renameChat(msg.id); break;
                 case 'settings': await this.deps.showSettingsMenu(); break;
                 case 'recheckAgents': await this.recheckAgents(); break;
                 case 'setModel': await this.setModel(msg); break;
@@ -642,6 +643,32 @@ class ChatPanel {
     }
 
     /**
+     * Give a chat a title of the user's choice
+     * @param {string} id - Chat ID
+     */
+    async renameChat(id) {
+        const t = this.deps.getT();
+        if (!this.sketchPath) return;
+        const chat = this.chat?.id === id ? this.chat : chatStore.loadChat(this.sketchPath, id);
+        if (!chat) return;
+
+        const title = (await vscode.window.showInputBox({
+            prompt: t('chat.renamePrompt'),
+            value: chat.title,
+            valueSelection: [0, chat.title.length]
+        }))?.trim();
+        if (!title || title === chat.title) return;
+
+        chat.title = title;
+        chat.titleFinal = true;
+        // A title the agent is still generating must not overwrite this one
+        chat.titleByUser = true;
+        chatStore.saveChat(this.sketchPath, chat);
+        projectManager.refreshAutoSection(this.sketchPath);
+        this.postHeader();
+    }
+
+    /**
      * Create the chat with its first message and request a real title
      * @param {string} sketchPath - Sketch folder
      * @param {string} firstText - First user message
@@ -659,7 +686,7 @@ class ChatPanel {
         if (!agent.adapter.generateTitle) return;
         const chat = this.chat;
         agent.adapter.generateTitle(agent.toolPath, t('prompt.title', firstText)).then(title => {
-            if (!title) return;
+            if (!title || chat.titleByUser) return;
             chat.title = title;
             chat.titleFinal = true;
             try {
@@ -1279,7 +1306,8 @@ class ChatPanel {
         </div>
     </header>
     <main id="messages"></main>
-    <div id="working" hidden><span class="spinner"></span><span id="workingText"></span></div>
+    <button id="scrollDown" class="scroll-down" hidden>↓</button>
+    <div id="working" hidden><span class="spinner"></span><span id="workingText"></span><span id="workingTime" class="working-time"></span></div>
     <footer>
         <div id="attachments"></div>
         <textarea id="input" rows="3"></textarea>

@@ -114,7 +114,11 @@
     "changesDeleted": "Eliminado:",
     "changesOpen": "Abrir comparación: antes de la tarea ↔ ahora",
     "changesTitle": "{0} (antes de la tarea ↔ ahora)",
-    "changesGone": "{0} vuelve a estar como antes de la tarea."
+    "changesGone": "{0} vuelve a estar como antes de la tarea.",
+    "steps": "{0} pasos",
+    "rename": "Cambiar nombre",
+    "renamePrompt": "Nuevo título para este chat",
+    "scrollDown": "Ir a las entradas nuevas"
   },
   "tools": {
     "Read": "Lee {0}",

@@ -114,7 +114,11 @@
     "changesDeleted": "Eliminato:",
     "changesOpen": "Apri il confronto: prima dell'attività ↔ ora",
     "changesTitle": "{0} (prima dell'attività ↔ ora)",
-    "changesGone": "{0} è tornato com'era prima dell'attività."
+    "changesGone": "{0} è tornato com'era prima dell'attività.",
+    "steps": "{0} passaggi",
+    "rename": "Rinomina",
+    "renamePrompt": "Nuovo titolo per questa chat",
+    "scrollDown": "Vai alle nuove voci"
   },
   "tools": {
     "Read": "Legge {0}",

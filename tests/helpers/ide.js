@@ -49,6 +49,8 @@ function startIde(overrides = {}) {
         // Answer of modal questions: (message, ...buttons) => button
         answerWarning: (message, options, ...buttons) => buttons[0],
         answerQuickPick: items => items[0],
+        // Answer of input boxes: options => text
+        answerInput: () => undefined,
 
         vscode: {
             version: '1.96.0',
@@ -91,6 +93,7 @@ function startIde(overrides = {}) {
                 showInformationMessage: async () => undefined,
                 showTextDocument: async () => undefined,
                 showOpenDialog: async () => undefined,
+                showInputBox: async options => ide.answerInput(options),
                 setStatusBarMessage: () => ({ dispose() {} }),
                 onDidChangeActiveTextEditor: listener => { listeners.editor.push(listener); return { dispose() {} }; }
             },

@@ -265,6 +265,47 @@ code {
     opacity: 0.8;
 }
 
+.working-time {
+    opacity: 0.7;
+    font-variant-numeric: tabular-nums;
+}
+
+.scroll-down {
+    align-self: center;
+    /* Overlaps the end of the chat instead of taking a line of its own */
+    margin-top: -32px;
+    position: relative;
+    z-index: 1;
+    border-radius: 12px;
+    padding: 2px 12px;
+}
+
+.activity-group {
+    margin: 2px 0;
+}
+
+/* Looks like a single activity line */
+.activity-group > summary {
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.9em;
+    opacity: 0.65;
+    margin-left: var(--gap);
+    font-family: var(--vscode-editor-font-family);
+}
+
+.activity-group > summary::-webkit-details-marker {
+    display: none;
+}
+
+.activity-group[open] > summary {
+    margin-bottom: 2px;
+}
+
+.activity-group > .entry.activity {
+    margin-left: calc(var(--gap) * 2);
+}
+
 #working[hidden] {
     display: none;
 }

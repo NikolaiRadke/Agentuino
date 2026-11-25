@@ -21,6 +21,10 @@
     const BAR_WARNING_PERCENT = 75;
     // More suggestions than this are cut, typing narrows them down
     const MAX_SUGGESTIONS = 100;
+    // Closer to the end than this counts as "at the end", so new entries scroll along
+    const SCROLL_SLACK_PX = 40;
+    const SECOND_MS = 1000;
+    const SECONDS_PER_MINUTE = 60;
 
     const elements = {
         messages: $('messages'),
@@ -37,6 +41,8 @@
         cost: $('cost'),
         working: $('working'),
         workingText: $('workingText'),
+        workingTime: $('workingTime'),
+        scrollDown: $('scrollDown'),
         attachments: $('attachments'),
         modelChoice: $('modelChoice'),
         model: $('model'),
@@ -49,6 +55,9 @@
     let texts = {};
     let locale = 'en';
     let busy = false;
+    // Follow new entries only while the user is at the end of the chat
+    let followEnd = true;
+    let busyTimer = null;
     let chats = [];
     let currentChatId = null;
     let snapshotTime = null;
@@ -278,14 +287,14 @@
         if (role === 'compile' && data) {
             renderCompile(entry, data, time);
             elements.messages.appendChild(entry);
-            elements.messages.scrollTop = elements.messages.scrollHeight;
+            keepScroll();
             return;
         }
 
         if (role === 'changes' && data) {
             renderChanges(entry, data);
             elements.messages.appendChild(entry);
-            elements.messages.scrollTop = elements.messages.scrollHeight;
+            keepScroll();
             return;
         }
 
@@ -319,9 +328,65 @@
             if (loginAgent) entry.append(' ', createLoginButton(texts.loginButton, loginAgent));
         }
 
-        elements.messages.appendChild(entry);
+        if (role === 'activity') {
+            addActivity(entry, text);
+        } else {
+            elements.messages.appendChild(entry);
+        }
+        keepScroll();
+    }
+
+    /**
+     * Add an activity line; consecutive ones are folded into one line
+     * with the latest step and the number of steps, like other chats do
+     * @param {HTMLElement} entry - Activity entry
+     * @param {string} text - Activity text
+     */
+    function addActivity(entry, text) {
+        const last = elements.messages.lastElementChild;
+        let group = last?.classList.contains('activity-group') ? last : null;
+        if (!group && last?.classList.contains('activity')) {
+            group = document.createElement('details');
+            group.className = 'activity-group';
+            group.appendChild(document.createElement('summary'));
+            last.replaceWith(group);
+            group.appendChild(last);
+        }
+        if (!group) {
+            elements.messages.appendChild(entry);
+            return;
+        }
+        group.appendChild(entry);
+        const count = group.querySelectorAll(':scope > .entry.activity').length;
+        group.firstElementChild.textContent = `› ${text} · ${texts.steps.replace('{0}', count)}`;
+    }
+
+    /**
+     * After new content: stay at the end if the user was there, otherwise offer the jump button
+     */
+    function keepScroll() {
+        if (followEnd) {
+            elements.messages.scrollTop = elements.messages.scrollHeight;
+        } else {
+            elements.scrollDown.hidden = false;
+        }
+    }
+
+    /**
+     * Jump to the end and follow new entries again
+     */
+    function scrollToEnd() {
+        followEnd = true;
+        elements.scrollDown.hidden = true;
         elements.messages.scrollTop = elements.messages.scrollHeight;
     }
+
+    elements.messages.addEventListener('scroll', () => {
+        const m = elements.messages;
+        followEnd = m.scrollHeight - m.scrollTop - m.clientHeight < SCROLL_SLACK_PX;
+        if (followEnd) elements.scrollDown.hidden = true;
+    });
+    elements.scrollDown.addEventListener('click', scrollToEnd);
 
     /**
      * Button that opens the login of an agent in the system terminal
@@ -555,7 +620,7 @@
         card.append(after, buttons);
 
         elements.messages.appendChild(card);
-        elements.messages.scrollTop = elements.messages.scrollHeight;
+        keepScroll();
     }
 
     /**
@@ -576,6 +641,27 @@
     }
 
     /**
+     * Show how long the agent has been working, so a long run visibly lives
+     */
+    function updateBusyTimer() {
+        if (!busy) {
+            clearInterval(busyTimer);
+            busyTimer = null;
+            elements.workingTime.textContent = '';
+            return;
+        }
+        if (busyTimer) return;
+        const start = Date.now();
+        const show = () => {
+            const seconds = Math.floor((Date.now() - start) / SECOND_MS);
+            const rest = String(seconds % SECONDS_PER_MINUTE).padStart(2, '0');
+            elements.workingTime.textContent = `${Math.floor(seconds / SECONDS_PER_MINUTE)}:${rest}`;
+        };
+        show();
+        busyTimer = setInterval(show, SECOND_MS);
+    }
+
+    /**
      * Update busy state of all controls
      * @param {boolean} value - Busy flag
      */
@@ -585,6 +671,7 @@
         elements.stop.hidden = !busy;
         elements.working.hidden = !busy;
         if (busy) elements.workingText.textContent = texts.working;
+        updateBusyTimer();
         elements.attach.disabled = busy;
         elements.newChat.disabled = busy;
         elements.chatTitle.disabled = busy;
@@ -632,6 +719,7 @@
         elements.model.placeholder = texts.modelDefault;
         elements.model.title = texts.modelTitle;
         elements.effort.title = texts.effortTitle;
+        elements.scrollDown.title = texts.scrollDown;
     }
 
     // ===== MODEL AND EFFORT =====
@@ -880,6 +968,16 @@
             date.textContent = formatTime(chat.updated);
             info.append(title, date);
 
+            const rename = document.createElement('button');
+            rename.className = 'copy-btn';
+            rename.textContent = '✎';
+            rename.title = texts.rename;
+            rename.addEventListener('click', (event) => {
+                event.stopPropagation();
+                hideChatList();
+                vscode.postMessage({ command: 'renameChat', id: chat.id });
+            });
+
             const remove = document.createElement('button');
             remove.className = 'copy-btn';
             remove.textContent = '🗑';
@@ -890,7 +988,7 @@
                 vscode.postMessage({ command: 'deleteChat', id: chat.id });
             });
 
-            item.append(info, remove);
+            item.append(info, rename, remove);
             item.addEventListener('click', () => {
                 hideChatList();
                 if (chat.id !== currentChatId) vscode.postMessage({ command: 'selectChat', id: chat.id });
@@ -993,6 +1091,8 @@
                 lastAgentName = msg.agent;
                 showSubline(msg.agent);
                 elements.messages.innerHTML = '';
+                followEnd = true;
+                elements.scrollDown.hidden = true;
                 if (msg.messages.length === 0) showWelcome();
                 msg.messages.forEach(m => addEntry(m.role, m.text, m.time, m.data));
                 renderAttachments(msg.attachments || []);
@@ -1000,6 +1100,8 @@
                 break;
             case 'entry':
                 elements.messages.querySelector('.welcome')?.remove();
+                // An own message always brings the chat back to the end
+                if (msg.role === 'user') scrollToEnd();
                 addEntry(msg.role, msg.text, msg.time, msg.data, msg.toolId, msg.loginAgent);
                 updateRestoreButtons();
                 break;

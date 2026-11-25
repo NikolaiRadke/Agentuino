@@ -114,7 +114,11 @@
     "changesDeleted": "Supprimé :",
     "changesOpen": "Ouvrir la comparaison : avant la tâche ↔ maintenant",
     "changesTitle": "{0} (avant la tâche ↔ maintenant)",
-    "changesGone": "{0} est revenu à son état d'avant la tâche."
+    "changesGone": "{0} est revenu à son état d'avant la tâche.",
+    "steps": "{0} étapes",
+    "rename": "Renommer",
+    "renamePrompt": "Nouveau titre de ce chat",
+    "scrollDown": "Aller aux nouvelles entrées"
   },
   "tools": {
     "Read": "Lit {0}",

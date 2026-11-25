@@ -114,7 +114,11 @@
     "changesDeleted": "Gelöscht:",
     "changesOpen": "Vergleich öffnen: vor dem Auftrag ↔ jetzt",
     "changesTitle": "{0} (vor dem Auftrag ↔ jetzt)",
-    "changesGone": "{0} ist wieder wie vor dem Auftrag."
+    "changesGone": "{0} ist wieder wie vor dem Auftrag.",
+    "steps": "{0} Schritte",
+    "rename": "Umbenennen",
+    "renamePrompt": "Neuer Titel für diesen Chat",
+    "scrollDown": "Zu den neuen Einträgen"
   },
   "tools": {
     "Read": "Liest {0}",

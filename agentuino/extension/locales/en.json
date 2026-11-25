@@ -114,7 +114,11 @@
     "changesDeleted": "Deleted:",
     "changesOpen": "Open comparison: before the task ↔ now",
     "changesTitle": "{0} (before the task ↔ now)",
-    "changesGone": "{0} is back to how it was before the task."
+    "changesGone": "{0} is back to how it was before the task.",
+    "steps": "{0} steps",
+    "rename": "Rename",
+    "renamePrompt": "New title for this chat",
+    "scrollDown": "Go to the new entries"
   },
   "tools": {
     "Read": "Reading {0}",

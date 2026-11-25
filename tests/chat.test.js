@@ -345,3 +345,20 @@ test('changes line lists the files of the task, a click opens the diff of before
     await ide.message({ command: 'showChange', rel: '../../etc/passwd' });
     assert.ok(!ide.executed.some(args => args[0] === 'vscode.diff'));
 });
+
+test('a chat keeps the title the user gives it', async () => {
+    const sketch = await newSketch('Rename');
+    await ide.send('A question');
+    const id = projectManager.getLastChatId(sketch);
+    ide.answerInput = () => '  My title  ';
+    try {
+        await ide.message({ command: 'renameChat', id });
+    } finally {
+        ide.answerInput = () => undefined;
+    }
+    const chat = chatStore.loadChat(sketch, id);
+    assert.equal(chat.title, 'My title');
+    assert.equal(chat.titleByUser, true);
+    const header = ide.posted.filter(m => m.command === 'header').pop();
+    assert.equal(header.title, 'My title');
+});
