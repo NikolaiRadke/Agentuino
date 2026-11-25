@@ -1,9 +1,35 @@
 # Changelog
 
-## 1.2.1
+## 1.3.0
 
-Board per IDE window, no repeated compile checks.
+Changes view, project list, library docs, settings menu, chat comfort.
+Includes the internal version 1.2.1.
 
+- Changes line after every task that changed code: changed, new and deleted
+  files; a click opens the IDE's diff editor (before the task / now, read-only
+  old side from the snapshot). Only the last task is clickable, like reset
+- Project list (📁): Agentuino projects of the sketchbook, also in subfolders,
+  last used first. A click opens one in a new IDE window (vscode.openFolder),
+  @ inserts a mention into the input
+- AGENTS.md: change files only in the sketch, read libraries at any time and
+  other sketches when the user refers to them; sketchbook path from arduino-cli
+  (directories.user)
+- AGENTS.md: section "Libraries used" with version and folder of the installed
+  libraries the sketch includes (root and src/, board package libraries left
+  out); rule to read headers, README and examples before using an unknown library
+- Settings submenu under ⚙: language, compile check, agent permissions, Git,
+  update check, program paths. Each entry shows its value
+- Program paths: the path actually used per agent and arduino-cli, file dialog or
+  automatic detection, the chosen file is checked at once (version, minimum version)
+- New setting agentuino.gitignoreAll (default on): agentuino/.gitignore ignores
+  the whole folder; only Agentuino's own defaults are rewritten, never a file
+  the user edited
+- Update check reads installer/version.json, written only by the release build,
+  so main may carry a newer package.json
+- Chat: follows new entries only while at the end, ↓ button otherwise; activity
+  lines fold into one line with the latest step (open while the agent works);
+  running time in the working line; chats can be renamed (✎ in the chat list)
+- "Agent not found" points to Settings → Program paths
 - Board and port come from the Arduino IDE itself (built-in vscode-arduino-api):
   every IDE window has its own board, a board change arrives at once. Before, the
   newest board in the shared IDE log won, even if another window had selected it

@@ -12,7 +12,7 @@ Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Co
 > Agentuino is tested on Linux and Windows. macOS and Codex CLI are untested so far: please tell how it went in the [issues](https://github.com/NikolaiRadke/Agentuino/issues), it works or not.
 
 🆕 What's new?
-* **20.11.2026** **V1.2.1**: the board comes from the Arduino IDE itself, one board per IDE window. Failed compile checks are no longer repeated after every message.    
+* **25.11.2026** **V1.3.0**: see what changed after every task, a project list for your sketchbook, the agent reads the docs of your libraries, a settings menu and a calmer chat.    
     -- More news? Check the [newsblog](NEWS.md).
 
 ## Features
