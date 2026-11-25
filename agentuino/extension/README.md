@@ -61,6 +61,7 @@ folders in the sketches are kept.
 - **+ New** starts a new chat. Earlier chats stay available. In a new chat, click the agent name to choose another agent.
 - **↑ / ↓** in the input field recall your last five messages.
 - **📎 Attach** sends a file with the next message (e.g. a photo of your breadboard).
+- Next to it, every chat chooses its own **model and effort**; a new chat starts with the choice of the last one.
 - **↶** next to your last message resets the sketch to the state before that task.
 - After a task that changed code, a line lists the changed files; a click on a name opens
   the diff editor: before the task and now.
@@ -68,7 +69,9 @@ folders in the sketches are kept.
   The agent's steps fold into one line, the running time shows it is still at work.
 - After every run that changed code the sketch is compiled: ✅ with flash and RAM usage,
   or ❌ with the errors. The agent then gets the compiler output and fixes it on its own
-  (up to 3 runs per task); if that fails, a button starts another round.
+  (up to 3 runs per task); if that fails, a button starts another round. A failed check is
+  repeated only when the code, the board or a library changed.
+- Board and port come from the Arduino IDE itself, so every IDE window has its own board.
 - With [ArduDebug](https://github.com/NikolaiRadke/ArduDebug) installed, the agent can stop the program
   on the board at a line and read variables. It asks before uploading a debug build.
 - **⚙** opens project instructions, semantic anchors, knowledge files, project memory, the agent selection,

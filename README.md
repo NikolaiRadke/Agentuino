@@ -21,7 +21,7 @@ Agentuino drives the command line agents **Claude Code**, **Mistral Vibe**, **Co
 Like a project in Claude: several chats per sketch share your instructions, knowledge files and a project memory. The agent can look up earlier chats when you refer to them. Everything lives in a folder `agentuino/` inside your sketch.
 
 ### The agent compiles and fixes
-After every task that changed code, Agentuino compiles the sketch itself and shows the result: ✅ with flash and RAM usage, or ❌ with the errors. On errors the agent gets the compiler output and fixes the code on its own, up to three runs per task. A missing library is never installed without your ok.
+After every task that changed code, Agentuino compiles the sketch itself and shows the result: ✅ with flash and RAM usage, or ❌ with the errors. On errors the agent gets the compiler output and fixes the code on its own, up to three runs per task. A failed check is repeated only when the code, the board or a library changed, not after every question. A missing library is never installed without your ok.
 
 ### Undo with one click
 Before every task Agentuino saves the code. ↶ next to your message brings back the state before that task, including files the agent created or deleted. The agent is told about the reset.
@@ -41,6 +41,9 @@ The agent can read what your board prints with `Serial.println()` for a few seco
 ### Debugging with ArduDebug
 With [ArduDebug](https://github.com/NikolaiRadke/ArduDebug) installed, the agent can stop your sketch on the board at a line and look into the variables, without changing the code. It asks before it uploads a debug build and brings the normal sketch back when the bug is fixed.
 
+### Model and effort per chat
+Below the input field every chat chooses its own model and effort. The model field suggests what the agent offers, the effort levels fit the model. A new chat starts with the choice of the last one.
+
 ### Semantic anchors
 Switch code rules on with a click, per sketch: beginner-friendly comments, no magic numbers, non-blocking code, save RAM, interrupt-safe and more. Create your own anchors for rules you need again and again. New sketches start with your default selection.
 
@@ -50,6 +53,7 @@ The agent **never uploads on its own**, because a board can drive motors or rela
 ### More
 - Attach files to a message, e.g. a photo of your breadboard or a datasheet
 - Input history with ↑ / ↓
+- Every IDE window has its own board: Agentuino takes board and port from the Arduino IDE itself
 - Rename chats in the chat list
 - The chat follows new entries only while you are at the end; ↓ brings you back. The agent's steps fold into one line, the running time shows that it is still at work
 - Everything else in ⚙ → *Settings*, including the paths of the agents and arduino-cli
